@@ -1,12 +1,54 @@
 import Cookies from 'js-cookie'
+import sessionstorage from  'sessionstorage'
 // cookie保存的天数
 import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
-
+const isApp = process.env.NODE_ENV === 'development' ? false : true //
 export const TOKEN_KEY = 'token'
 
 export const setToken = (token) => {
   Cookies.set(TOKEN_KEY, token, {expires: config.cookieExpires || 1,path: '/'})
+}
+
+export const setSession = (key,value) => {
+  sessionstorage.setItem(key, value);
+  // if(isApp){
+  //   window.api.setPrefs({
+  //       key,
+  //       value
+  //   })     
+  // }else{
+  //   sessionstorage.setItem(key, value);
+  // }
+  
+}
+
+export const getSession  = (key) => {
+  const value = sessionstorage.getItem(key);
+  if (value) return value
+  else return ''
+  // if(isApp){
+  //   const value = window.api.getPrefs({
+  //         sync: true,
+  //         key
+  //     })
+  //   if (value) return value
+  //   else return ''
+  // }else{
+  //   const value = sessionstorage.getItem(key);
+  //   if (value) return value
+  //   else return ''
+  // }
+ 
+}
+
+export const removeSession = (key) => {
+  sessionstorage.removeItem(key);
+  // if(isApp){
+  //   window.api.removePrefs({key})
+  // }else{
+  //   sessionstorage.removeItem(key);
+  // }
 }
 
 export const setCookie = (key,value) => {
@@ -17,6 +59,8 @@ export const setCookie = (key,value) => {
 export const removeCookie = (key) => {
 	 Cookies.remove(key, {path: '/'});
 }
+
+
 
 export const getCookie = (key) => {
   //debugger

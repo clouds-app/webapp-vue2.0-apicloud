@@ -1,6 +1,6 @@
-import Home from '@/pages/home/App.vue'
+//import Home from '@/pages/home/App.vue'
 import Menu from '@/components/Menu'
-import Login from '@/pages/login/App.vue'
+//import Login from '@/pages/login/App.vue'
 export default[
     {
       path: '/',
@@ -8,13 +8,23 @@ export default[
       component: Menu
     },
     {
+      path: '/index',
+      name: 'index',
+      component: Menu
+    },
+    {
       path: '/home',
       name: 'home',
-      component: Home
+      component: () => import(/* webpackChunkName: "UserCenter" */ '@/pages/home/home.vue'),
     },
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: () => import(/* webpackChunkName: "UserCenter" */ '@/pages/login/login.vue'),
+    },
+    {
+      path: '/payment',
+      name: 'payment',
+      component: () => import(/* webpackChunkName: "UserCenter" */ '@/pages/payment/payment.vue'),
     }
   ]

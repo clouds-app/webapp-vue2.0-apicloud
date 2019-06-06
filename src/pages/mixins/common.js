@@ -29,6 +29,15 @@ export default {
           return otherH
         }
       },
+         //获取设备编码
+         getDeviceId(){
+          let deviceId = 'dk408F8B-9598-48B6-A740-B9037ADCXXXE'
+          if(process.env.NODE_ENV === 'production'){
+               deviceId = window.api.deviceId;  //比如： FC408F8B-9598-48B6-A740-B9037ADCXXXE
+               console.log('login deviceId :' +deviceId)
+          }
+          return deviceId
+      },
       
     },
     mounted(){

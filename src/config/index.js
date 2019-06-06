@@ -3,6 +3,12 @@ export default {
      * @description 默认页面标题
      */
      title: 'webApp',
+
+    /**
+     * @description 测试deviceId
+     */
+    deviceId: 'dk408F8B-9598-48B6-A740-B9037ADCXXXE',
+
     /**
      * @description token在Cookie中存储的天数，默认1天
      */
@@ -12,7 +18,7 @@ export default {
      */
     baseUrl: {
       dev: '',
-      pro: 'http://shop.szclsoft.com/clerp-getway-admin/'
+      pro: 'http://shop.szclsoft.com/clerp-getway-admin'
     },
     
 	baseImgUrl:'http://shop.szclsoft.com',

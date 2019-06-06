@@ -1,7 +1,7 @@
 <template>
   <div id="app">
      
-    <NavBar title="登  陆"/>
+    <NavBar title="注 册" :hideArrow="true"/>
     
     <LoginForm/>
   </div>
