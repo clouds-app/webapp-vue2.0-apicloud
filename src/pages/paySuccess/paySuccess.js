@@ -1,13 +1,12 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './payment.vue'
+import App from './paySuccess.vue'
 import store from '@/store'
 import config from '@/config'
 
 import Vant from 'vant';
 import 'vant/lib/index.css';
-
 Vue.use(Vant);
 /**
  * @description 全局注册应用配置 add by andy 

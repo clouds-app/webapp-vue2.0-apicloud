@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie'
-import sessionstorage from  'sessionstorage'
+import localStorage from 'localStorage'
 // cookie保存的天数
 import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
@@ -10,46 +10,42 @@ export const setToken = (token) => {
   Cookies.set(TOKEN_KEY, token, {expires: config.cookieExpires || 1,path: '/'})
 }
 
-export const setSession = (key,value) => {
-  sessionstorage.setItem(key, value);
-  // if(isApp){
-  //   window.api.setPrefs({
-  //       key,
-  //       value
-  //   })     
-  // }else{
-  //   sessionstorage.setItem(key, value);
-  // }
+// 设置数据存储
+export const setLocalStorage = (key,value) => {
+  if(isApp){
+    $api.setStorage(key,value)
+  }else{
+    localStorage.setItem(key, value);
+  }
   
 }
 
-export const getSession  = (key) => {
-  const value = sessionstorage.getItem(key);
-  if (value) return value
-  else return ''
-  // if(isApp){
-  //   const value = window.api.getPrefs({
-  //         sync: true,
-  //         key
-  //     })
-  //   if (value) return value
-  //   else return ''
-  // }else{
-  //   const value = sessionstorage.getItem(key);
-  //   if (value) return value
-  //   else return ''
-  // }
+// 获取数据存储
+export const getLocalStorage  = (key) => {
+  if(isApp){
+    const value = $api.getStorage(key)
+    if (value) return value
+    else return ''
+  }else{
+
+    const value = localStorage.getItem(key);
+    if (value) return value
+    else return ''
+  }
+}
+
+// 移除指定数据存储
+export const removeLocalStorage = (key) => {
+  if(isApp){
+    $api.rmStorage(key)
+  }else{
+    localStorage.removeItem(key);
+  }
  
 }
 
-export const removeSession = (key) => {
-  sessionstorage.removeItem(key);
-  // if(isApp){
-  //   window.api.removePrefs({key})
-  // }else{
-  //   sessionstorage.removeItem(key);
-  // }
-}
+
+
 
 export const setCookie = (key,value) => {
   //不设置path 会导致延时，不即时

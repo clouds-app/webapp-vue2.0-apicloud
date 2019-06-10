@@ -16,15 +16,15 @@ export const turnToPage = (params) => {
     if (isApp) {
      //正式环境
      window.api.openWin({
-          name: `${params}`,
-          url: `./${params}.html`,
+          name: `${params.name}`,
+          url: `./${params.name}.html`,
           pageParam: {
               name: 'test'
           }
        })
     } else{
      //测试环境
-      router.push(`/${params}`)
+      router.push(`/${params.name}`)
  
     }
 

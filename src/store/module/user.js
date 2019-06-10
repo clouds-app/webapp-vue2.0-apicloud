@@ -1,21 +1,19 @@
 /* eslint-disable */
-import { login,checkLogin,userRegister} from '@/api/user'
-import { setToken, getToken,setCookie,getCookie,setSession,getSession} from '@/libs/util'
+import { checkLogin,userRegister} from '@/api/user'
+import { setCookie,getCookie,setLocalStorage,getLocalStorage} from '@/libs/util'
 const serverBusyTips="服务繁忙，请稍后再试！";
 
 
 export default {
    //使用方法：this.$store.state.user.属性名称
     state: {
-      statusCheck:getSession('statusCheck'),
-      token: getToken(),
-      userSystemId:getCookie('userSystemId'),
-      userInfo:getCookie('userInfo'),
-      paymentStatus:getSession('paymentStatus'),
+      statusCheck:getCookie('statusCheck'),
+      userSystemId:getLocalStorage('userSystemId'),
+      userInfo:getLocalStorage('userInfo'),
+      paymentStatus:getCookie('paymentStatus'),
     },
     //使用方法：this.$store.getters.属性名称
     getters:{
-      token_state:state=>state.token,
       userSystemId_state:state=>state.userSystemId,
       statusCheck_state:state=>state.statusCheck,
       userInfo_state:state=>state.userInfo,
@@ -30,29 +28,25 @@ export default {
     },
     //使用方法：this.$store.commit('method name',data)
     mutations: {
-      setToken (state, token) {
-        state.token = token
-        setToken(token)
-      },
       //用户SystemId 登陆后服务返回
       setUserSystemId (state, data) {
         state.userSystemId = data
-        setCookie('userSystemId',data)
+        setLocalStorage('userSystemId',data)
       },
       //用户续费选择状态
       setStatusCheck (state, data) {
         state.statusCheck = data
-        setSession('statusCheck',data)
+        setCookie('statusCheck',data)
       },
       //保存用户信息
       setUserInfo (state, data) {
         state.userInfo = data
-        setCookie('userInfo',JSON.stringify(data))
+        setLocalStorage('userInfo',JSON.stringify(data))
       },
        //保存用户付款套餐状态
        setPaymentStatus (state, data) {
         state.paymentStatus = data
-        setSession('paymentStatus',JSON.stringify(data))
+        setCookie('paymentStatus',JSON.stringify(data))
       }
     },
     //使用方法：this.$store.dispatch('method name',params)

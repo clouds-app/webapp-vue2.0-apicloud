@@ -1,6 +1,10 @@
-//import Home from '@/pages/home/App.vue'
+import home from '@/pages/home/home.vue'
+import login from '@/pages/login/login.vue'
+import chargeList from '@/pages/chargeList/chargeList.vue'
+import payment from '@/pages/payment/payment.vue'
+import payFail from '@/pages/payFail/payFail.vue'
+import paySuccess from '@/pages/paySuccess/paySuccess.vue'
 import Menu from '@/components/Menu'
-//import Login from '@/pages/login/App.vue'
 export default[
     {
       path: '/',
@@ -15,16 +19,38 @@ export default[
     {
       path: '/home',
       name: 'home',
-      component: () => import(/* webpackChunkName: "UserCenter" */ '@/pages/home/home.vue'),
+      component: home
+    
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import(/* webpackChunkName: "UserCenter" */ '@/pages/login/login.vue'),
+      component: login
+   
+    },
+    {
+      path: '/chargeList',
+      name: 'chargeList',
+      component: chargeList
+     
     },
     {
       path: '/payment',
       name: 'payment',
-      component: () => import(/* webpackChunkName: "UserCenter" */ '@/pages/payment/payment.vue'),
+      component: payment
+    
+    }
+    ,
+    {
+      path: '/payFail',
+      name: 'payFail',
+      component: payFail
+    }
+    ,
+    {
+      path: '/paySuccess',
+      name: 'paySuccess',
+      component: paySuccess
+     
     }
   ]

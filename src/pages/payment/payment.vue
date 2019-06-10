@@ -1,37 +1,33 @@
 <template>
   <div id="app">
-      <NavBar title="支 付"/>
-       <userStatus/>
-    
-
-        <van-cell-group title="">
-          <van-cell>
-             <template slot="title">
-              <div>
-                  <van-collapse v-model="activeName" accordion>
-                  <van-collapse-item title="选择套餐" name="1">
-                      <van-card v-for="(item) in ChargeList" :key="item.id"
-                        num="1"
-                        tag=""
-                        :price="item.serverPrice"
-                        :title="item.serverName"
-                        :origin-price="item.serverPrice+item.serverPriceDiscount"
-                      >
-                    <div slot="desc" style="margin:10px;">
-                     <van-cell :title="`有效时长(天)：${item.serverUseTime}`"  />
-                    </div>
-                    <div slot="footer">
-                      <van-button tapmode :loading='isLoding' round @click="handleSubmit(item)" type="primary" size="normal">购买</van-button>
-                    </div>
-                  </van-card>
-                  </van-collapse-item>
-                </van-collapse>
-              
-              </div>
-             </template>
-          </van-cell>
+    <div class="payment">
+        <NavBar title="支 付"/>
+        <userStatus/>
+        <van-cell-group>
+          <van-cell title="订单编号" :value="orderItem.orderNo" />
+          <!-- <van-cell title="实付金额"><span class="red">{{orderItem.orderPrice}}</span></van-cell> -->
         </van-cell-group>
-       <!-- <Footer></Footer> -->
+
+      <div class="pay_way_group">
+        <div class="pay_way_title">选择支付方式</div>
+         <van-radio-group v-model="payWay">
+          <van-cell-group>
+            <van-cell @click="payWay='2'">
+              <van-radio name="2" @click="payWay='2'">
+                <img src="../../../static/images/ali_pay.png" alt="支付宝" width="82" height="29">
+              </van-radio>
+            </van-cell>
+            <van-cell @click="payWay='1'">
+              <van-radio name="1" @click="payWay='1'">
+                <img src="../../../static/images/wx_pay.png" alt="微信支付" width="113" height="23">
+              </van-radio>
+            </van-cell>
+          </van-cell-group>
+        </van-radio-group>
+      </div>
+      <van-button class="pay_submit" @click="paySubmit" :loading="isSubmit"  round  long type="primary" size="large">去支付</van-button>
+		
+	</div>
   </div>
 </template>
 
@@ -39,9 +35,8 @@
 import userStatus from '_c/userStatus'
 import base_mixin from '@/pages/mixins/common'
 import NavBar from '_c/header'
-import {getViewportSize} from '@/libs/switchMethods'
 import Footer from '@/components/footer'
-import {setCookie,getCookie,setSession,getSession} from '@/libs/util'
+import {getCookie,getLocalStorage} from '@/libs/util'
 export default {
   name: 'payment',
   mixins:[base_mixin],
@@ -50,77 +45,125 @@ export default {
   },
    data() {
             return {
-                  isLoding:false,
-                  activeName: '1',
-                  ChargeList:[],
+				    jsAPIConfig: {},
+                    orderItem:{
+                      orderNo:'0',
+                      orderPrice:'0'
+                    },
+                    payWay:'2',
+                    isSubmit:false,
                 }
         },
    methods:{
-      //获取收费信息
-       getChargeList(){
-         let params ={}
-          let _self=this
-          this.$store.dispatch('getChargeList_actions',params).then(res=>{
-            // debugger
-              _self.ChargeList =res.data
-          }).catch(err=>{
-             //console.log('获取收费信息列表 失败'+JSON.stringify(err))
-             _self.$toast('获取收费信息列表 失败'+err);
-          })
-       },
-       //购买套餐下单
-        handleSubmit2(item){
-          debugger
-            if(item && item.id!=null){
-              
-                let params={
-                  systemId : getCookie('userSystemId'),
-                  serverId :item.id
-                }
-                // console.log(params.systemId,params.serverId)
-                  let _self=this
-                  this.$store.dispatch('orderSubmit_action',params).then(res=>{
-                    _self.$toast('下单成功！');
-                   //return done
-                  }).catch(err=>{
-                    _self.$toast('下单错误：'+err);
-                   //return done
-                  })
-                }
-            
-        },
-        handleSubmit(item) {
-          let _self=this
-          function beforeClose(action, done) {
-            if (action === 'confirm') {
-              if(item && item.id!=null){
-                let params={
-                  systemId : getCookie('userSystemId'),
-                  serverId :item.id
-                }
-                  _self.$store.dispatch('orderSubmit_action',params).then(res=>{
-                   setTimeout(done, 0);
-                     _self.$toast('下单成功！')
-                  }).catch(err=>{
-                    setTimeout(done, 0);
-                    _self.$toast('下单错误：'+err)
-                  })
-                }
-              
-            } else{
-               done()
+     //确认支付
+     paySubmit(){
+        this.orderPayment()
+     },
+     //支付逻辑处理
+     orderPayment(){
+       let params = {
+        orderNo:this.orderItem.orderNo,
+        payType:this.payWay
+       }
+        let _self=this
+        debugger
+        this.$store.dispatch('orderPayment_action',params).then(res=>{
+            if(_self.payWay == '2'){//支付宝
+              _self.payByAlipay(res,_self)
             }
-          }
-          this.$dialog.confirm({
-            title: '确认购买？',
-            message: `<ul style="text-align:left; "><li>套餐：${item.serverName}</li><li>价格：${item.serverPrice}</li><li>有效时长(天)：${item.serverUseTime}</li></ul> `,
-            beforeClose
+        }).catch(err=>{
+            debugger
+             _self.$toast('支付失败：'+err);
+        })
+     },
+     //支付宝--支付
+     payByAlipay(resData,_self){
+       let aliPayPlus = window.api.require('aliPayPlus')
+         console.log("aliPayPlus"+ JSON.stringify(aliPayPlus) )
+          aliPayPlus.payOrder({
+              orderInfo: resData.data
+          }, function(ret, err) {
+              window.api.alert({
+                  title: '支付结果',
+                  msg: ret.code,
+                  buttons: ['确定']
+              });
           });
+     },
+     //微信--支付
+     payByWeChat(res,_self){
+       	if (res.data.trade_type == 'JSAPI') {
+							_self.jsAPIConfig = res.data.data;
+							if (typeof WeixinJSBridge == "undefined") {
+								if (document.addEventListener) {
+									document.addEventListener('WeixinJSBridgeReady', _self.wxJSAPIPay, false);
+								} else if (document.attachEvent) {
+									document.attachEvent('WeixinJSBridgeReady', _self.wxJSAPIPay);
+									document.attachEvent('onWeixinJSBridgeReady', _self.wxJSAPIPay);
+								}
+							} else {
+								_self.wxJSAPIPay();
+							}
+						} else {
+							if(res.data.data == null){
+								_self.showErrorNotify('调用微信支付失败，请稍后再试');
+								return;
+							}
+							window.location.href = res.data.data;
+							_self.$dialog.confirm({
+								  title: '支付提示',
+								  message: '是否完成支付?',
+								  beforeClose:_self.orderPayStatusCheck
+							});
+						}   	
       },
-      //
-   },
+     //获取订单信息
+     getOrderInfo(){
+      let orderInfo = getLocalStorage('orderInfo')
+      //debugger
+      if(orderInfo!=""){
+                let order =JSON.parse(orderInfo)
+                this.orderItem.orderNo =order.orderNo
+                this.orderItem.orderPrice =order.payPrice
+
+            }
+
+     },
+     //微信支付
+			wxJSAPIPay() {
+				let config = this.jsAPIConfig;
+				let _self = this;
+				WeixinJSBridge.invoke(
+					'getBrandWCPayRequest', config,
+					function(res) {
+						if (res.err_msg == "get_brand_wcpay_request:ok") {
+							_self.orderPayStatusCheck();
+						} else {
+							//支付失败
+							 _self.turnToPage('payFail') 
+						}
+					});
+			},
+			orderPayStatusCheck(){
+				let _self = this;
+				_self.$store.dispatch('getOrderPayStatus', {orderNo: _self.orderItem.orderNo}).then(res => {
+					_self.$dialog.close();
+					//支付成功
+					 _self.turnToPage('paySuccess') 
+				}).catch(res=>{
+					_self.$dialog.close();
+					//支付失败
+					 _self.turnToPage('payFail') 
+				})
+      },
+      checkWxEnv(){
+				let ua = navigator.userAgent.toLowerCase();
+				this.wxEnv = ua.match(/MicroMessenger\/[0-9]/i);
+      },
+     },//end
    mounted(){
-     this.getChargeList()
+     //订单信息
+     this.getOrderInfo()
    }
 
 }
@@ -130,12 +173,32 @@ export default {
   text-align: center;
  
 }
-.van-card__title{
-  font-weight: bold;
-}
-.van-card__price{
-  font-size: 16px;
-  font-weight: bold;
-}
+.van-cell {
+		text-align: left;
+	}
+
+	.payment_group {
+		margin-bottom: 10px;
+	}
+
+	.time_down {
+		background-color: #fffeec;
+		padding: 10px 15px;
+	}
+
+	.pay_submit {
+		margin-top: 20px;
+	
+		width: 100%;
+	}
+
+	.pay_way_group img {
+		vertical-align: middle;
+	}
+
+	.pay_way_title {
+		padding: 15px;
+		background-color: #fff;
+	}
 </style>
 

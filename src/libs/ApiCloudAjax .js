@@ -21,16 +21,22 @@ var options = {
     // 响应失败拦截器
     // 默认把错误信息和出错接口向上抛出
     interceptorResErr: (err,  res, rej) => {
+      
       console.warn('响应失败拦截器:'+JSON.stringify(err))
       let { data, config } = err;
       if (data.statusCode === 0) {
         // 广播网络错误
-        api.sendEvent({name: 'netError'})
+        window.api.sendEvent({name: 'netError'})
       }
       return rej({...err.data, url: err.config.url})
     },
     // 请求拦截器
     interceptorReq: (config) => {
+       // 加载loading
+       window.api.showProgress({
+        title:"获取数据中...",
+        text: '请稍等...'
+        });
       console.warn('请求拦截器:'+JSON.stringify(config))
       return config
     }
@@ -73,10 +79,14 @@ var options = {
 
           // 将结果传入对应的拦截器中,并把最后的成功/失败判定权转移到连接器中
           if (!!ret) {
+             //取消loading
+             window.api.hideProgress();
            // console.warn('---------options.interceptorResSuc -----')
             options.interceptorResSuc({data: ret, config: _arg}, res, rej);
           }
           else {
+             //取消loading
+             window.api.hideProgress();
            // console.warn('---------options.interceptorResErr -----')
             options.interceptorResErr({data: err, config: _arg}, res, rej);
           }

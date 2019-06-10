@@ -10,7 +10,8 @@
     </div>
 </template>
 <script>
-import {setCookie,getCookie,setSession,getSession} from '@/libs/util'
+import EventListener from '@/apiCloud/EventListener'
+import {getCookie,getLocalStorage} from '@/libs/util'
 export default {
     name:'userStatus',
     data(){
@@ -26,8 +27,8 @@ export default {
     methods:{
         initUserInfo(){
             //debugger
-            let userInfo = getCookie('userInfo')
-            let userPaymentStatus = getSession('paymentStatus')
+            let userInfo = getLocalStorage('userInfo')
+            let userPaymentStatus = getCookie('paymentStatus')
             if(userInfo!=""){
                 let user =JSON.parse(userInfo)
                 this.userTelephone =user.phoneNo
@@ -37,7 +38,18 @@ export default {
                  let userPaymentItem =JSON.parse(userPaymentStatus)
                  this.userPaymentMsg = userPaymentItem.msg
             }
-        }
+        },
+        //注册监听事件，apiCloud 内部事件
+       initEventListenter(){
+        //    EventListener.MessageRegister('userInfoChange').then(res=>{
+        //        this.initUserInfo()
+        //        api.toast({
+        //             msg: '用户状态变更',
+        //             duration: 1500,
+        //             location: 'middle'
+        //         })
+        //    })
+       }
     }
 }
 </script>

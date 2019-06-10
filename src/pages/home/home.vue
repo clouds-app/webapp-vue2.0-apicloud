@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-      <NavBar title="首  页"/>
+      <NavBar title="数 据"/>
 
         <div class="dataTable">
             <v-table
@@ -20,7 +20,7 @@
 import base_mixin from '@/pages/mixins/common'
 import NavBar from '_c/header'
 import LoginForm from '_c/login-form'
-import {getViewportSize} from '@/libs/switchMethods'
+
 import Footer from '@/components/footer'
 export default {
   name: 'home',

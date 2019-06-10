@@ -1,6 +1,6 @@
 <template>
     <div class="loginForm-container">
-    <van-cell-group>
+     <van-cell-group>
             <van-field
                 v-model="loginForm.name"
                 required
@@ -34,6 +34,7 @@
             <van-cell-group>
                 <van-button :disabled="disabledLogin" :loading="loadingSubmit" loading-txt="提交中.." @click="handleLogin()" round  long type="primary" size="large">注 册</van-button>
             </van-cell-group>
+          
     </div>
 </template>
 <script>
@@ -55,31 +56,31 @@ export default {
         }
     },
     computed:{ //只能计算DATA中的属性数据
-        watchLoginForm(){
-            if(this.loginForm.name.length > 0 && this.loginForm.phoneNo.length > 0 && this.loginForm.userCode.length > 0){
-                return true
-            }else{
-                return false
-            }
-        }
+         watchLoginForm(){
+             if(this.loginForm.name.length > 0 && this.loginForm.phoneNo.length > 0 && this.loginForm.userCode.length > 0){
+                 return true
+             }else{
+                 return false
+             }
+         }
     },
     //如果watch监测的是一个对象的话，直接使用watch是不行的，此时我们可以借助于computed计算属性来完成
     watch:{
         //监控数据的变化 是否可以提交 登陆按钮 【取反】
-      watchLoginForm(val) {
-          if(val){
-               this.disabledLogin=false 
-          }else{
-               this.disabledLogin=true
-          }
-      }
+       watchLoginForm(val) {
+           if(val){
+                this.disabledLogin=false 
+           }else{
+                this.disabledLogin=true
+           }
+       }
     },
     mounted(){
          //首次验证数据
-        this.CheckDataBeforeMount()
+        //this.CheckDataBeforeMount()
     },
     methods:{
-        //登陆
+        // //登陆
         handleLogin(){
             this.loadingSubmit=true
             if(this.checkInputData()){
@@ -89,13 +90,12 @@ export default {
                let _self=this
                this.$store.dispatch('handleUserRegister',params).then(res=>{
                      _self.loadingSubmit=false 
-                     switchMethods.turnToPage('index')
+                     this.turnToPage('index')
                     _self.$toast('注册成功');
                }).catch(err=>{
                    _self.loadingSubmit=false 
                   _self.$toast('注册失败: '+err);
-                  
-                // switchMethods.turnToPage('home') //测试跳转
+
                })
                
             }else{
@@ -104,15 +104,6 @@ export default {
             }
             
         },
-         //获取设备编码
-    //    getDeviceId(){
-    //        let deviceId = 'dk408F8B-9598-48B6-A740-B9037ADCXXXE'
-    //        if(process.env.NODE_ENV === 'production'){
-    //             deviceId = window.api.deviceId;  //比如： FC408F8B-9598-48B6-A740-B9037ADCXXXE
-    //             console.log('login deviceId :' +deviceId)
-    //        }
-    //        return deviceId
-    //    },
         //数据验证
         checkInputData(){
             let flag=true
@@ -134,7 +125,7 @@ export default {
             if(this.checkInputData()){
                 this.disabledLogin=false
             }
-        },
+        }
        
         
     }
