@@ -18,6 +18,8 @@ export const turnToPage = (params) => {
      window.api.openWin({
           name: `${params.name}`,
           url: `./${params.name}.html`,
+          reload:true,
+          slidBackEnabled:false,
           pageParam: {
               name: 'test'
           }

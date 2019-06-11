@@ -13,9 +13,9 @@
                       <van-card v-for="(item) in ChargeList" :key="item.id"
                         num="1"
                         tag=""
-                        :price="item.serverPrice"
+                        :price="item.discountPrice"
                         :title="item.serverName"
-                        :origin-price="item.serverPrice+item.serverPriceDiscount"
+                        :origin-price="item.serverPrice"
                       >
                     <div slot="desc" style="margin:10px;">
                      <van-cell :title="`有效时长(天)：${item.serverUseTime}`"  />

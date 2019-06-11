@@ -18,6 +18,7 @@
 </template>
 <script>
 const isApp = process.env.NODE_ENV === 'development' ? false : true 
+import * as switchMethods  from '@/libs/switchMethods'
 export default {
     name:'NavBar',
     props:{
@@ -28,14 +29,26 @@ export default {
         hideArrow:{
             type:Boolean,
             default:true
+        },
+        returnUrl:{
+            type:String,
+            default:''
         }
     },
     methods:{
         onClickLeft() {
-            location.href="javascript:history.go(-1)";  
-            if(isApp){
-                window.api.closeWin()
+            if(this.returnUrl!=""){
+                 let params ={
+                     name:this.returnUrl
+                 }
+                switchMethods.turnToPage(params)
+            }else{
+                location.href="javascript:history.go(-1)";  
+                if(isApp){
+                    window.api.closeWin()
+                }
             }
+         
         },
         onClickRight() {
 

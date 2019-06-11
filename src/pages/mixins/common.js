@@ -22,8 +22,8 @@ export default {
       },
       fixHeaderStatusBar(){
         if(process.env.NODE_ENV === 'production'){
-          // let header = $api.byId('appheader');
-          // $api.fixStatusBar(header);
+          let header = $api.byId('appheader');
+          $api.fixStatusBar(header);
         }
        
       },
@@ -49,7 +49,7 @@ export default {
       
     },
     mounted(){
-     // this.fixHeaderStatusBar();
+      this.fixHeaderStatusBar();
     }
   };
   

@@ -5,6 +5,7 @@
                 v-model="loginForm.name"
                 required
                 clearable
+                maxlength="11"
                 label="用户名"
                 right-icon="question-o"
                 placeholder="请输入用户名"
@@ -14,16 +15,20 @@
                 v-model="loginForm.phoneNo"
                 required
                 clearable
+                maxlength="11"
                 label="手机号"
+                type="number"
                 right-icon="question-o"
                 placeholder="请输入手机号"
+                :error-message="phoneError"
                 @click-right-icon="$toast('请输入手机号')"
             />
 
             <van-field
                 v-model="loginForm.userCode"
                 label="授权码"
-                clearable
+                 clearable
+                 maxlength="11"
                  right-icon="question-o"
                 placeholder="请输入授权码"
                @click-right-icon="$toast('请输入授权码')"
@@ -32,7 +37,8 @@
             </van-cell-group>
             <div style="margin-top:10px;height:1px;"></div>
             <van-cell-group>
-                <van-button :disabled="disabledLogin" :loading="loadingSubmit" loading-txt="提交中.." @click="handleLogin()" round  long type="primary" size="large">注 册</van-button>
+              
+                <van-button style="width:250px" :disabled="disabledLogin" :loading="loadingSubmit" loading-txt="提交中.." @click="handleLogin()" round  type="primary" size="normal">注 册</van-button>
             </van-cell-group>
           
     </div>
@@ -47,6 +53,7 @@ export default {
         return {
             loadingSubmit:false,
             disabledLogin:false,
+            phoneError:'',
             loginForm:{
                 name:'',
                 phoneNo:'',
@@ -77,7 +84,7 @@ export default {
     },
     mounted(){
          //首次验证数据
-        //this.CheckDataBeforeMount()
+        this.CheckDataBeforeMount()
     },
     methods:{
         // //登陆
@@ -90,8 +97,8 @@ export default {
                let _self=this
                this.$store.dispatch('handleUserRegister',params).then(res=>{
                      _self.loadingSubmit=false 
+                     _self.$toast('注册成功')
                      this.turnToPage('index')
-                    _self.$toast('注册成功');
                }).catch(err=>{
                    _self.loadingSubmit=false 
                   _self.$toast('注册失败: '+err);
@@ -99,25 +106,44 @@ export default {
                })
                
             }else{
-           
-                  this.$toast('请填写必要信息');
+                  this.loadingSubmit=false 
+                  
+                  //this.$toast('请填写必要信息');
             }
             
         },
         //数据验证
         checkInputData(){
             let flag=true
+            this.phoneError=''
+            if(this.loginForm.name ==""){
+               flag =false
+            }
+            if(this.loginForm.phoneNo==""){
+                flag =false
+            }
+           if(this.loginForm.userCode==""){
+               flag =false
+            }
+            if(this.loginForm.phoneNo!=""){
+               if(!this.isPoneAvailable(this.loginForm.phoneNo)){
+                   this.phoneError='手机号格式错误'
+                    flag =false
+               }
+            }
           
-            if(!this.loginForm.name !=""){
-               flag =false
-            }
-            if(!this.loginForm.phoneNo!=""){
-               flag =false
-            }
-           if(!this.loginForm.userCode!=""){
-               flag =false
-            }
             return flag
+        },
+        //手机号码校验
+        isPoneAvailable(tel){
+            //debugger
+          let myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+            if (!myreg.test(tel)) {
+                 return false;
+            } else {
+                return true;
+           }
+          
         },
         //首次验证数据
         CheckDataBeforeMount(){

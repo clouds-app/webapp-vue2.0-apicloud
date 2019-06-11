@@ -37,6 +37,7 @@ import base_mixin from '@/pages/mixins/common'
 import NavBar from '_c/header'
 import Footer from '@/components/footer'
 import {getCookie,getLocalStorage} from '@/libs/util'
+const isApp = process.env.NODE_ENV === 'development' ? false : true
 export default {
   name: 'payment',
   mixins:[base_mixin],
@@ -45,7 +46,7 @@ export default {
   },
    data() {
             return {
-				    jsAPIConfig: {},
+				            jsAPIConfig: {},
                     orderItem:{
                       orderNo:'0',
                       orderPrice:'0'
@@ -66,56 +67,94 @@ export default {
         payType:this.payWay
        }
         let _self=this
-        debugger
+        //debugger
         this.$store.dispatch('orderPayment_action',params).then(res=>{
-            if(_self.payWay == '2'){//支付宝
-              _self.payByAlipay(res,_self)
+           //debugger
+            if(res.status == 10011){ //0元使用
+                 	//支付成功
+					      _self.turnToPage('paySuccess') 
+            }else{
+             if(_self.payWay == '2'){//支付宝
+                if(isApp){
+                    _self.payByAlipay(res,_self)
+                }
+                _self.openWinforCheckState()
+            }else{
+               if(isApp){
+                   _self.payByWeChat(res,_self) //微信支付
+               }
+                _self.openWinforCheckState()
             }
+
+            }
+
         }).catch(err=>{
-            debugger
+            //debugger
              _self.$toast('支付失败：'+err);
         })
      },
+     
      //支付宝--支付
      payByAlipay(resData,_self){
        let aliPayPlus = window.api.require('aliPayPlus')
-         console.log("aliPayPlus"+ JSON.stringify(aliPayPlus) )
           aliPayPlus.payOrder({
               orderInfo: resData.data
           }, function(ret, err) {
-              window.api.alert({
-                  title: '支付结果',
-                  msg: ret.code,
-                  buttons: ['确定']
-              });
+              // window.api.alert({
+              //     title: '支付结果',
+              //     msg: ret.code,
+              //     buttons: ['确定']
+              // });
           });
      },
      //微信--支付
      payByWeChat(res,_self){
-       	if (res.data.trade_type == 'JSAPI') {
-							_self.jsAPIConfig = res.data.data;
-							if (typeof WeixinJSBridge == "undefined") {
-								if (document.addEventListener) {
-									document.addEventListener('WeixinJSBridgeReady', _self.wxJSAPIPay, false);
-								} else if (document.attachEvent) {
-									document.attachEvent('WeixinJSBridgeReady', _self.wxJSAPIPay);
-									document.attachEvent('onWeixinJSBridgeReady', _self.wxJSAPIPay);
-								}
-							} else {
-								_self.wxJSAPIPay();
-							}
-						} else {
-							if(res.data.data == null){
-								_self.showErrorNotify('调用微信支付失败，请稍后再试');
-								return;
-							}
-							window.location.href = res.data.data;
-							_self.$dialog.confirm({
-								  title: '支付提示',
-								  message: '是否完成支付?',
-								  beforeClose:_self.orderPayStatusCheck
-							});
-						}   	
+       	
+ 	      let browser = window.api.require('webBrowser')
+        let referer = 'shop.szclsoft.com://';
+        if (window.api.systemType.toLowerCase() == 'android') {
+            referer = 'http://shop.szclsoft.com';
+        }
+        browser.openView({
+              url: res.data.data,
+              headers: {
+                  Referer: referer,
+                  Scheme: 'shop.szclsoft.com'
+              },
+              rect: {
+                  x: 0,
+                  y: 64,
+                  w: 'auto',
+                  h: 'auto'
+              }
+          }, function(ret, err) {
+              switch (ret.state) {
+                  case 0:
+                      console.log('开始加载');
+                      break;
+                  case 1:
+                    console.log('加载进度发生变化');
+                      break;
+                  case 2:
+                    console.log('结束加载');
+                    setTimeout(function(){
+                      browser.closeView();
+                    },5000);
+                      break;
+                  case 3:
+                    console.log('title发生变化');
+                      break;
+                  case 4:
+                    console.log('url发生变化');
+                      break;
+                  default:
+                    console.log('default');
+                      break;
+              }
+
+           
+          })
+		
       },
      //获取订单信息
      getOrderInfo(){
@@ -129,36 +168,33 @@ export default {
             }
 
      },
-     //微信支付
-			wxJSAPIPay() {
-				let config = this.jsAPIConfig;
-				let _self = this;
-				WeixinJSBridge.invoke(
-					'getBrandWCPayRequest', config,
-					function(res) {
-						if (res.err_msg == "get_brand_wcpay_request:ok") {
-							_self.orderPayStatusCheck();
-						} else {
-							//支付失败
-							 _self.turnToPage('payFail') 
-						}
+     //弹出窗体查询
+     openWinforCheckState(){
+       let _self=this
+        this.$dialog.confirm({
+								  title: '支付提示',
+								  message: '是否完成支付?',
+								  beforeClose:_self.orderPayStatusCheck
 					});
-			},
+     },
 			orderPayStatusCheck(){
-				let _self = this;
-				_self.$store.dispatch('getOrderPayStatus', {orderNo: _self.orderItem.orderNo}).then(res => {
-					_self.$dialog.close();
-					//支付成功
+        let _self = this;
+        let params ={
+              orderNo: _self.orderItem.orderNo
+        }
+				_self.$store.dispatch('orderPayStatus_action', params).then(res => {
+           _self.$dialog.close();
+           if(res.status=='true'){
+             	//支付成功
 					 _self.turnToPage('paySuccess') 
+           }else{
+              _self.turnToPage('payFail') 
+           }     
 				}).catch(res=>{
 					_self.$dialog.close();
 					//支付失败
 					 _self.turnToPage('payFail') 
 				})
-      },
-      checkWxEnv(){
-				let ua = navigator.userAgent.toLowerCase();
-				this.wxEnv = ua.match(/MicroMessenger\/[0-9]/i);
       },
      },//end
    mounted(){

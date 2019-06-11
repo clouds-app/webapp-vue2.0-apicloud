@@ -3,16 +3,22 @@
          
   <NavBar :hideArrow="false" title="  我  "/>
   
-  <userStatus/>
+  <userStatus :userStatus="userStatus"/>
 
   <marginLine></marginLine>
-  <van-cell-group>
-  <van-cell title="查 看" @click="turnToPage('home')"  icon="location-o" is-link />
+  <van-cell-group v-show="hasAccess">
+  <van-cell  title="查 看" @click="turnToPage('home')"  icon="location-o" is-link />
   <van-cell @click="turnToPage('login')"  title="注 册" icon="location-o"  is-link  arrow-direction="down"  />
-  <van-cell title="套 餐" @click="turnToPage('chargeList')" icon="location-o" is-link  />
-  <van-cell title="支 付" @click="turnToPage('payment')" icon="location-o" is-link  />
+  <!-- <van-cell @click="turnToPage('login')"  title="注 册" icon="location-o"  is-link  arrow-direction="down"  />
+  <van-cell title="套 餐" @click="turnToPage('chargeList')" icon="location-o" is-link  /> -->
+  <!-- <van-cell title="支 付" @click="turnToPage('payment')" icon="location-o" is-link  /> -->
 </van-cell-group>
-<Footer/>
+
+ <van-cell-group v-show="!hasAccess">
+  <van-cell  title="查 看"   icon="location-o" is-link />
+  <van-cell title="支 付" @click="turnToPage('chargeList')" icon="location-o" is-link  />
+</van-cell-group>
+<!-- <Footer/> -->
     </div>
 </template>
 <script>
@@ -32,6 +38,8 @@ export default {
     components:{NavBar,userStatus,Footer,marginLine},
     data(){
         return{
+            hasAccess:false,
+            userStatus:{},
             statusCheck:getCookie('statusCheck'),
         }
     },
@@ -96,25 +104,38 @@ export default {
                 systemId:getLocalStorage('userSystemId'),
                 deviceId:this.getDeviceId()
             }
+            let _self=this
             this.$store.dispatch('handleCheckLogin',params).then(res=>{
                  //debugger
-                 this.$toast.success('欢迎回来');
-                 this.turnToPage('index') 
+                 _self.$toast.success('欢迎回来');
+                 let currentStatus = res.data
+                 _self.userStatus = currentStatus
+                _self.hasAccess = (res.status===0)
             }).catch(err=>{
-               //debugger
                 //根据返回状态，判断跳转的页面
-                console.log("判断跳转的页面 :"+JSON.stringify(err));
                 let errData =err
-                // if(typeof(err) == "object" && err.status!="10002"){
-                //     this.$store.commit('setPaymentStatus',err)
-                // }
+                if(typeof(err) == "object" && err.status!="10002"){
+                    _self.$store.commit('setPaymentStatus',err)
+                }
                 if(errData && errData.status){
-                    console.log("跳转login");
-                    this.turnToPageByStatus(errData.status)
+                     //console.log("跳转login");
+                    _self.turnToPageByStatus(errData.status)
                 }
               
          })
-       }
+       //  this.checkAccess()
+       },
+       //检查用户权限
+       checkAccess(){
+           debugger
+              let userInfo = getLocalStorage('userInfo')
+               if(userInfo!=""){
+                let user =JSON.parse(userInfo)
+                this.hasAccess =(user.status===0)
+            }
+       },
+       
+
       
 
     },

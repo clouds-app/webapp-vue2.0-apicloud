@@ -103,11 +103,11 @@ export default {
         * @params { orderNo,payType }
         */
         orderPayment_action({commit},params){
-          debugger
+         // debugger
           return new Promise((resolve,reject)=>{
                 try {
                   orderPayment(params).then(res=>{
-                    debugger
+                    //debugger
                     const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
                     if(data.success || data.status.toString() == '10011')
                     {
@@ -115,16 +115,16 @@ export default {
                     }
                     else
                     {
-                      debugger
+                     // debugger
                       reject(data)
                     }
                   }).catch(err=>{
-                    debugger
+                   // debugger
                     console.error(JSON.stringify(err))
                     reject(serverBusyTips)
                   })
                 } catch (error) {
-                  debugger
+                  //debugger
                   console.error(JSON.stringify(error))
                   reject(serverBusyTips)
                 }
@@ -135,10 +135,12 @@ export default {
         * @params { orderNo }
         */
         orderPayStatus_action({commit},params){
+          //debugger
             return new Promise((resolve,reject)=>{
               try {
                 orderPayStatus(params).then(res=>{
                   const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
+
                   if(data.success)
                   {
                     resolve(data)

@@ -64,6 +64,8 @@ export default {
               const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
               if(data.success)
               {
+               
+                commit('setUserInfo',data.data)
                 resolve(data)
               }
               else
