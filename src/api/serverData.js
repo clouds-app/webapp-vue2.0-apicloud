@@ -1,9 +1,9 @@
-import vueAxios from '@/libs/serverApi.request'
-import ApiCloudAjax from '@/libs/ApiCloudAjax.request'
+import vueAxios from '@/libs/api.request'
+import ApiCloudAjax from '@/libs/serverApiCloudAjax.request'
 import Qs from 'qs'
 
-var axios = process.env.NODE_ENV === 'development' ? vueAxios : ApiCloudAjax
-
+var axiosServer = process.env.NODE_ENV === 'development' ? vueAxios : ApiCloudAjax
+const api = process.env.NODE_ENV === 'development' ? '/apk' : ''
 
 /**
 * @description 获取生产线详情
@@ -19,8 +19,8 @@ export const getGoodsDetail = ({line}) => {
       data= {values: data} 
     } 
 
-    return axios.request({
-      url: `/apk/GetOrdersByLineID&${line}`,
+    return axiosServer.request({
+      url: `${api}/GetOrdersByLineID&${line}`,
       data,
       method: 'post',
       transformRequest: [function (data) {
@@ -44,8 +44,8 @@ export const getGoodsList = () => {
       data= {values: data} 
     } 
 
-    return axios.request({
-      url: `/apk/GetLineList`,
+    return axiosServer.request({
+      url: `${api}/GetLineList`,
       data,
       method: 'get',
       // transformRequest: [function (data) {

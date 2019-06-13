@@ -8,7 +8,8 @@
 // 默认配置对象
 var options = {
     // 基础url前缀
-    baseUrl:'',
+   // baseUrl: baseUrl,
+     baseUrl:'',
     // 默认错误处理函数
     defErrHandle: err => {throw new Error(JSON.stringify(err))},
     // 默认成功处理函数
@@ -42,15 +43,15 @@ var options = {
     }
   }
   
-  class ApiAjax {
+  class serverApiAjax {
     /**
      * 构造方法
      * @param  {object} config 配置参数
      */
     constructor (config) {
-
+     // console.warn('构造方法:'+JSON.stringify(config))
       options = Object.assign(options, config);
- 
+      //console.warn('构造方法:'+JSON.stringify(config))
     }
     /**
      * 配置 其它参数
@@ -97,4 +98,4 @@ var options = {
     }
   }
  
-  export default ApiAjax
+  export default serverApiAjax

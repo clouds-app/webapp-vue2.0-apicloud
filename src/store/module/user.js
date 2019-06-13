@@ -73,11 +73,11 @@ export default {
               const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
               if(data.success)
               {
-                debugger
+                //debugger
                 commit('setUserInfo',data.data)
-                if(data.data.serverPath!=""){
-                 // config.serverPath = data.data.serverPath
-                }
+                // if(data.data.serverPath!=""){
+                //  // config.serverPath = data.data.serverPath
+                // }
                 commit('setUserSystemId',data.data.systemId)
                 resolve(data)
               }

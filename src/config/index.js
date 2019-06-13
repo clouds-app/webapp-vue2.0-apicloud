@@ -23,7 +23,10 @@ export default {
      /**
      * @description 生管数据api请求基础路径 
      */
-    serverPath:'', //http://120.78.91.203:12689/api
+    serverPath:{
+      dev: '',
+      pro: 'http://120.78.91.203:12689/api'
+    },
     
 	  baseImgUrl:'http://shop.szclsoft.com',
 
