@@ -98,7 +98,8 @@ export default {
                this.$store.dispatch('handleUserRegister',params).then(res=>{
                      _self.loadingSubmit=false 
                      _self.$toast('注册成功')
-                     this.turnToPage('index')
+                    // this.turnToPage('index')
+                     this.turnToPage(this.$config.homeName)
                }).catch(err=>{
                    _self.loadingSubmit=false 
                   _self.$toast('注册失败: '+err);

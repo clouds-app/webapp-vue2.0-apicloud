@@ -36,7 +36,8 @@ const isApp = process.env.NODE_ENV === 'development' ? false : true
 		computed: {},
 		mounted(){
 			  //订单信息
-    		 this.getOrderInfo()
+			 this.getOrderInfo()
+			 this.forbidReturn() //安卓-禁用返回
 		},
 		methods: {
 			//获取订单信息

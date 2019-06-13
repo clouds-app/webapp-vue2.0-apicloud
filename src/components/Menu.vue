@@ -1,21 +1,22 @@
 <template>
     <div class="main-container">
          
-  <NavBar :hideArrow="false" title="  我  "/>
+  <NavBar :hideArrow="false" :title="companyName"/>
   
   <userStatus :userStatus="userStatus"/>
 
   <marginLine></marginLine>
   <van-cell-group v-show="hasAccess">
   <van-cell  title="查 看" @click="turnToPage('home')"  icon="location-o" is-link />
-  <van-cell @click="turnToPage('login')"  title="注 册" icon="location-o"  is-link  arrow-direction="down"  />
+  <van-cell title="支 付" @click="turnToPage('chargeList')" icon="location-o" is-link  />
+  <!-- <van-cell @click="turnToPage('login')"  title="注 册" icon="location-o"  is-link  arrow-direction="down"  /> -->
   <!-- <van-cell @click="turnToPage('login')"  title="注 册" icon="location-o"  is-link  arrow-direction="down"  />
   <van-cell title="套 餐" @click="turnToPage('chargeList')" icon="location-o" is-link  /> -->
   <!-- <van-cell title="支 付" @click="turnToPage('payment')" icon="location-o" is-link  /> -->
 </van-cell-group>
 
  <van-cell-group v-show="!hasAccess">
-  <van-cell  title="查 看"   icon="location-o" is-link />
+  <van-cell  title="查 看"  @click="NoAccess()"  icon="location-o" is-link />
   <van-cell title="支 付" @click="turnToPage('chargeList')" icon="location-o" is-link  />
 </van-cell-group>
 <!-- <Footer/> -->
@@ -38,21 +39,24 @@ export default {
     components:{NavBar,userStatus,Footer,marginLine},
     data(){
         return{
+            companyName:' 我 ',
             hasAccess:false,
             userStatus:{},
             statusCheck:getCookie('statusCheck'),
         }
     },
     methods:{
-    //    //获取设备编码
-    //    getDeviceId(){
-    //        let deviceId = 'dk408F8B-9598-48B6-A740-B9037ADCXXXE'
-    //        if(process.env.NODE_ENV === 'production'){
-    //             deviceId = window.api.deviceId;  //比如： FC408F8B-9598-48B6-A740-B9037ADCXXXE
-    //             console.log('deviceId :' +deviceId)
-    //        }
-    //        return deviceId
-    //    },
+        NoAccess(){
+            this.$dialog.confirm({
+             title: '提示',
+             message: '无权查看，立即付费'
+             }).then(() => {
+              // on confirm
+             this.turnToPage('chargeList') 
+             }).catch(() => {
+             // on cancel
+            });                                     
+        },
        //根据状态调整到指定页面或指定操作
        turnToPageByStatus(status){
            //debugger
@@ -100,18 +104,22 @@ export default {
        },
        //检查是否已经登陆
        checkLogin(){
+            this.$store.commit('setHasAccess','false')
             let params ={
                 systemId:getLocalStorage('userSystemId'),
                 deviceId:this.getDeviceId()
             }
             let _self=this
             this.$store.dispatch('handleCheckLogin',params).then(res=>{
-                 //debugger
+                 
                  _self.$toast.success('欢迎回来');
                  let currentStatus = res.data
                  _self.userStatus = currentStatus
                 _self.hasAccess = (res.status===0)
+                //debugger
+                this.$store.commit('setHasAccess',_self.hasAccess)
             }).catch(err=>{
+                //debugger
                 //根据返回状态，判断跳转的页面
                 let errData =err
                 if(typeof(err) == "object" && err.status!="10002"){
@@ -123,15 +131,16 @@ export default {
                 }
               
          })
-       //  this.checkAccess()
+        
        },
-       //检查用户权限
-       checkAccess(){
-           debugger
+       //首页 公司名称赋值
+       getCompanyName(){
+           //debugger
               let userInfo = getLocalStorage('userInfo')
                if(userInfo!=""){
                 let user =JSON.parse(userInfo)
-                this.hasAccess =(user.status===0)
+                //this.hasAccess =(user.status===0)
+                this.companyName = user.companyName
             }
        },
        
@@ -141,6 +150,7 @@ export default {
     },
     mounted(){
         this.checkLogin()
+       this.getCompanyName()
     }
 }
 </script>

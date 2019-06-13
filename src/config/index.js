@@ -20,13 +20,17 @@ export default {
       dev: '',
       pro: 'http://shop.szclsoft.com/clerp-getway-admin'
     },
+     /**
+     * @description 生管数据api请求基础路径 
+     */
+    serverPath:'', //http://120.78.91.203:12689/api
     
-	baseImgUrl:'http://shop.szclsoft.com',
+	  baseImgUrl:'http://shop.szclsoft.com',
 
     /**
      * @description 默认打开的首页的路由name值，默认为home
      */
-    homeName: 'home',
+    homeName: 'index',
     /**
      * @description 需要加载的插件
      */

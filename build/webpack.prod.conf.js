@@ -22,10 +22,11 @@ const webpackConfig = merge(baseWebpackConfig, {
     })
   },
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
+  //js 打包后输出路径 修改 
   output: {
     path: config.build.assetsRoot,
-    filename: utils.assetsPath('js/[name].[chunkhash].js'),
-    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
+    filename: utils.assetsPath('script/[name].[chunkhash].js'), //js=>script edit by andy
+    chunkFilename: utils.assetsPath('script/[id].[chunkhash].js')//js=>script edit by andy
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html

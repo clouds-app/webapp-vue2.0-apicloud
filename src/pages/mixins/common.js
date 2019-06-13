@@ -13,6 +13,19 @@ export default {
     computed: {
     },
     methods: {
+       //安卓手机禁用返回键
+       forbidReturn(){
+        if(process.env.NODE_ENV === 'production'){
+          window.api.addEventListener({
+            name: 'keyback'
+          }, function(ret, err){
+            window.api.closeToWin({
+              name: 'root'
+            });
+            window.api.closeWin();
+          })
+        }
+       },
       //跳转到指定页面，默认字符串
        turnToPage(path){
           let params ={
@@ -41,8 +54,17 @@ export default {
          getDeviceId(){
           let deviceId = 'dk408F8B-9598-48B6-A740-B9037ADCXXXE'
           if(process.env.NODE_ENV === 'production'){
-               deviceId = window.api.deviceId;  //比如： FC408F8B-9598-48B6-A740-B9037ADCXXXE
-               console.log('login deviceId :' +deviceId)
+              let deviceId_Param = window.api.getPrefs({
+                sync: true,
+                key: 'deviceId'
+              })
+               if(deviceId_Param!=""){
+                deviceId = deviceId_Param; //权限控制
+                console.log('login deviceId_Param :' +deviceId_Param)
+               }else{
+                deviceId = window.api.deviceId;  //比如： FC408F8B-9598-48B6-A740-B9037ADCXXXE
+                console.log('login deviceId :' +deviceId)
+               }
           }
           return deviceId
       },

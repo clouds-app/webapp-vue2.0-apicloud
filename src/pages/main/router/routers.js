@@ -4,12 +4,13 @@ import chargeList from '@/pages/chargeList/chargeList.vue'
 import payment from '@/pages/payment/payment.vue'
 import payFail from '@/pages/payFail/payFail.vue'
 import paySuccess from '@/pages/paySuccess/paySuccess.vue'
+import getLineList from '@/pages/getLineList/getLineList.vue'
 import Menu from '@/components/Menu'
 export default[
     {
       path: '/',
       name: 'Menu',
-      component: Menu
+      component: Menu 
     },
     {
       path: '/index',
@@ -51,6 +52,13 @@ export default[
       path: '/paySuccess',
       name: 'paySuccess',
       component: paySuccess
+     
+    }
+    ,
+    {
+      path: '/getLineList',
+      name: 'getLineList',
+      component: getLineList
      
     }
   ]

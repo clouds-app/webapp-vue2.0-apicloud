@@ -7,7 +7,9 @@ import config from '@/config'
 
 import Vant from 'vant';
 import 'vant/lib/index.css';
-
+import FastClick from 'fastclick'
+// 使用
+FastClick.attach(document.body)
 Vue.use(Vant);
 /**
  * @description 全局注册应用配置 add by andy 

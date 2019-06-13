@@ -13,7 +13,7 @@
                 </div>
             </template>
        </van-nav-bar>
-       <div style="margin-top:10px;height:1px;"></div>
+       <div style="margin-top:10px;"></div>
     </div>
 </template>
 <script>
@@ -33,6 +33,10 @@ export default {
         returnUrl:{
             type:String,
             default:''
+        },
+         closeToWin:{
+            type:Boolean,
+            default:false
         }
     },
     methods:{
@@ -45,7 +49,12 @@ export default {
             }else{
                 location.href="javascript:history.go(-1)";  
                 if(isApp){
-                    window.api.closeWin()
+                    if(this.closeToWin){
+                     window.api.closeToWin({
+                        name: 'root'
+                      })
+                    }
+                   window.api.closeWin()
                 }
             }
          
@@ -57,6 +66,9 @@ export default {
 }
 </script>
 <style scoped>
+.NavBarcontainer{
+    background-color:#1989fa
+}
     .van-nav-bar{
         background-color:#1989fa
     }

@@ -2,10 +2,10 @@
   <div id="app">
     <div class="payment">
         <NavBar title="支 付"/>
-        <userStatus/>
+        <!-- <userStatus/> -->
         <van-cell-group>
           <van-cell title="订单编号" :value="orderItem.orderNo" />
-          <!-- <van-cell title="实付金额"><span class="red">{{orderItem.orderPrice}}</span></van-cell> -->
+          <van-cell title="实付金额"><span class="red">{{orderItem.orderPrice}} 元</span></van-cell>
         </van-cell-group>
 
       <div class="pay_way_group">
@@ -14,18 +14,18 @@
           <van-cell-group>
             <van-cell @click="payWay='2'">
               <van-radio name="2" @click="payWay='2'">
-                <img src="../../../static/images/ali_pay.png" alt="支付宝" width="82" height="29">
+                <img src="../../../static/image/ali_pay.png" alt="支付宝" width="82" height="29">
               </van-radio>
             </van-cell>
             <van-cell @click="payWay='1'">
               <van-radio name="1" @click="payWay='1'">
-                <img src="../../../static/images/wx_pay.png" alt="微信支付" width="113" height="23">
+                <img src="../../../static/image/wx_pay.png" alt="微信支付" width="113" height="23">
               </van-radio>
             </van-cell>
           </van-cell-group>
         </van-radio-group>
       </div>
-      <van-button class="pay_submit" @click="paySubmit" :loading="isSubmit"  round  long type="primary" size="large">去支付</van-button>
+      <van-button class="pay_submit" @click="paySubmit" :loading="isSubmit" round  type="primary" size="normal" >去支付</van-button>
 		
 	</div>
   </div>
@@ -161,14 +161,15 @@ export default {
       let orderInfo = getLocalStorage('orderInfo')
       //debugger
       if(orderInfo!=""){
+       // debugger
                 let order =JSON.parse(orderInfo)
                 this.orderItem.orderNo =order.orderNo
-                this.orderItem.orderPrice =order.payPrice
+                this.orderItem.orderPrice =order.payPrice+""
 
             }
 
      },
-     //弹出窗体查询
+     //弹出窗体查询 订单 是否付款
      openWinforCheckState(){
        let _self=this
         this.$dialog.confirm({
@@ -177,14 +178,16 @@ export default {
 								  beforeClose:_self.orderPayStatusCheck
 					});
      },
+     //查询订单状态 判断跳转
 			orderPayStatusCheck(){
         let _self = this;
         let params ={
-              orderNo: _self.orderItem.orderNo
+              orderNo: _self.orderItem.orderNo //'20190611173517548585' //
         }
 				_self.$store.dispatch('orderPayStatus_action', params).then(res => {
+          //debugger
            _self.$dialog.close();
-           if(res.status=='true'){
+           if(res.data.status){
              	//支付成功
 					 _self.turnToPage('paySuccess') 
            }else{
@@ -224,8 +227,8 @@ export default {
 
 	.pay_submit {
 		margin-top: 20px;
-	
-		width: 100%;
+	  width:250px;
+		
 	}
 
 	.pay_way_group img {

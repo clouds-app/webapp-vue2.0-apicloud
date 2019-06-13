@@ -2,7 +2,7 @@
 import { checkLogin,userRegister} from '@/api/user'
 import { setCookie,getCookie,setLocalStorage,getLocalStorage} from '@/libs/util'
 const serverBusyTips="服务繁忙，请稍后再试！";
-
+import config from '@/config'
 
 export default {
    //使用方法：this.$store.state.user.属性名称
@@ -11,6 +11,7 @@ export default {
       userSystemId:getLocalStorage('userSystemId'),
       userInfo:getLocalStorage('userInfo'),
       paymentStatus:getCookie('paymentStatus'),
+      hasAccess:getLocalStorage('hasAccess') || false,
     },
     //使用方法：this.$store.getters.属性名称
     getters:{
@@ -18,6 +19,7 @@ export default {
       statusCheck_state:state=>state.statusCheck,
       userInfo_state:state=>state.userInfo,
       paymentStatus_state:state=>state.paymentStatus,
+      hasAccess_state:state=>state.hasAccess,
       // doneTodos: state => {//通过方法访问
       //   return state.todos.filter(todo => todo.done)
       // },
@@ -28,6 +30,12 @@ export default {
     },
     //使用方法：this.$store.commit('method name',data)
     mutations: {
+       //是否付费用户
+       setHasAccess (state, data) {
+        //debugger
+        state.hasAccess = data
+        setLocalStorage('hasAccess',data+"")
+      },
       //用户SystemId 登陆后服务返回
       setUserSystemId (state, data) {
         state.userSystemId = data
@@ -40,6 +48,7 @@ export default {
       },
       //保存用户信息
       setUserInfo (state, data) {
+        // debugger
         state.userInfo = data
         setLocalStorage('userInfo',JSON.stringify(data))
       },
@@ -57,19 +66,30 @@ export default {
       * @params { systemId,deviceId } 
       */
       handleCheckLogin ({commit}, params) {
-        //debugger
+        //
         return new Promise((resolve, reject) => {
           try {
             checkLogin(params).then(res => {
               const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
               if(data.success)
               {
-               
+                debugger
                 commit('setUserInfo',data.data)
+                if(data.data.serverPath!=""){
+                 // config.serverPath = data.data.serverPath
+                }
+                commit('setUserSystemId',data.data.systemId)
                 resolve(data)
               }
               else
               {
+                //debugger
+                let errData=data.data  //到期续费的 需要重新赋值setUserInfo
+                if(errData!=null){
+                  commit('setUserInfo',data.data)
+                  commit('setUserSystemId',data.data.systemId)
+                }
+                
                 reject(data)
               }
             }).catch(err => {

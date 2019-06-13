@@ -7,6 +7,12 @@ import store from '@/store'
 import config from '@/config'
 import Vant from 'vant';
 import 'vant/lib/index.css';
+import FastClick from 'fastclick'
+// import VueResource from 'vue-resource'
+// /*使用VueResource插件*/
+// Vue.use(VueResource)
+// 使用
+FastClick.attach(document.body)
 
 Vue.use(Vant);
 // 引入样式
@@ -36,7 +42,10 @@ if(process.env.NODE_ENV === 'production'){
       router,
       render: h => h(App)
     }).$mount('#app')
-    
+
+//   window.api.setStatusBarStyle({
+//       style: 'dark'
+// }); 
   }
 }
 else{

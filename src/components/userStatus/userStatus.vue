@@ -1,7 +1,7 @@
 <template>
     <div class="userStatus">
-
-         <van-cell :title="userTelephone"  :label="userName" :value="userPaymentMsg" > 
+<!-- :value="userPaymentMsg" -->
+         <van-cell :title="userTelephone"  :label="userName"  > 
               <van-image slot="icon" style="margin:0 10px"
                 width="50"
                 height="50"
@@ -9,7 +9,14 @@
                 />
                 <template slot="label">
                     <div>
-                       {{this.userName}}  {{this.endTime}}
+                       {{this.userName}} 
+                    </div>
+                </template>
+                 <template>
+                    <div>
+                        <div> {{this.userPaymentMsg}} </div>
+                        <div>  到期时间 {{this.endTime}}  </div>
+                      
                     </div>
                 </template>
           </van-cell>
@@ -58,29 +65,36 @@ export default {
         this.initUserInfo()
     },
     methods:{
-        initUserInfo(){
-            //debugger
-            let userInfo = getLocalStorage('userInfo')
-            let userPaymentStatus = getCookie('paymentStatus')
-            if(userInfo!=""){
-                let user =JSON.parse(userInfo)
-                this.userTelephone =user.phoneNo
-                this.userName =user.name
-            }
-            if(userPaymentStatus!=""){
+        //获取用户支付续费状态
+        getPaymentStatus(){
+          let userPaymentStatus = getCookie('paymentStatus')
+           if(userPaymentStatus!=""){
                  let userPaymentItem =JSON.parse(userPaymentStatus)
                  this.userPaymentMsg = userPaymentItem.msg
             }
         },
+        //初始化用户信息
+        initUserInfo(){
+           // debugger
+            let userInfo = getLocalStorage('userInfo')
+            if(userInfo!=""){
+                let user =JSON.parse(userInfo)
+                this.userTelephone =user.phoneNo
+                this.userName =user.name
+                this.endTime  = user.endTime
+            }
+           this. getPaymentStatus()
+        },
         //更新用户状态
         refreshUserStatus(){
-           // debugger
+            //debugger
            if(this.userStatus && this.userStatus.chargeName){
                  this.userTelephone =this.userStatus.phoneNo
-                 this.userName =this.userStatus.name//+`到期时间`
+                 this.userName =this.userStatus.name
                  this.userPaymentMsg = this.userStatus.chargeName
-                 this.endTime  = `（${this.userStatus.endTime}）`
+                 this.endTime  = `${this.userStatus.endTime}`
            }
+          // this. getPaymentStatus()
         },
         //注册监听事件，apiCloud 内部事件
        initEventListenter(){
@@ -97,15 +111,5 @@ export default {
 }
 </script>
 <style>
-     /* .van-cell{
-        padding: 0;
-    }
-     .van-cell__value{
-         border: 1px solid pink;
-         height: 22px !important;
-    }
-     .van-cell__label{
-        width: 250px;
-        border: 1px solid red
-    } */
+   
 </style>

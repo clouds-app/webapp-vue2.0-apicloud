@@ -11,6 +11,14 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
+      // '/api': {
+      //   target: 'http://120.78.91.203:12689/api/', //对应自己的接口
+      //   changeOrigin: true,//是否跨域
+      //   ws: true,
+      //   pathRewrite: {
+      //     '^/api': '' //这里理解成/api 代替 target 里面的地址，后面组件中我们调用接口时，直接使用 api 代替
+      //   }
+      // }
       '/api': {
         target: 'http://shop.szclsoft.com/clerp-getway-admin/api/', //对应自己的接口
         changeOrigin: true,//是否跨域
@@ -18,11 +26,21 @@ module.exports = {
         pathRewrite: {
           '^/api': '' //这里理解成/api 代替 target 里面的地址，后面组件中我们调用接口时，直接使用 api 代替
         }
+      },
+      '/apk': {
+        target: 'http://120.78.91.203:12689/api/', //对应自己的接口
+        changeOrigin: true,//是否跨域
+        ws: true,
+        pathRewrite: {
+          //'^/apk': '' //这里理解成/apk 代替 target 里面的地址，后面组件中我们调用接口时，直接使用 api 代替
+          // http://120.78.91.203:12689/api/DemoApi/oftenGoods.php，直接写成‘/apk/DemoApi/oftenGoods.php’就可以了
+          '^/apk': '/'
+        }
       }
     },
 
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    host: '127.0.0.1', // can be overwritten by process.env.HOST
     port: 8083, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
@@ -74,7 +92,7 @@ module.exports = {
     // Before setting to `true`, make sure to:
     // npm install --save-dev compression-webpack-plugin
     productionGzip: false,
-    productionGzipExtensions: ['js', 'css'],
+    productionGzipExtensions: ['script', 'css'],
 
     // Run the build command with an extra argument to
     // View the bundle analyzer report after build finishes:

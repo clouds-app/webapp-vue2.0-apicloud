@@ -1,37 +1,27 @@
 <template>
   <div id="app">
       <NavBar title="套 餐"/>
-       <userStatus/>
+       <userStatus :userStatus="userStatus"/>
     
-
-        <van-cell-group title="">
-          <van-cell>
-             <template slot="title">
-              <div>
-                  <van-collapse v-model="activeName" accordion>
-                  <van-collapse-item title="选择套餐" name="1">
-                      <van-card v-for="(item) in ChargeList" :key="item.id"
-                        num="1"
-                        tag=""
-                        :price="item.discountPrice"
-                        :title="item.serverName"
-                        :origin-price="item.serverPrice"
-                      >
-                    <div slot="desc" style="margin:10px;">
-                     <van-cell :title="`有效时长(天)：${item.serverUseTime}`"  />
-                    </div>
-                    <div slot="footer">
-                      <van-button tapmode :loading='isLoding' round @click="handleSubmit(item)" type="primary" size="normal">购买</van-button>
-                    </div>
-                  </van-card>
-                  </van-collapse-item>
-                </van-collapse>
-              
+        <van-tabs v-model="active">
+          <van-tab title="套 餐">
+              <van-col
+                v-for="(item) in ChargeList"
+                :key="item.id"
+                span="8" 
+              >
+              <div class="changeBox"  @click="handleSubmit(item)">
+                    <div class="serverName"> <span >{{ item.serverName }}</span></div>
+                   <div class="discountPrice"> <span >￥{{ item.discountPrice }}</span></div>
+                    <div > <span class="serverPrice">￥{{ item.serverPrice }}</span></div>
+                    <div class="serverUseTime"> <span >有效时长 {{ item.serverUseTime }} 天</span></div>
               </div>
-             </template>
-          </van-cell>
-        </van-cell-group>
-       <!-- <Footer></Footer> -->
+             
+            
+             </van-col>
+          </van-tab>
+        </van-tabs>
+      
   </div>
 </template>
 
@@ -50,45 +40,51 @@ export default {
   },
    data() {
             return {
+                  userStatus:{},
+                  active:"1",
                   isLoding:false,
                   activeName: '1',
                   ChargeList:[],
                 }
         },
    methods:{
+        //更新用户状态
+        refreshUserStatus(){
+          //debugger
+           let userStatus = getLocalStorage('userInfo')
+           if(userStatus!=""){
+                this.userStatus = JSON.parse(userStatus) 
+               
+           }
+        },
       //获取收费信息
        getChargeList(){
+         let currentHasAccress = getLocalStorage('hasAccess')
+       
          let params ={}
           let _self=this
           this.$store.dispatch('getChargeList_actions',params).then(res=>{
             // debugger
-              _self.ChargeList =res.data
+                 //_self.ChargeList =res.data
+                let tempChargeList = res.data
+
+                if(currentHasAccress=='true')
+                {
+                  let newChargeList = tempChargeList.filter(item=>{
+                       return item.discountPrice > 0
+                    })
+                  _self.ChargeList  =newChargeList
+                }
+                else{
+                    _self.ChargeList = tempChargeList
+                }
+              
           }).catch(err=>{
              //console.log('获取收费信息列表 失败'+JSON.stringify(err))
              _self.$toast('获取收费信息列表 失败'+err);
           })
        },
-       //购买套餐下单
-        handleSubmit2(item){
-         // debugger
-            if(item && item.id!=null){
-              
-                let params={
-                  systemId : getLocalStorage('userSystemId'),
-                  serverId :item.id
-                }
-                // console.log(params.systemId,params.serverId)
-                  let _self=this
-                  this.$store.dispatch('orderSubmit_action',params).then(res=>{
-                    _self.$toast('下单成功！');
-                   //return done
-                  }).catch(err=>{
-                    _self.$toast('下单错误：'+err);
-                   //return done
-                  })
-                }
-            
-        },
+        //确认下单
         handleSubmit(item) {
           let _self=this
           function beforeClose(action, done) {
@@ -106,7 +102,7 @@ export default {
                       }, 1000);
                   }).catch(err=>{
                     setTimeout(done, 0);
-                    _self.$toast('下单错误：'+err)
+                    _self.$toast('下单错误：'+err.msg)
                   })
                 }
               
@@ -116,7 +112,7 @@ export default {
           }
           this.$dialog.confirm({
             title: '确认购买？',
-            message: `<ul style="text-align:left; "><li>套餐：${item.serverName}</li><li>价格：${item.serverPrice}</li><li>有效时长(天)：${item.serverUseTime}</li></ul> `,
+            message: `<ul style="text-align:left; "><li>套餐：${item.serverName}</li><li>价格：${item.discountPrice} 元</li><li>有效时长(天)：${item.serverUseTime}</li></ul> `,
             beforeClose
           });
       },
@@ -124,11 +120,44 @@ export default {
    },
    mounted(){
      this.getChargeList()
+     this.refreshUserStatus()
    }
 
 }
 </script>
 <style>
+    /*  */
+    .serverPrice{
+        display: inline-block;
+        margin-left: 5px;
+        color: #7d7e80;
+        font-size: 10px;
+        text-decoration: line-through;
+    }
+.serverUseTime{
+   font-size: 12px;
+   font-weight: bold;
+   color: #ccc;
+}
+.serverName{
+   font-size: 13px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.discountPrice {
+   font-size: 20px;
+  color:burlywood;
+  font-weight: bold;
+  margin: 10px 0 10px 0;
+}
+.changeBox{
+  background-color: rgba(235, 237, 240, 0.5);
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  height: 130px;
+  margin: 6px;
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
 #app {
   text-align: center;
  
