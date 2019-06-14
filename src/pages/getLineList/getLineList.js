@@ -37,7 +37,17 @@ if(process.env.NODE_ENV === 'production'){
       store,
       render: h => h(App)
     }).$mount('#app')
-    
+
+    window.api.setScreenOrientation({
+      orientation: 'landscape_right'
+    });
+
+  //   window.addEventListener("orientationchange", function() {
+  //     var degree = window.orientation
+  //     var w = api.winWidth
+  //     var h = api.winHeight
+  // })
+
   }
 }
 else{

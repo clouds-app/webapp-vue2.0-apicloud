@@ -1,54 +1,59 @@
 <template>
   <div id="app">
-      <NavBar title="生产数据"/>
-      <div style="position: fixed;top: 60px;">
+      <NavBar title="生产数据">
+         <div >
              <van-tabs @click="getDataDetailByLine">
                   <van-tab 
-                    v-for="index in tableData"
+                    v-for="(index) in tableData"
                     :title="index.LineID"
                     :key="index.LineID"
                   >
-                  <div slot="title">
+                   <div slot="title">
                           <van-icon :name="handleLineStatusIcon(index.LineStatus)" 
                           :color="handleLineStatusIconColor(index.LineStatus)"/>
                           {{`第 ${index.LineID} 线(${handleLineStatus(index.LineStatus)})`}}
                     </div>
                     <div class="dataTable">
                         <v-table
-                        :width="tableWidth"
+                        id="dataTable"
+                        ref="dataTable"
+                           is-vertical-resize
+                            style="width:100%"
+                            is-horizontal-resize
+                            :vertical-resize-offset='5'
                         :columns="columns"
                         :table-data="getDataByLine(index.LineID)"
                         :show-vertical-border="true">
                         </v-table>
+                            <!-- :width="tableWidth" -->
                     </div>
+                    
                 </van-tab>
-        </van-tabs>
-       </div>
-       <div style="width:100%;height:118px;">
-         
-       </div>
-        
-      <div class="dataTableDetail">
-                        <!-- <virtual-list :size="60" :remain="8"> -->
+		      	</van-tabs>
+		   </div>
+      </NavBar>
+         <div style="width:100%;height:130px;"/>
+        <div class="dataTableDetail">
                             <v-table
-                             :height="tableHeight"
-                            :width="tableWidth"
+                             is-vertical-resize
+                            :style="`width:100%;`"
+                            is-horizontal-resize
+                            :vertical-resize-offset='5'
+                             id="dataTableDetail"
+                             ref="dataTableDetail"
+                            :height="tableHeight"
                             :columns="columnsDetail"
                             :table-data="tableDataDetail"
                             :show-vertical-border="true"
                             even-bg-color="#f4f4f4"
                             row-hover-color="#eee"
-                            row-click-color="#edf7ff"
-
-                            >
-                            </v-table>
-                          <!-- </virtual-list> -->
-      </div>
-
-   
+                            row-click-color="#edf7ff"/>
+                            
+        </div>
+         <!--  :width="tableWidth" :style="`width:${tableWidth}px`" -->
+      
   </div>
 </template>
-
 <script>
 import virtualList from 'vue-virtual-scroll-list'
 import base_mixin from '@/pages/mixins/common'
@@ -66,35 +71,96 @@ export default {
   },
    data() {
             return {
+                 dataWindowH: document.body.clientHeight,
+                 currentIndex:0,
                  tableWidth:window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                  tableData: [],
                  tableDataDetail:[],
                  columns: [
-                    {field: 'LineID', title:'线别名称', width: 150, titleAlign: 'center',columnAlign:'center',isFrozen: true},
-                    {field: 'ClassBadArea', title:'本班不良面积(平方米)', width: 220, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ClassBadLength', title: '本班不良米数(mm)', width: 220, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ClassBadQty', title: '本班不良张数', width: 150, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ClassBreakCount', title: '本班停车次数',width: 150, titleAlign: 'center',columnAlign:'right'},
-             
+                    {field: 'LineID', title:'订单', width: 36, titleAlign: 'center',columnAlign:'center',
+                     formatter: function (rowData, index) {
+                               return '<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">本笔</span>'
+                        },isFrozen: true},
+                    {field: 'LineID', title:'总数', width: 40, titleAlign: 'center',columnAlign:'center',
+                     formatter: function (rowData, index) {
+                             return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty)) + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '</span>'
+                        },isFrozen: true},
+                    {field: 'ClassQty', title:'良品', width: 40, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty) + '</span>'
+                        }
+                    },
+                    {field: 'ClassBadQty', title: '不良', width: 40, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty) + '</span>'
+                        }
+                    },
+                    {field: 'ClassGoodLength', title:'良品米数', width: 40, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassGoodLength) + '</span><br/><span style="font-weight: bold;">' + '</span>'
+                        }
+                    },
+                    {field: 'ClassBadLength', title:'不良米数', width: 40, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadLength) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                        }
+                    },
+                    {field: 'ClassGoodArea', title: '良品面积(平方米)', width: 60, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassGoodArea) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                        }
+                    },
+                    {field: 'ClassBadArea', title: '不良面积(平方米)',width: 60, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadArea) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                        }
+                    },
+                   
+                    {field: 'ClassProdTime', title: '生产时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
+                        }
+                    },
+                    {field: 'ClassBreakCount', title: '停车次数',width: 50, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakCount) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakCount) + '</span>'
+                        }
+                    },
+                    {field: 'ClassBreakTime', title: '停车时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakTime) + '</span>'
+                        }
+                    },
                     ],
 
+             
+
                   columnsDetail:[ 
-                    // {field: 'PrimaryKey', title:'订单唯一识别码', width: 150, titleAlign: 'center',columnAlign:'center',isFrozen: true},
-                    // {field: 'OrderStatus', title:'订单状态', width: 220, titleAlign: 'center',columnAlign:'right'},
-                    // {field: 'EditFlag', title: '订单修改状态', width: 220, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtID', title: '纸质编号',width: 150, titleAlign: 'center',columnAlign:'right',isFrozen: true},
-                    {field: 'TotalWidthmm', title: '用纸幅宽 单位:mm', width: 150, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtLB', title:'楞别', width: 260, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtD', title: '糊机用纸代号', width: 220, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtDDesc', title: '糊机用纸描述', width: 220, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtBF', title: '坑机一芯用纸代号',width: 150, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtBFDesc', title:'坑机一芯用纸描述', width: 260, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtBB', title: '坑机一底用纸代号', width: 150, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'ArtBBDesc', title: '坑机一底用纸描述', width: 260, titleAlign: 'center',columnAlign:'right'},
+                    {field: 'TotalWidthmm', title: '门幅',width: 40, titleAlign: 'center',columnAlign:'center',isFrozen: true,isResize:true},
+                   
+                    {field: 'CustName', title:'客户名称', width: 80, titleAlign: 'center',columnAlign:'left',isResize:true},
+                    {field: 'ArtID', title: '纸质', width: 40, titleAlign: 'center',columnAlign:'left',isResize:true},
+                    {field: 'ArtLB', title: '楞别', width: 40, titleAlign: 'center',columnAlign:'center',isResize:true},
+                    {field: 'CSizeW', title: '规格',width: 66, titleAlign: 'center',columnAlign:'center',isResize:true,
+                      formatter: function (rowData, index) {
+                            return '<span>' + (rowData.CSizeW) + '</span> * <span>' + (rowData.CSizeL) + '</span>'
+                        }
+                    },
+                    // {field: 'CSizeW', title: '幅宽',width: 50, titleAlign: 'center',columnAlign:'right'},
+                    // {field: 'CSizeL', title:'切长', width: 50, titleAlign: 'center',columnAlign:'right'},
+                    {field: 'OrderQty', title: '数量', width: 40, titleAlign: 'center',columnAlign:'right',isResize:true},
+                    {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',isResize:true},
+                    {field: 'OrderNo', title: '订单号', width: 80, titleAlign: 'center',columnAlign:'center',isResize:true},
                     ]
             }
         },
    methods:{
+         //计算数据合并
+          totalData(val1,val2){
+              if(val1!="" && val1!=null && val2 !="" && al2 !=null){
+                return Number(val1)+ Number(val2)
+              }
+          },
             //tab切换获取对应的生产数据
           getDataByLine(lineId){
             //debugger
@@ -107,6 +173,7 @@ export default {
            //tab切换获取对应的生产数据详细
           getDataDetailByLine(index,key){
             this.$toast(`第 ${key} 线`);
+            this.currentIndex = key
             this.GetLineDetailList(key)
           },
           //处理运行状态
@@ -152,6 +219,7 @@ export default {
               let currentData =[...res]
               //console.warn(JSON.stringify(currentData))
               this.tableData = currentData
+               this.currentIndex = currentData[0].LineID
                this.GetLineDetailList(currentData[0].LineID)
             }).catch(err=>{
               debugger
@@ -168,7 +236,7 @@ export default {
               this.tableDataDetail = currentData
 
             }).catch(err=>{
-              debugger
+              //debugger
             })
           }
    },
@@ -178,7 +246,7 @@ export default {
            return window.api.winHeight - 220;
        }else
        {
-          return document.body.clientHeight - 220;
+          return this.dataWindowH - 100;
        }
 
     
@@ -186,12 +254,31 @@ export default {
    },
    mounted(){
        this.GetLineList()
+       let _selt =this
+        window.addEventListener("orientationchange", function() {
+            //alert(1)
+      
+            // if(isApp){
+            //     _selt.dataWindowH = window.api.winHeight - 220
+            // }else
+            // {
+              
+            //     _selt.dataWindowH = document.body.clientHeight
+            //    // alert(_selt.dataWindowH)
+            //      console.log("_selt.dataWindowH :"+_selt.dataWindowH)
+            //       let ele = document.getElementById('dataTableDetail')
+            //      console.log(ele)
+            // }
+       })
 
    }
 
 }
 </script>
 <style>
+.v-table-body-cell{
+  line-height: 20px !important;
+}
 body{
   width: 100%;
   position: absolute;
@@ -199,6 +286,7 @@ body{
 }
 #app {
   text-align: center;
+  font-size: 12px;
 }
  .vanTabs{
    position: fixed;
@@ -230,4 +318,5 @@ body{
    
   }
 </style>
+
 

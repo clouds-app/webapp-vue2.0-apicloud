@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="NavBarcontainer" id="appheader">
+     <div class="NavBarcontainer" id="appheader">
        <van-nav-bar tapmode
             :title="title"
              left-text=" "
@@ -14,7 +14,16 @@
                 </div>
             </template>
        </van-nav-bar>
+        <!-- // 具名插槽 -->
+        <slot name="up"></slot>
+        
+        <!-- // 具名插槽 -->
+        <slot name="down"></slot>
+        
+        <!-- // 匿名插槽 -->
+        <slot></slot>
     </div>
+    
      <div :style="navBarStyle"></div>
 </div>
     
