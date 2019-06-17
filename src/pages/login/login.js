@@ -26,9 +26,9 @@ if(process.env.NODE_ENV === 'production'){
       render: h => h(App)
     }).$mount('#app')
     
-    window.api.setScreenOrientation({
-      orientation: 'auto'
-    });
+    // window.api.setScreenOrientation({
+    //   orientation: 'auto'
+    // });
   }
 }
 else{

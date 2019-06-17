@@ -1,8 +1,8 @@
 <template>
 <div id="app">
       <NavBar title="支付结果" returnUrl="index"/>
-        <div>
-			<van-icon name="checked" size="6rem" color="#07c160"/>
+       <div >
+			<van-icon style="margin-top:15px;" name="checked" size="6rem" color="#07c160"/>
 			<p>支付成功<p>
 		     <br/>  <br/>
 			<p>订单号:{{orderItem.orderNo}}</p>

@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './chargeList.vue'
+import App from './main_frame.vue'
 import store from '@/store'
 import config from '@/config'
 
@@ -16,7 +16,6 @@ Vue.use(Vant);
  */
 Vue.prototype.$config = config
 Vue.config.productionTip = false
-
 
 
 /* eslint-disable no-new */

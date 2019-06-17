@@ -1,57 +1,58 @@
 <template>
   <div id="app">
-      <NavBar title="生产数据">
-         <div >
-             <van-tabs @click="getDataDetailByLine">
-                  <van-tab 
-                    v-for="(index) in tableData"
-                    :title="index.LineID"
-                    :key="index.LineID"
-                  >
-                   <div slot="title">
-                          <van-icon :name="handleLineStatusIcon(index.LineStatus)" 
-                          :color="handleLineStatusIconColor(index.LineStatus)"/>
-                          {{`第 ${index.LineID} 线(${handleLineStatus(index.LineStatus)})`}}
-                    </div>
-                    <div class="dataTable">
-                        <v-table
-                        id="dataTable"
-                        ref="dataTable"
-                           is-vertical-resize
-                            style="width:100%"
-                            is-horizontal-resize
-                            :vertical-resize-offset='5'
-                        :columns="columns"
-                        :table-data="getDataByLine(index.LineID)"
-                        :show-vertical-border="true">
-                        </v-table>
-                            <!-- :width="tableWidth" -->
-                    </div>
-                    
-                </van-tab>
-		      	</van-tabs>
-		   </div>
-      </NavBar>
-         <div style="width:100%;height:130px;"/>
-        <div class="dataTableDetail">
-                            <v-table
-                             is-vertical-resize
-                            :style="`width:100%;`"
-                            is-horizontal-resize
-                            :vertical-resize-offset='5'
-                             id="dataTableDetail"
-                             ref="dataTableDetail"
-                            :height="tableHeight"
-                            :columns="columnsDetail"
-                            :table-data="tableDataDetail"
-                            :show-vertical-border="true"
-                            even-bg-color="#f4f4f4"
-                            row-hover-color="#eee"
-                            row-click-color="#edf7ff"/>
-                            
+      <div id="lineData">
+        <NavBar title="生产数据">
+          <div >
+              <van-tabs @click="getDataDetailByLine">
+                    <van-tab 
+                      v-for="(index) in tableData"
+                      :title="index.LineID"
+                      :key="index.LineID"
+                    >
+                    <div slot="title">
+                            <van-icon :name="handleLineStatusIcon(index.LineStatus)" 
+                            :color="handleLineStatusIconColor(index.LineStatus)"/>
+                            {{`第 ${index.LineID} 线(${handleLineStatus(index.LineStatus)})`}}
+                      </div>
+                      <div class="dataTable">
+                          <v-table
+                          id="dataTable"
+                          ref="dataTable"
+                            is-vertical-resize
+                              style="width:100%"
+                              is-horizontal-resize
+                              :vertical-resize-offset='5'
+                          :columns="columns"
+                          :table-data="getDataByLine(index.LineID)"
+                          :show-vertical-border="true">
+                          </v-table>
+                              <!-- :width="tableWidth" -->
+                      </div>
+                      
+                  </van-tab>
+              </van-tabs>
         </div>
-         <!--  :width="tableWidth" :style="`width:${tableWidth}px`" -->
-      
+        </NavBar>
+          <div style="width:100%;height:130px;"/>
+          <div class="dataTableDetail">
+                              <v-table
+                              is-vertical-resize
+                              :style="`width:100%;`"
+                              is-horizontal-resize
+                              :vertical-resize-offset='5'
+                              id="dataTableDetail"
+                              ref="dataTableDetail"
+                              :height="tableHeight"
+                              :columns="columnsDetail"
+                              :table-data="tableDataDetail"
+                              :show-vertical-border="true"
+                              even-bg-color="#f4f4f4"
+                              row-hover-color="#eee"
+                              row-click-color="#edf7ff"/>
+                              
+          </div>
+          <!--  :width="tableWidth" :style="`width:${tableWidth}px`" -->
+       </div>
   </div>
 </template>
 <script>
@@ -81,7 +82,7 @@ export default {
                      formatter: function (rowData, index) {
                                return '<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">本笔</span>'
                         },isFrozen: true},
-                    {field: 'LineID', title:'总数', width: 40, titleAlign: 'center',columnAlign:'center',
+                    {field: 'LineID', title:'总数', width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                              return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty)) + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '</span>'
                         },isFrozen: true},
@@ -116,7 +117,7 @@ export default {
                         }
                     },
                    
-                    {field: 'ClassProdTime', title: '生产时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                    {field: 'ClassProdTime', title: '生产时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
                         }
@@ -126,9 +127,19 @@ export default {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakCount) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakCount) + '</span>'
                         }
                     },
-                    {field: 'ClassBreakTime', title: '停车时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                    {field: 'ClassBreakTime', title: '停车时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakTime) + '</span>'
+                        }
+                    },
+                    {field: 'ClassBadLength', title:'剩余米数', width: 40, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadLength) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                        }
+                    },
+                    {field: 'ClassProdTime', title: '预估完工时间',width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                     formatter: function (rowData, index) {
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
                         }
                     },
                     ],
@@ -150,6 +161,8 @@ export default {
                     // {field: 'CSizeL', title:'切长', width: 50, titleAlign: 'center',columnAlign:'right'},
                     {field: 'OrderQty', title: '数量', width: 40, titleAlign: 'center',columnAlign:'right',isResize:true},
                     {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',isResize:true},
+                    {field: 'Cut', title: '完工时间', width: 50, titleAlign: 'center',columnAlign:'right',isResize:true},
+                    {field: 'Cut', title: '总长', width: 30, titleAlign: 'center',columnAlign:'right',isResize:true},
                     {field: 'OrderNo', title: '订单号', width: 80, titleAlign: 'center',columnAlign:'center',isResize:true},
                     ]
             }
@@ -275,7 +288,8 @@ export default {
 
 }
 </script>
-<style>
+
+<style >
 .v-table-body-cell{
   line-height: 20px !important;
 }
@@ -286,7 +300,10 @@ body{
 }
 #app {
   text-align: center;
-  font-size: 12px;
+  /* font-size: 12px; */
+}
+#lineData{
+font-size: 12px;
 }
  .vanTabs{
    position: fixed;

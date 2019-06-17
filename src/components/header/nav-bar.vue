@@ -59,9 +59,17 @@ export default {
     mounted(){
         if(isApp){
             this.navBarStyle='margin-top:80px;'
+            this.fixHeaderStatusBar();
         }
     },
     methods:{
+         fixHeaderStatusBar(){
+            if(process.env.NODE_ENV === 'production'){
+            let header = $api.byId('appheader');
+            $api.fixStatusBar(header);
+            }
+        
+        },
         onClickLeft() {
             if(this.returnUrl!=""){
                  let params ={
@@ -69,7 +77,6 @@ export default {
                  }
                 switchMethods.turnToPage(params)
             }else{
-                location.href="javascript:history.go(-1)";  
                 if(isApp){
                     if(this.closeToWin){
                      window.api.closeToWin({
@@ -77,12 +84,26 @@ export default {
                       })
                     }
                    window.api.closeWin()
+                }else{
+                     location.href="javascript:history.go(-1)";  
                 }
             }
-         
+         this.sendRefreshEvent()
         },
         onClickRight() {
 
+        },
+        //发送刷新界面事件
+        sendRefreshEvent(){
+            if(isApp){
+                window.api.sendEvent({
+                name: 'refreshEvent',
+                extra: {
+                    key1: 'value1',
+                    key2: 'value2'
+                }
+            });
+          }  
         }
     }
 }

@@ -6,16 +6,17 @@ import payFail from '@/pages/payFail/payFail.vue'
 import paySuccess from '@/pages/paySuccess/paySuccess.vue'
 import getLineList from '@/pages/getLineList/getLineList.vue'
 import Menu from '@/components/Menu'
+import Main from '@/components/Main'
 export default[
     {
       path: '/',
-      name: 'Menu',
-      component: Menu 
+      name: 'Main',
+      component: Main 
     },
     {
       path: '/index',
       name: 'index',
-      component: Menu
+      component: Main
     },
     {
       path: '/home',

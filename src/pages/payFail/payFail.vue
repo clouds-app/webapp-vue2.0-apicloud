@@ -2,8 +2,8 @@
 
 <div id="app">
       <NavBar title="支付结果" returnUrl="index"/>
-        <div>
-			<van-icon name="clear" size="6rem" color="#f44"/>
+        <div >
+			<van-icon style="margin-top:15px;" name="clear" size="6rem" color="#f44"/>
 			<p>支付失败<p>
 		     <br/>  <br/>
 			<p>订单号:{{orderItem.orderNo}}</p>
@@ -38,8 +38,13 @@ const isApp = process.env.NODE_ENV === 'development' ? false : true
 			  //订单信息
 			 this.getOrderInfo()
 			 this.forbidReturn() //安卓-禁用返回
+			//   this.RefreshEvent().then(res=>{
+			// 	  alert('刷新成功')
+			//   })
+
 		},
 		methods: {
+			
 			//获取订单信息
 			getOrderInfo(){
 				let orderInfo = getLocalStorage('orderInfo')

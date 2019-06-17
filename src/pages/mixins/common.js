@@ -1,6 +1,8 @@
 //视图公用方法
-import {getCookie} from '@/libs/util'
+// import {getCookie} from '@/libs/util'
 import * as switchMethods  from '@/libs/switchMethods'
+// import { resolve } from 'dns';
+const isApp = process.env.NODE_ENV === 'development' ? false : true 
 export default {
     data(){
       return {
@@ -13,6 +15,7 @@ export default {
     computed: {
     },
     methods: {
+       
        //安卓手机禁用返回键
        forbidReturn(){
         if(process.env.NODE_ENV === 'production'){
@@ -72,6 +75,7 @@ export default {
     },
     mounted(){
       this.fixHeaderStatusBar();
+     
     }
   };
   

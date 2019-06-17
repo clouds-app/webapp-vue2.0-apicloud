@@ -4,7 +4,7 @@
 // 都是通过修改ajax方法传入的参数进行封装,
 // import config from '@/config'
 // const baseUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
-
+const isApp = process.env.NODE_ENV === 'development' ? false : true //
 // 默认配置对象
 var options = {
     // 基础url前缀
@@ -25,8 +25,19 @@ var options = {
       console.warn('响应失败拦截器:'+JSON.stringify(err))
       let { data, config } = err;
       if (data.statusCode === 0) {
-        // 广播网络错误
-        window.api.sendEvent({name: 'netError'})
+        if(isApp){
+           // 广播网络错误
+            window.api.sendEvent({name: 'netError'})
+          //   监听事件，支持系统事件和自定义事件。
+          //  addEventListener('netError', callback(ret, err))
+            window.api.toast({
+                msg: '"网络无法连接服务，请稍后再试！',
+                duration: 2000,
+                location: 'bottom'
+            })
+        }
+        console.warn('响应失败拦截器sendEvent: netError')
+       
       }
       return rej({...err.data, url: err.config.url})
     },

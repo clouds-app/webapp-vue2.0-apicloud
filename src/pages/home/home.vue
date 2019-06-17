@@ -16,6 +16,7 @@
 </template>
 
 <script>
+const isApp = process.env.NODE_ENV === 'development' ? false : true 
 import base_mixin from '@/pages/mixins/common'
 import NavBar from '_c/header'
 import Footer from '@/components/footer'
@@ -31,10 +32,23 @@ export default {
             }
         },
    methods:{
-
+      //如监听回退刷新事件
+          RefreshEventListener(){
+          let _self = this
+          window.api.addEventListener({
+          name: 'refreshEvent'
+            }, function(ret, err) {
+                window.api.setScreenOrientation({
+                  orientation: 'auto'
+                });
+                //alert('refreshEvent')
+           })
+       },
    },
    mounted(){
-    
+     if(isApp){
+       this.RefreshEventListener()
+     }
    }
 
 }
