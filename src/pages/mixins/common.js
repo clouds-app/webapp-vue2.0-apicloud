@@ -15,7 +15,14 @@ export default {
     computed: {
     },
     methods: {
-       
+        //如监听回退刷新事件
+        RefreshEventListener(callback){
+          window.api.addEventListener({
+          name: 'refreshEvent'
+            }, function(ret, err) {
+              callback(ret, err)
+            });
+       },
        //安卓手机禁用返回键
        forbidReturn(){
         if(process.env.NODE_ENV === 'production'){
@@ -75,7 +82,9 @@ export default {
     },
     mounted(){
       this.fixHeaderStatusBar();
-     
+      if(isApp){
+        this.RefreshEventListener(function(){})
+      }
     }
   };
   

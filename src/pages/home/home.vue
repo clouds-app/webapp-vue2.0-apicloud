@@ -4,7 +4,7 @@
       <van-cell-group title="生产线">
 
         <van-cell icon="location-o" @click="turnToPage('getLineList')" title="生产线数据" is-link value="查看" />
-        <van-cell icon="location-o" title="单元格测试1"   />
+        <van-cell icon="location-o" @click="turnToPage('dataEcharts')" title="图表查看" is-link value="查看" />
         <van-cell icon="location-o" title="单元格测试2" arrow-direction="down"  />
       </van-cell-group>
 
@@ -32,22 +32,24 @@ export default {
             }
         },
    methods:{
-      //如监听回退刷新事件
-          RefreshEventListener(){
-          let _self = this
-          window.api.addEventListener({
-          name: 'refreshEvent'
-            }, function(ret, err) {
-                window.api.setScreenOrientation({
-                  orientation: 'auto'
-                });
-                //alert('refreshEvent')
-           })
-       },
+     //跳转到指定页面，默认字符串
+       turnToPage(path){
+          let params ={
+              name:path,
+              slidBackEnabled:true //划屏 回退
+
+          }
+          switchMethods.turnToPage(params)
+      },
    },
    mounted(){
      if(isApp){
-       this.RefreshEventListener()
+       this.RefreshEventListener(function(){
+            //横竖屏 自动 模式
+                window.api.setScreenOrientation({
+                  orientation: 'auto'
+                })
+       })
      }
    }
 

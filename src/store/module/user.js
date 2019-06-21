@@ -2,7 +2,7 @@
 import { checkLogin,userRegister} from '@/api/user'
 import { setCookie,getCookie,setLocalStorage,getLocalStorage} from '@/libs/util'
 const serverBusyTips="服务繁忙，请稍后再试！";
-import config from '@/config'
+
 
 export default {
    //使用方法：this.$store.state.user.属性名称
@@ -73,11 +73,15 @@ export default {
               const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
               if(data.success)
               {
-                //debugger
+               // debugger
                 commit('setUserInfo',data.data)
-                // if(data.data.serverPath!=""){
-                //  // config.serverPath = data.data.serverPath
-                // }
+                //import config from '@/config'
+                const config  = require('@/config');
+                if(data.data.serverPath!=""){
+                  console.log(' successdata.data.serverPath '+ data.data.serverPath);
+                  config.default.serverPath.pro = data.data.serverPath
+                  console.log(' success config.default.serverPath.pro '+ config.default.serverPath.pro);
+                }
                 commit('setUserSystemId',data.data.systemId)
                 resolve(data)
               }
@@ -87,6 +91,14 @@ export default {
                 let errData=data.data  //到期续费的 需要重新赋值setUserInfo
                 if(errData!=null){
                   commit('setUserInfo',data.data)
+
+                  const config  = require('@/config');
+                  if(data.data.serverPath!=""){
+                    console.log(' errData data.data.serverPath '+ data.data.serverPath);
+                    config.default.serverPath.pro = data.data.serverPath
+                    console.log(' errData config.default.serverPath.pro '+ config.default.serverPath.pro);
+                  }
+
                   commit('setUserSystemId',data.data.systemId)
                 }
                 

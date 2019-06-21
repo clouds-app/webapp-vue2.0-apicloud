@@ -55,3 +55,31 @@ export const getGoodsList = () => {
     })
   }
 
+/**
+* @description 获取生产报表数据列表
+* @params {storedProcedureName,StartDate,EndDate}
+*/
+  export const getQueryDatasList = ({storedProcedureName,StartDate,EndDate}) =>{
+    //debugger
+    //参数
+    let data = {
+      //storedProcedureName,StartDate,EndDate
+    }
+    storedProcedureName ='spAppXLAanlyzer'
+    if(process.env.NODE_ENV === 'production'){
+      //apiCloud 参数传递封装，其它另行处理，参考：https://docs.apicloud.com/Client-API/api#3  ajax
+      data= {values: data} 
+    } 
+
+    return axiosServer.request({
+      url: `${api}/GetQueryDatas&${storedProcedureName}&${StartDate}&${EndDate}`,
+      data,
+      method: 'post',
+      // transformRequest: [function (data) {
+      //   // 对 data 进行任意转换处理
+      //   return Qs.stringify(data)
+      // }],
+    })
+
+  }
+

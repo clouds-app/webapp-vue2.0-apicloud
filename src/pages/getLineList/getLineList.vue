@@ -1,7 +1,7 @@
 <template>
   <div id="app">
       <div id="lineData">
-        <NavBar title="生产数据">
+        <!-- <NavBar title="生产数据"> -->
           <div >
               <van-tabs @click="getDataDetailByLine">
                     <van-tab 
@@ -16,13 +16,15 @@
                       </div>
                       <div class="dataTable">
                           <v-table
+                          titleBgColor="#1989fa"
                           id="dataTable"
                           ref="dataTable"
-                            is-vertical-resize
-                              style="width:100%"
-                              is-horizontal-resize
-                              :vertical-resize-offset='5'
+                          is-vertical-resize
+                          style="width:100%;"
+                          is-horizontal-resize
+                          :vertical-resize-offset='5'
                           :columns="columns"
+                          :column-cell-class-name="columnCellClass" 
                           :table-data="getDataByLine(index.LineID)"
                           :show-vertical-border="true">
                           </v-table>
@@ -33,9 +35,10 @@
               </van-tabs>
         </div>
         </NavBar>
-          <div style="width:100%;height:130px;"/>
+          <div :style="`width:100%;height:${virtualMarginHeight};`"/>
           <div class="dataTableDetail">
                               <v-table
+                              titleBgColor="#1989fa"
                               is-vertical-resize
                               :style="`width:100%;`"
                               is-horizontal-resize
@@ -72,6 +75,7 @@ export default {
   },
    data() {
             return {
+                 virtualMarginHeight:'136px', //区分真机和网页的不兼容问题
                  dataWindowH: document.body.clientHeight,
                  currentIndex:0,
                  tableWidth:window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
@@ -106,29 +110,32 @@ export default {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadLength) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
                         }
                     },
-                    {field: 'ClassGoodArea', title: '良品面积(平方米)', width: 60, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassGoodArea', title: '良品面积(㎡)', width: 58, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassGoodArea) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
                         }
                     },
-                    {field: 'ClassBadArea', title: '不良面积(平方米)',width: 60, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBadArea', title: '不良面积(㎡)',width: 58, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
+
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadArea) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
                         }
                     },
                    
-                    {field: 'ClassProdTime', title: '生产时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassProdTime', title: '生产时间(s)',width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
+                            rowData.ClassProdTime = 1000
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
                         }
                     },
-                    {field: 'ClassBreakCount', title: '停车次数',width: 50, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBreakCount', title: '停车次数',width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakCount) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakCount) + '</span>'
                         }
                     },
-                    {field: 'ClassBreakTime', title: '停车时间(s)',width: 50, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBreakTime', title: '停车时间(s)',width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
+                           rowData.ClassBreakTime = 1000
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakTime) + '</span>'
                         }
                     },
@@ -137,7 +144,7 @@ export default {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadLength) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
                         }
                     },
-                    {field: 'ClassProdTime', title: '预估完工时间',width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                    {field: 'ClassProdTime', title: '预估完工时间',width: 70, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
                         }
@@ -147,11 +154,15 @@ export default {
              
 
                   columnsDetail:[ 
-                    {field: 'TotalWidthmm', title: '门幅',width: 40, titleAlign: 'center',columnAlign:'center',isFrozen: true,isResize:true},
+                    {field: 'TotalWidthmm', title: '门幅',width: 40, titleAlign: 'center',columnAlign:'center',isFrozen: true,},
                    
                     {field: 'CustName', title:'客户名称', width: 80, titleAlign: 'center',columnAlign:'left',isResize:true},
                     {field: 'ArtID', title: '纸质', width: 40, titleAlign: 'center',columnAlign:'left',isResize:true},
-                    {field: 'ArtLB', title: '楞别', width: 40, titleAlign: 'center',columnAlign:'center',isResize:true},
+                    {field: 'ArtLB', title: '楞别', width: 40, titleAlign: 'center',columnAlign:'center',
+                     formatter: function (rowData, index) {
+                            return '<span>' + (rowData.ArtLB) + '</span>'
+                        }
+                    },
                     {field: 'CSizeW', title: '规格',width: 66, titleAlign: 'center',columnAlign:'center',isResize:true,
                       formatter: function (rowData, index) {
                             return '<span>' + (rowData.CSizeW) + '</span> * <span>' + (rowData.CSizeL) + '</span>'
@@ -159,20 +170,31 @@ export default {
                     },
                     // {field: 'CSizeW', title: '幅宽',width: 50, titleAlign: 'center',columnAlign:'right'},
                     // {field: 'CSizeL', title:'切长', width: 50, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'OrderQty', title: '数量', width: 40, titleAlign: 'center',columnAlign:'right',isResize:true},
-                    {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',isResize:true},
+                    {field: 'OrderQty', title: '数量', width: 40, titleAlign: 'center',columnAlign:'right',},
+                    {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',},
                     {field: 'Cut', title: '完工时间', width: 50, titleAlign: 'center',columnAlign:'right',isResize:true},
                     {field: 'Cut', title: '总长', width: 30, titleAlign: 'center',columnAlign:'right',isResize:true},
-                    {field: 'OrderNo', title: '订单号', width: 80, titleAlign: 'center',columnAlign:'center',isResize:true},
+                    {field: 'OrderNo', title: '订单号', width: 80, titleAlign: 'center',columnAlign:'center',},
                     ]
             }
         },
    methods:{
-         //计算数据合并
-          totalData(val1,val2){
-              if(val1!="" && val1!=null && val2 !="" && al2 !=null){
-                return Number(val1)+ Number(val2)
+          //设置class
+          columnCellClass(rowIndex,columnName,rowData){
+              // 给三行column为‘Parts1Material’和‘Parts2Material’的列设置className
+              /*根据你自己的cloumn设置*/
+              //debugger
+              if (columnName==='ClassProdTime'||columnName==='ClassBreakTime'){
+               // debugger
+                console.log('rowData.ClassBreakTime:'+rowData.ClassBreakTime)
+                  this.tableData.ClassBreakTime = this.totalData(rowData.ClassBreakTime)
+                   console.log('this.tableData.ClassBreakTime:'+this.tableData.ClassBreakTime)
+                //return 'column-cell-class-name-cailiao';//这是你的css名字
               }
+          },
+         //计算数据合并
+          totalData(val1){
+              return val1+100
           },
             //tab切换获取对应的生产数据
           getDataByLine(lineId){
@@ -235,7 +257,8 @@ export default {
                this.currentIndex = currentData[0].LineID
                this.GetLineDetailList(currentData[0].LineID)
             }).catch(err=>{
-              debugger
+              //debugger
+              this.$toast('获取生产数据列表失败：'+err);
             })
           },
            //获取生产详细数据列表
@@ -250,6 +273,7 @@ export default {
 
             }).catch(err=>{
               //debugger
+               this.$toast('获取生产详细数据列表失败：'+err);
             })
           }
    },
@@ -269,20 +293,11 @@ export default {
        this.GetLineList()
        let _selt =this
         window.addEventListener("orientationchange", function() {
-            //alert(1)
-      
-            // if(isApp){
-            //     _selt.dataWindowH = window.api.winHeight - 220
-            // }else
-            // {
-              
-            //     _selt.dataWindowH = document.body.clientHeight
-            //    // alert(_selt.dataWindowH)
-            //      console.log("_selt.dataWindowH :"+_selt.dataWindowH)
-            //       let ele = document.getElementById('dataTableDetail')
-            //      console.log(ele)
-            // }
+          //监听横屏事件
        })
+       if(isApp){
+         this.virtualMarginHeight ='116px'
+       }
 
    }
 
@@ -323,6 +338,12 @@ font-size: 12px;
   .van-tabs--card .van-tab__pane {
     background-color: transparent;
   }
+  .v-table-rightview {
+    right: -1px;  /*覆盖原有样式，解决表头最右侧有1px的间隙 */
+}
+.table-title{
+  color: #fff;
+}
   /* .dataTable{
       position: fixed;
       left:0px;

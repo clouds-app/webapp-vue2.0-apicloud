@@ -1,7 +1,7 @@
 <template>
 <div>
      <div class="NavBarcontainer" id="appheader">
-       <van-nav-bar tapmode
+       <van-nav-bar tapmode v-show="isHideTitleAndArrow"
             :title="title"
              left-text=" "
             :left-arrow="hideArrow"
@@ -54,9 +54,16 @@ export default {
          closeToWin:{
             type:Boolean,
             default:false
+        },
+         isHideTitleAndArrow:{
+            type:Boolean,
+            default:true
         }
     },
     mounted(){
+        if(!this.isHideTitleAndArrow){
+             this.navBarStyle='margin-top:14px;'
+        }
         if(isApp){
             this.navBarStyle='margin-top:80px;'
             this.fixHeaderStatusBar();
@@ -66,7 +73,10 @@ export default {
          fixHeaderStatusBar(){
             if(process.env.NODE_ENV === 'production'){
             let header = $api.byId('appheader');
-            $api.fixStatusBar(header);
+            if(header!=null){
+                   $api.fixStatusBar(header);
+            }
+         
             }
         
         },
@@ -100,7 +110,6 @@ export default {
                 name: 'refreshEvent',
                 extra: {
                     key1: 'value1',
-                    key2: 'value2'
                 }
             });
           }  

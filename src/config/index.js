@@ -1,3 +1,19 @@
+
+// import {getLocalStorage} from '@/libs/util'
+
+// import localStorage from 'localStorage'
+
+// const getServerPath = () =>{
+//   debugger
+//   let userInfo = localStorage.getItem('userInfo') //getLocalStorage('userInfo')
+//   if(userInfo!=""){
+//   let user =JSON.parse(userInfo)
+//   return user.serverPath
+//  }else{
+//    return ''
+//  }
+// }
+
 export default {
     /**
      * @description 默认页面标题
@@ -25,7 +41,7 @@ export default {
      */
     serverPath:{
       dev: '',
-      pro: 'http://120.78.91.203:12689/api'
+      pro: '' //'http://120.78.91.203:12689/api' //getServerPath() //
     },
     
 	  baseImgUrl:'http://shop.szclsoft.com',
@@ -44,4 +60,4 @@ export default {
       // }
     }
   }
-  
+

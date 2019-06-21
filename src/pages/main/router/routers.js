@@ -7,6 +7,7 @@ import paySuccess from '@/pages/paySuccess/paySuccess.vue'
 import getLineList from '@/pages/getLineList/getLineList.vue'
 import Menu from '@/components/Menu'
 import Main from '@/components/Main'
+import dataEcharts from '@/pages/dataEcharts/dataEcharts.vue'
 export default[
     {
       path: '/',
@@ -29,6 +30,12 @@ export default[
       name: 'login',
       component: login
    
+    },
+    {
+      path: '/dataEcharts',
+      name: 'dataEcharts',
+      component: dataEcharts
+     
     },
     {
       path: '/chargeList',

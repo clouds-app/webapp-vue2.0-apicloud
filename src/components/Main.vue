@@ -52,17 +52,6 @@ export default {
         }
     },
     methods:{
-         //如监听回退刷新事件
-         RefreshEventListener(){
-          let _self = this
-          window.api.addEventListener({
-          name: 'refreshEvent'
-            }, function(ret, err) {
-                 _self.checkLogin()  //必须使用 let _self=this 否则无法识别 方法函数
-                 _self.getCompanyName()
-                
-            });
-       },
         //vant 下拉刷新
         onRefresh() {
          let _self=this
@@ -199,7 +188,11 @@ export default {
         this.checkLogin()
         this.getCompanyName()
         if(isApp){
-           this.RefreshEventListener() //监听返回刷新事件
+           let _self = this
+           this.RefreshEventListener(function(){
+                _self.checkLogin()  //必须使用 let _self=this 否则无法识别 方法函数
+                _self.getCompanyName()
+           })
         }
     }
 }

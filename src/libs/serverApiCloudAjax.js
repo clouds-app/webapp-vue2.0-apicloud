@@ -49,7 +49,7 @@ var options = {
      * @param  {object} config 配置参数
      */
     constructor (config) {
-     // console.warn('构造方法:'+JSON.stringify(config))
+     // console.warn('serverApiAjax 构造方法:'+JSON.stringify(config))
       options = Object.assign(options, config);
       //console.warn('构造方法:'+JSON.stringify(config))
     }

@@ -84,7 +84,7 @@ export default {
                     }
                     else
                     {
-                      debugger
+                      //debugger
                       reject(data)
                     }
                 }).catch(err=>{

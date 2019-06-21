@@ -15,13 +15,17 @@ export const turnToPage = (params) => {
     //debugger
     if (isApp) {
      //正式环境
+     let slidBackEnabled = params.slidBackEnabled
+     if(!slidBackEnabled){
+      slidBackEnabled =false
+     }
      window.api.openWin({
           name: `${params.name}`,
           url: `./${params.name}.html`,
           reload:true,
-          slidBackEnabled:false,
+          slidBackEnabled,
           pageParam: {
-              name: 'test'
+              //name: 'test'
           }
        })
     } else{
