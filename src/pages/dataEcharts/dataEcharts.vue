@@ -4,9 +4,9 @@
        <!-- <div style="margin-top:50px;"></div> -->
        <van-row>
         <van-col span="8"> 
-           <van-button plain size="mini" style="minWidth:30px;width:auto;"   @click="handleSearch()"   type="primary" >当天</van-button>
-           <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="info" >本周</van-button>
-           <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="danger" >本月</van-button>
+           <van-button  size="mini" style="minWidth:40px;width:auto;"   @click="handleSearch()"   type="primary" >当 天</van-button>
+           <van-button  size="mini" style="minWidth:40px;width:auto"   @click="handleSearch()"   type="info" >本 周</van-button>
+           <van-button  size="mini" style="minWidth:40px;width:auto"   @click="handleSearch()"   type="danger" >本 月</van-button>
         </van-col>
         <van-col span="16" >
             <van-row gutter="20"> 
@@ -16,43 +16,42 @@
             </van-row>
        </van-col>
       </van-row>
-         <van-row gutter="20"> 
-              <van-col span="2" class="subButton"> 
-                 <ul>
+       
+       <div class="subButton">
+            <ul>
                   <li>
-                      <van-button  plain size="mini" style="minWidth:40px;width:auto;"   @click="handleSearch()"   type="primary" >产 能</van-button>
+                      <van-button   size="mini"  @click="handleSearch()"   type="primary" >产 能</van-button>
                   </li>
                   <li>
-                      <van-button plain size="mini" style="minWidth:40px;width:auto;"   @click="handleSearch()"   type="primary" >损 耗</van-button>
+                      <van-button  size="mini" @click="handleSearch()"   type="primary" >损 耗</van-button>
                   </li>
                   <li>
-                      <van-button plain size="mini" style="minWidth:40px;width:auto;"   @click="handleSearch()"   type="primary" >停 次</van-button>
+                      <van-button  size="mini"   @click="handleSearch()"   type="primary" >停 次</van-button>
                   </li>
                   <li>
-                      <van-button plain size="mini" style="minWidth:40px;width:auto;"   @click="handleSearch()"   type="primary" >车 速</van-button>
+                      <van-button  size="mini"  @click="handleSearch()"   type="primary" >车 速</van-button>
                   </li>
               </ul>
-              </van-col>
-              <van-col span="22">
-                <div style="margin-left:10px;">
-                          
-                          <chart-bar style="height: 240px;" :value="barData" text="生产报表图"/>
-                </div>
-              </van-col>
-           
-       </van-row>
-       <div>
-          <van-button plain size="mini" style="minWidth:30px;width:auto;"   @click="handleSearch()"   type="primary" >班别</van-button>
-           <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="info" >全部</van-button>
-           <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="danger" >1线</van-button>
-            <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="danger" >2线</van-button>
+               <chart-bar style="height:260px;" :value="barData" text="生产报表图"/>
        </div>
-        <div>
-          <van-button plain size="mini" style="minWidth:30px;width:auto;"   @click="handleSearch()"   type="primary" >线别</van-button>
-           <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="info" >全部</van-button>
-           <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="danger" >A</van-button>
-          <van-button plain size="mini" style="minWidth:30px;width:auto"   @click="handleSearch()"   type="danger" >B</van-button>
+       <div class="lineButton">
+            <div>
+              <van-button  size="mini"    @click="handleSearch()"   type="primary" >线 别</van-button>
+              <van-button  size="mini"    @click="handleSearch()"   type="info" >全 部</van-button>
+              <van-button  round size="mini"    @click="handleSearch()"   type="danger" >1</van-button>
+              <van-button  round size="mini"   @click="handleSearch()"   type="danger" >2</van-button>
+            </div>
+              <div style="margin-top:6px;">
+                <van-button  size="mini"    @click="handleSearch()"   type="primary" >班 别</van-button>
+                <van-button  size="mini"    @click="handleSearch()"   type="info" >全 部</van-button>
+               <van-button  size="mini"  round   @click="handleSearch()"   type="danger" >A</van-button>
+               <van-button  size="mini"  round @click="handleSearch()"   type="danger" >B</van-button>
+            </div>
        </div>
+       <div class="jumpButton">
+          <van-button  size="normal" round   @click="handleSearch()"   type="primary" >生产现场</van-button>
+       </div>
+      
   </div>
 </template>
 
@@ -140,14 +139,33 @@ export default {
 }
 
 .subButton ul{
-  margin-top: 50px;
-  margin-left: 6px;
+    position: absolute;
+    left: 10px;
+    top: 93px;
 }
 .subButton li {
   margin-top: 15px;
 }
-/* .subButton button{
-  padding: 1px;
-} */
+.subButton li button{
+   min-width:40px;width:auto;
+}
+.lineButton{
+    z-index: 999;
+    position: absolute;
+    left: 100px;
+    bottom: 36px;
+    min-width:40px;
+    width:auto;
+}
+
+.lineButton button{
+
+   min-width:40px;width:auto;
+}
+.jumpButton{
+    position: absolute;
+    right:58px;
+    bottom: 36px;
+}
 </style>
 
