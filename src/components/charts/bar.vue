@@ -35,7 +35,16 @@ export default {
     getSeriesData(itemList){
       let tempList = []
       for(let item in itemList){
-         let seriesData = Object.values(itemList[item])
+       // debugger
+        let params = {
+                  PDate:itemList[item].PDate,
+                  FinishArea:Number.parseFloat(itemList[item].FinishArea),
+                  BadArea:Number.parseFloat(itemList[item].BadArea),
+                  FinishLength:Number.parseFloat(itemList[item].FinishLength),
+                  } 
+              
+         let seriesData = Object.values(params)
+         //debugger
          tempList.push(seriesData)
        }
        return tempList
@@ -81,23 +90,23 @@ export default {
             // 提供一份数据。
             dimensions:  ['product', '面积', '米速', '车速'],
             //dimensions:  ['product', 'LineID','ClassID', 'PDate','FinishArea','BadArea','FinishLength', 'BadLength','FinishWt','BadWt', 'BreakCount','BreakTime','ProdTime', 'BadRate','AvgSpeed'],
-           // source: seriesData
-            source: [
-                ['6月1', 43.3, 85.8, 2193.7],
-                ['6月2', 83.1, 73.4, 55.1],
-                ['6月3', 86.4, 65.2, 82.5],
-                ['6月4', 72.4, 53.9, 1239.1],
-                ['6月5', 72.4, 53.9, 39.1],
-                ['6月6', 72.4, 353.9, 339.1],
-                ['6月7', 72.4, 253.9, 39.1],
-                ['6月8', 43.3, 85.8, 193.7],
-                ['6月9', 83.1, 73.4, 55.1],
-                ['6月13', 86.4, 265.2, 1182.5],
-                ['6月14', 72.4, 253.9, 239.1],
-                ['6月15', 72.4, 53.9, 39.1],
-                ['6月16', 72.4, 53.9, 339.1],
-                ['6月17', 72.4, 53.9, 39.1],
-            ]
+            source: seriesData
+            // source: [
+            //     ['6月1', 43.3, 85.8, 2193.7],
+            //     ['6月2', 83.1, 73.4, 55.1],
+            //     ['6月3', 86.4, 65.2, 82.5],
+            //     ['6月4', 72.4, 53.9, 1239.1],
+            //     ['6月5', 72.4, 53.9, 39.1],
+            //     ['6月6', 72.4, 353.9, 339.1],
+            //     ['6月7', 72.4, 253.9, 39.1],
+            //     ['6月8', 43.3, 85.8, 193.7],
+            //     ['6月9', 83.1, 73.4, 55.1],
+            //     ['6月13', 86.4, 265.2, 1182.5],
+            //     ['6月14', 72.4, 253.9, 239.1],
+            //     ['6月15', 72.4, 53.9, 39.1],
+            //     ['6月16', 72.4, 53.9, 339.1],
+            //     ['6月17', 72.4, 53.9, 39.1],
+            // ]
         },
         // title: {
         // text: this.text,
