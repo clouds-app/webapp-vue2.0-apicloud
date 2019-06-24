@@ -3,7 +3,7 @@ export default
     {
     LineID: "1",
     ClassID: "A",
-    PDate: "2019/06/22",
+    PDate: "2019/06/24",
     FinishArea: "81517.05",
     BadArea: "11000",
     FinishLength: "60665.082",
@@ -49,8 +49,8 @@ export default
     AvgSpeed: "94.4547"
 },
 {
-    LineID: "2",
-    ClassID: "B",
+    LineID: "11",
+    ClassID: "D",
     PDate: "2019/06/19",
     FinishArea: "11517.05",
     BadArea: "62000",
@@ -87,6 +87,22 @@ export default
     FinishArea: "21517.05",
     BadArea: "22000",
     FinishLength: "30665.082",
+    BadLength: "0",
+    FinishWt: "47186.4018",
+    BadWt: "0",
+    BreakCount: "19",
+    BreakTime: "5404",
+    ProdTime: "38536",
+    BadRate: "0",
+    AvgSpeed: "94.4547"
+},
+{
+    LineID: "5",
+    ClassID: "C",
+    PDate: "2019/06/1",
+    FinishArea: "55517.05",
+    BadArea: "36000",
+    FinishLength: "78665.082",
     BadLength: "0",
     FinishWt: "47186.4018",
     BadWt: "0",

@@ -66,6 +66,9 @@ export default {
         }
         if(isApp){
             this.navBarStyle='margin-top:80px;'
+            if(!this.isHideTitleAndArrow){
+             this.navBarStyle='margin-top:40px;'
+            }
             this.fixHeaderStatusBar();
         }
     },

@@ -7,12 +7,10 @@ import store from '@/store'
 import config from '@/config'
 import Vant from 'vant';
 import 'vant/lib/index.css';
-import FastClick from 'fastclick'
-// import VueResource from 'vue-resource'
-// /*使用VueResource插件*/
-// Vue.use(VueResource)
-// 使用
-FastClick.attach(document.body)
+// import FastClick from 'fastclick'
+
+// // 使用
+// FastClick.attach(document.body)
 
 Vue.use(Vant);
 // 引入样式
@@ -43,9 +41,9 @@ if(process.env.NODE_ENV === 'production'){
       render: h => h(App)
     }).$mount('#app')
   
-    // window.api.setScreenOrientation({
-    //   orientation: 'auto'
-    // });
+    window.api.setScreenOrientation({
+      orientation: 'auto'
+    });
   // window.addEventListener("orientationchange", function() {
   //     var degree = window.orientation
   //     var w = api.winWidth

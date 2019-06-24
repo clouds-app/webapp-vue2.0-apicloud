@@ -11,6 +11,7 @@
         <van-cell-group v-show="hasAccess">
         <van-cell  title="查 看" @click="turnToPage('home')"  icon="location-o" is-link />
         <van-cell title="支 付" @click="turnToPage('chargeList')" icon="location-o" is-link  />
+       <van-cell  @click="turnToPage('dataEcharts')" title="图表查看" is-link value="查看" />
         <!-- <van-cell @click="turnToPage('login')"  title="注 册" icon="location-o"  is-link  arrow-direction="down"  /> -->
         <!-- <van-cell @click="turnToPage('login')"  title="注 册" icon="location-o"  is-link  arrow-direction="down"  />
         <van-cell title="套 餐" @click="turnToPage('chargeList')" icon="location-o" is-link  /> -->
@@ -18,6 +19,7 @@
         </van-cell-group>
 
         <van-cell-group v-show="!hasAccess">
+        <van-cell  @click="turnToPage('dataEcharts')" title="图表查看" is-link value="查看" />
         <van-cell  title="查 看"  @click="NoAccess()"  icon="location-o" is-link />
         <van-cell title="支 付" @click="turnToPage('chargeList')" icon="location-o" is-link  />
 

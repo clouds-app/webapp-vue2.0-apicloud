@@ -18,6 +18,7 @@
 <script>
 const isApp = process.env.NODE_ENV === 'development' ? false : true 
 import base_mixin from '@/pages/mixins/common'
+import * as switchMethods  from '@/libs/switchMethods'
 import NavBar from '_c/header'
 import Footer from '@/components/footer'
 export default {

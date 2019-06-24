@@ -22,7 +22,7 @@ export default {
   watch:{
     value(val){
       if(val){
-         console.log('数据变化：...')
+         console.log('数据变化：...'+val)
         this.initData()
       }
     }
@@ -35,12 +35,17 @@ export default {
     getSeriesData(itemList){
       let tempList = []
       for(let item in itemList){
-       // debugger
+        //车速=生产米数/生产时间     车速单位：米/秒
+        let runSpeed = Number.parseFloat(itemList[item].FinishLength)/Number.parseFloat(itemList[item].ProdTime)
+       //损耗率=不良面积/良品面积*100    保留两位小数
+        let WasteArea =  Number.parseFloat(itemList[item].BadArea)/Number.parseFloat(itemList[item].FinishArea) * 100
         let params = {
                   PDate:itemList[item].PDate,
                   FinishArea:Number.parseFloat(itemList[item].FinishArea),
-                  BadArea:Number.parseFloat(itemList[item].BadArea),
                   FinishLength:Number.parseFloat(itemList[item].FinishLength),
+                  WasteArea:WasteArea,
+                  runSpeed:runSpeed,
+                  BreakCount:Number.parseFloat(itemList[item].BreakCount),
                   } 
               
          let seriesData = Object.values(params)
@@ -65,30 +70,30 @@ export default {
    initData(){
        let _self = this
        let tempValue =this.value
-      // debugger
+       //debugger
        if(tempValue){
             let seriesData = _self.getSeriesData(tempValue)
-       
+       console.warn('seriesData'+seriesData)
        let option = {
         legend: {
            align: 'right',
            orient:'vertical',
-           itemWidth:10,
-           itemHeight:10,
-           top:80,
-           right:5,
-          //  selectedMode:'single', //单选
-          //  type: 'scroll',
+           itemWidth:30,
+           itemHeight:18,
+           top:60,
+           left:8,
+           selectedMode:'single', //单选
+           type: 'scroll',
         },
          grid: [
-                 {top:40,left:100} //x: '100%', y: '7%', width: '38%', height: '38%',
+                 {top:40,left:140} //x: '100%', y: '7%', width: '38%', height: '38%',
          ],
         tooltip: {},
         toolbox: {
         },
         dataset: {
             // 提供一份数据。
-            dimensions:  ['product', '面积', '米速', '车速'],
+            dimensions:  ['product', '面积', '米数', '车速','损耗','停次'],
             //dimensions:  ['product', 'LineID','ClassID', 'PDate','FinishArea','BadArea','FinishLength', 'BadLength','FinishWt','BadWt', 'BreakCount','BreakTime','ProdTime', 'BadRate','AvgSpeed'],
             source: seriesData
             // source: [
@@ -119,7 +124,7 @@ export default {
         // 声明一个 Y 轴，数值轴。
         yAxis: {},
         // 声明多个 bar 系列，默认情况下，每个系列会自动对应到 dataset 的每一列。
-        series: _self.getSeriesCount(3)
+        series: _self.getSeriesCount(5)
     }
       this.dom = echarts.init(this.$refs.dom, 'tdTheme')
       this.dom.setOption(option)
