@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-      <div id="lineData">
-        <!-- <NavBar title="生产数据"> -->
+      <div id="lineData" >
+        <NavBar title="生产数据" :isHideTitleAndArrow="false" :offSetHight="true">
           <div >
               <van-tabs @click="getDataDetailByLine">
                     <van-tab 
@@ -39,10 +39,10 @@
           <div class="dataTableDetail">
                               <v-table
                               titleBgColor="#1989fa"
-                              is-vertical-resize
+                              :is-vertical-resize="true"
                               :style="`width:100%;`"
-                              is-horizontal-resize
-                              :vertical-resize-offset='5'
+                              :is-horizontal-resize="true"
+                              :vertical-resize-offset='resizeOffset'
                               id="dataTableDetail"
                               ref="dataTableDetail"
                               :height="tableHeight"
@@ -75,8 +75,9 @@ export default {
   },
    data() {
             return {
-                 virtualMarginHeight:'136px', //区分真机和网页的不兼容问题
-                 dataWindowH: document.body.clientHeight,
+                  resizeOffset:1,
+                 virtualMarginHeight:'126px', //区分真机和网页的不兼容问题
+                 dataWindowH: window.innerHeight || document.body.clientHeight,
                  currentIndex:0,
                  tableWidth:window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                  tableData: [],
@@ -279,11 +280,13 @@ export default {
    },
    computed:{
      tableHeight(){
+        // return this.dataWindowH - 100;
        if(isApp){
-           return window.api.winHeight - 220;
+           return window.api.winHeight - 160;
        }else
        {
           return this.dataWindowH - 100;
+       
        }
 
     
@@ -294,10 +297,13 @@ export default {
        let _selt =this
         window.addEventListener("orientationchange", function() {
           //监听横屏事件
+         // this.dataWindowH =
        })
        if(isApp){
          this.virtualMarginHeight ='116px'
+         this.resizeOffset=-1
        }
+       this.$refs.dataTableDetail.resize()
 
    }
 
@@ -315,6 +321,7 @@ body{
 }
 #app {
   text-align: center;
+  
   /* font-size: 12px; */
 }
 #lineData{

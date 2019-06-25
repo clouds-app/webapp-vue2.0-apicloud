@@ -22,7 +22,7 @@ export default {
   watch:{
     value(val){
       if(val){
-         console.log('数据变化：...'+val)
+         console.log('数据变化：...')
         this.initData()
       }
     }
@@ -35,10 +35,19 @@ export default {
     getSeriesData(itemList){
       let tempList = []
       for(let item in itemList){
+        //debugger
+        //损耗率=不良面积/良品面积*100    保留两位小数
+        let WasteArea =  0
+        if(itemList[item].FinishArea!="" && itemList[item].FinishArea!="0"){
+         WasteArea= (Number.parseFloat(itemList[item].BadArea)/Number.parseFloat(itemList[item].FinishArea) * 100).toFixed(2)
+        }
+
         //车速=生产米数/生产时间     车速单位：米/秒
-        let runSpeed = Number.parseFloat(itemList[item].FinishLength)/Number.parseFloat(itemList[item].ProdTime)
-       //损耗率=不良面积/良品面积*100    保留两位小数
-        let WasteArea =  Number.parseFloat(itemList[item].BadArea)/Number.parseFloat(itemList[item].FinishArea) * 100
+        let runSpeed = 0
+        if(itemList[item].ProdTime!="" && itemList[item].ProdTime!="0"){
+         runSpeed= Number.parseFloat(itemList[item].FinishLength)/Number.parseFloat(itemList[item].ProdTime)
+        }
+       
         let params = {
                   PDate:itemList[item].PDate,
                   FinishArea:Number.parseFloat(itemList[item].FinishArea),
@@ -73,22 +82,33 @@ export default {
        //debugger
        if(tempValue){
             let seriesData = _self.getSeriesData(tempValue)
-       console.warn('seriesData'+seriesData)
+      // console.warn('seriesData'+seriesData)
        let option = {
         legend: {
            align: 'right',
            orient:'vertical',
-           itemWidth:30,
-           itemHeight:18,
-           top:60,
+           itemWidth:38,
+           itemHeight:22,
+           top:50,
            left:8,
            selectedMode:'single', //单选
            type: 'scroll',
+           inactiveColor:'rgba(0,23,11,0.3)',
+           textStyle:{color:'#000'}
         },
          grid: [
                  {top:40,left:140} //x: '100%', y: '7%', width: '38%', height: '38%',
          ],
-        tooltip: {},
+        tooltip: {
+          // 绝对位置，相对于容器左侧 10px, 上侧 10 px
+          // position: [10, 10]
+          //   position: function (point, params, dom, rect, size) {
+          //     // 固定在顶部
+          //     return [point[0], '10%'];
+          // }
+          // 相对位置，放置在容器正中间
+          position: ['50%', '5%']
+        },
         toolbox: {
         },
         dataset: {
@@ -122,7 +142,13 @@ export default {
         // 声明一个 X 轴，类目轴（category）。默认情况下，类目轴对应到 dataset 第一列。
         xAxis: {type: 'category'},
         // 声明一个 Y 轴，数值轴。
-        yAxis: {},
+         yAxis:{},
+        // yAxis: [
+        //     {
+        //         type: 'value',
+        //         name: 'GDP（亿元）'
+        //     }
+        // ],
         // 声明多个 bar 系列，默认情况下，每个系列会自动对应到 dataset 的每一列。
         series: _self.getSeriesCount(5)
     }

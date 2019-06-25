@@ -1,8 +1,7 @@
 <template>
   <div id="app">
-      <NavBar title="图 表" :isHideTitleAndArrow="false"/>
-       <!-- <div style="margin-top:50px;"></div> -->
-       <van-row>
+   <NavBar title="图 表" :isHideTitleAndArrow="false"> </NavBar>
+    <van-row style="background-color:#fff">
         <van-col span="8" class="dayWeekMonthButton"> 
            <van-button tapmode :disabled="currentDateType=='day'" size="mini" style="minWidth:40px;width:auto;"   @click="handleDataFilter('day')"   type="primary" >当 天</van-button>
            <van-button tapmode :disabled="currentDateType=='week'" size="mini" style="minWidth:40px;width:auto"   @click="handleDataFilter('week')"   type="info" >本 周</van-button>
@@ -10,12 +9,14 @@
         </van-col>
         <van-col span="16" >
             <van-row > 
-              <van-col span="8"> 
+              <van-col span="7"> 起始：
                 <van-button tapmode icon="clock" size="mini" style="minWidth:80px;width:auto;" @click="handlePickupData(1)" type="default">{{StartDate}}</van-button>
-                <!-- <van-field @focus="handlePickupData(1)" size="mini" :border="false" left-icon="clock"   style="width:160px;" v-model="StartDate" placeholder="起始日期" /> -->
                 </van-col>
-              <van-col span="8">
-                <!-- <van-field @focus="handlePickupData(2)" size="mini" left-icon="clock" style="width:160px;"  v-model="EndDate" placeholder="结束日期" /> -->
+                <van-col span="2"> 
+                    <span> - </span>
+                </van-col>
+              <van-col span="7">
+                结束：
                 <van-button tapmode  icon="clock" size="mini" style="minWidth:80px;width:auto;" @click="handlePickupData(2)" type="default">{{EndDate}}</van-button>
               </van-col>
               <van-col span="8"><van-button size="mini" style="minWidth:80px;width:auto"   @click="handleSearch()"   type="warning">查询</van-button></van-col>
@@ -33,27 +34,14 @@
                     :formatter="formatter"
                     @confirm="handleConfirm"
                     @cancel="handleCancel"
+
                   />
            </van-popup>
           
        </van-col>
       </van-row>
-       
+
        <div class="subButton">
-            <!-- <ul>
-                  <li>
-                      <van-button   size="mini"  @click="handleSearch()"   type="primary" >产 能</van-button>
-                  </li>
-                  <li>
-                      <van-button  size="mini" @click="handleSearch()"   type="primary" >损 耗</van-button>
-                  </li>
-                  <li>
-                      <van-button  size="mini"   @click="handleSearch()"   type="primary" >停 次</van-button>
-                  </li>
-                  <li>
-                      <van-button  size="mini"  @click="handleSearch()"   type="primary" >车 速</van-button>
-                  </li>
-              </ul> -->
                <chart-bar style="height:300px;" :value="barData" text="生产报表图"/>
        </div>
        <div class="lineButton">
@@ -93,6 +81,7 @@ export default {
   },
    data() {
             return {
+                  isSearchData:false,
                   isSelectedEndDate:false,
                   currentDate: new Date(),
                   minDate: new Date(2018, 0, 1),
@@ -101,8 +90,9 @@ export default {
                   StartDate:'',
                   EndDate:'',
                   barData:  [],
-                  tempBarData:[...mockData] || [],
-                  currentDateType:'week',//当天day （默认），本周week，本月month
+                  currentMonthBarData:[],
+                  tempBarData:[],//[...mockData] || [],
+                  currentDateType:'week',//当天 day （默认），本周 week，本月 month :null
                   currentSelectLineId:'', //当前选中线别
                   currentSelectClassId:'',//当前选中班别
                   allLineList:[], //当前数据所有线别
@@ -123,26 +113,13 @@ export default {
       //过滤数据 线别
       filterDataByLineId(lineId){
            this.currentSelectLineId =lineId
-          //  let currentFilterData = []
-          //   currentFilterData = this.tempBarData.filter(item=>{
-          //         let flag = this.strToArrayNum(lineId).includes(Number(item.LineID))
-          //           return flag 
-          //     })
-
-          //  this.barData  = currentFilterData
+   
           let currentData =this.dateFilter(this)
           this.barData  = currentData
       },
         //过滤数据 班别
       filterDataByClassId(classId){
           this.currentSelectClassId = classId
-        //   let currentFilterData = []
-        //    currentFilterData = this.tempBarData.filter(item=>{
-        //        let flag = (classId.toUpperCase().indexOf(item.ClassID.toUpperCase()+"")==-1 ? false : true)
-        //             return flag
-        //       })
-
-        //  this.barData  = currentFilterData
          let currentData =this.dateFilter(this)
           this.barData  = currentData
       },
@@ -168,6 +145,9 @@ export default {
         //debugger
         let tempLineList = []
         let tempClassList = []
+        if(!this.isSearchData){
+          this.tempBarData = this.currentMonthBarData
+        }
         for(let i=0;i<this.tempBarData.length;i++){
               //线别（去重）
               let currentLineId =this.tempBarData[i].LineID+""
@@ -186,6 +166,7 @@ export default {
       },
       //根据条件过滤当前数据 当天day，本周week，本月month
       handleDataFilter(type){
+          this.isSearchData =false
           this.currentDateType = type
           let currentData =this.dateFilter(this)
           this.barData  = currentData
@@ -197,10 +178,14 @@ export default {
         //    _self = this
         //  }
          let type = _self.currentDateType 
-         let currentFilterData = []
-         if(type =='day'){
+         let currentFilterData = _self.tempBarData
+
+         //当前日期数据
+         if(!this.isSearchData){
+            
+             if(type =='day'){
              let currentDate =_self.getCurrentData().replace('-','/').replace('-','/')
-              currentFilterData = _self.tempBarData.filter(item=>{
+              currentFilterData = _self.currentMonthBarData.filter(item=>{
                     return item.PDate+"" == currentDate
               })
 
@@ -212,7 +197,7 @@ export default {
                     currentWeekArray.push(currentDate)
                  }
 
-              currentFilterData = _self.tempBarData.filter(item=>{
+              currentFilterData = _self.currentMonthBarData.filter(item=>{
                      let flag = (currentWeekArray.indexOf(item.PDate+"")==-1 ? false : true)
                     return flag
               })
@@ -220,12 +205,18 @@ export default {
           }else{ //month
              let currentYearAndMonth = _self.getCurrentYearAndMonth()
 
-              currentFilterData = _self.tempBarData.filter(item=>{
+              currentFilterData = _self.currentMonthBarData.filter(item=>{
                      let flag = ((item.PDate).indexOf(currentYearAndMonth)==-1 ? false : true)
                     return flag
               })
           }
 
+          }else{
+            //日期搜索数据
+
+
+          }
+  
         //线别过滤
          if(this.currentSelectLineId!='' && this.currentSelectLineId!=null){
                currentFilterData = currentFilterData.filter(item=>{ //本体数据上过滤
@@ -260,12 +251,36 @@ export default {
           let currentDateFormat = currentData.getFullYear()+'/'+currentMonth
           return currentDateFormat
       },
+      //字符串转日期
+      stringToDate(dateStr,separator){
+          if(!separator){
+            separator="-";
+          }
+          let dateArr = dateStr.split(separator);
+          let year = parseInt(dateArr[0]);
+          let month;
+          //处理月份为04这样的情况                         
+          if(dateArr[1].indexOf("0") == 0){
+              month = parseInt(dateArr[1].substring(1));
+          }else{
+                month = parseInt(dateArr[1]);
+          }
+          let day = parseInt(dateArr[2]);
+          let date = new Date(year,month -1,day);
+          return date;
+      },
       //点击开始/结束日期,确认当前点了那个日期输入框
       handlePickupData(type){
         this.showGetContainer=true
+        this.currentDate =new Date()
         if(type=='1'){
+           //开始日期 绑定选择日期
+           this.currentDate =new Date(this.stringToDate(this.StartDate))
           this.isSelectedEndDate =false;
         }else{
+          //结束日子 绑定选择日期
+          this.currentDate =new Date(this.stringToDate(this.EndDate))
+          
           this.isSelectedEndDate =true;
         }
       },
@@ -316,12 +331,17 @@ export default {
            currentMonth =(Number(currentMonth)+1)
         }
         let currentDate =currentData.getDate()
+        if(Number(currentDate) <10){
+          currentDate ='0'+(Number(currentDate))
+        }
     
         let currentDataFormat = currentData.getFullYear()+'-'+currentMonth+'-'+currentDate
         return currentDataFormat
      },
       //查询报表数据
       handleSearch(){
+        this.currentDateType ='null' //置空 星期类型
+        this.isSearchData =true
         let params = {
           StartDate:this.StartDate,
           EndDate:this.EndDate
@@ -329,9 +349,12 @@ export default {
         let _self=this
         this.$store.dispatch('getQueryDatasList_actions',params).then(res=>{
            //console.log(JSON.stringify(res))
-           _self.$toast('获取数据成功')
            _self.tempBarData =res
+           if(this.currentMonthBarData.length==0){
+              this.currentMonthBarData =res 
+           }
            _self.dateFilter(_self)
+           _self.$toast('获取数据成功')
         }).catch(err=>{
            _self.$toast(err)
         })
@@ -339,15 +362,16 @@ export default {
    },
    //初始化数据
    beforeMount(){
-     this.StartDate =this.getCurrentData(-53).toString()
+     this.StartDate =this.getCurrentData(-30).toString()
      this.EndDate = this.getCurrentData(1).toString()
-     //this.handleSearch()
+     this.handleSearch()
+     this.currentDateType ='week'
    },
     
    mounted(){
-
-  let currentData =this.dateFilter(this)
-   this.barData  = currentData
+   //测试
+    //  let currentData =this.dateFilter(this)
+    //  this.barData  = currentData
    }
 
 }
@@ -356,7 +380,7 @@ export default {
    
 #app {
   text-align: center;
- 
+  font-size: 14px;
 }
 .van-cell{
   padding:0;

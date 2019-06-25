@@ -1,6 +1,7 @@
 <template>
 <div>
      <div class="NavBarcontainer" id="appheader">
+     <div style="height:10px;background-color:#1989fa" v-if="offSetHight"></div>
        <van-nav-bar tapmode v-show="isHideTitleAndArrow"
             :title="title"
              left-text=" "
@@ -24,7 +25,7 @@
         <slot></slot>
     </div>
     
-     <div :style="navBarStyle"></div>
+     <div :style="navBarStyle" ></div>
 </div>
     
 </template>
@@ -39,6 +40,10 @@ export default {
         }
     },
     props:{
+        offSetHight:{
+            type:Boolean,
+            default:false
+        },
         title:{
             type:String,
             default:'首  页'
@@ -66,9 +71,11 @@ export default {
         }
         if(isApp){
             this.navBarStyle='margin-top:80px;'
+            
             if(!this.isHideTitleAndArrow){
              this.navBarStyle='margin-top:40px;'
             }
+        
             this.fixHeaderStatusBar();
         }
     },
