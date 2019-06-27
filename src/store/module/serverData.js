@@ -11,7 +11,8 @@ export default {
     getters:{
       
         goodsList_state:state=>state.goodsList,
-        goodsDetail_state:state=>state.goodsDetail
+        goodsDetail_state:state=>state.goodsDetail,
+        goodsReport_state:state=>state.goodsReport
        // doneTodos: state => {//通过方法访问
       //   return state.todos.filter(todo => todo.done)
       // },

@@ -72,7 +72,7 @@ import Footer from '@/components/footer'
 import { ChartPie, ChartBar } from '_c/charts'
 import * as switchMethods  from '@/libs/switchMethods'
 import {getCookie,getLocalStorage} from '@/libs/util'
-import {getDate} from '@/libs/tools'
+import {getDate,dataDiff} from '@/libs/tools'
 export default {
   name: 'dataEcharts',
   mixins:[base_mixin],
@@ -89,7 +89,7 @@ export default {
                   showGetContainer: false,
                   StartDate:'',
                   EndDate:'',
-                  barData:  [],
+                  barData: [],
                   currentMonthBarData:[],
                   tempBarData:[],//[...mockData] || [],
                   currentDateType:'week',//当天 day （默认），本周 week，本月 month :null
@@ -101,11 +101,39 @@ export default {
             }
         },
    methods:{
+     //验证两个输入的日期 是否有效
+     checkInputData(){
+       let flag =true
+       let msg =''
+       if(this.StartDate =='' || this.EndDate ==''){
+         msg ='开始/结束日期必填'
+         flag=false
+       }
+       else if(this.StartDate !='' || this.EndDate !='')
+       {
+          let date1 = this.stringToDate(this.StartDate)
+          let date2 = this.stringToDate(this.EndDate)
+          let diff =dataDiff('d',date1,date2)
+          if(diff>31){
+             msg ='时间间隔不能超过30天'
+             flag=false
+          }
+          if(diff<0){
+             msg ='结束时间必须大于开始时间'
+             flag=false
+          }
+       }
+
+       if(msg!=''){
+          this.$toast(msg)
+       }
+       return flag
+     },
        //跳转到指定页面，默认字符串
        turnToPage(path){
           let params ={
               name:path,
-              slidBackEnabled:true //划屏 回退
+              slidBackEnabled:true //划屏 回 退
 
           }
           switchMethods.turnToPage(params)
@@ -141,21 +169,19 @@ export default {
           return tempArrayList
       },
       //获取数据所有 班别/线别 列表 （去重）
-      getGoodsAllLineOrClass(){
+      getGoodsAllLineOrClass(itemList){
         //debugger
         let tempLineList = []
         let tempClassList = []
-        if(!this.isSearchData){
-          this.tempBarData = this.currentMonthBarData
-        }
-        for(let i=0;i<this.tempBarData.length;i++){
+       
+        for(let i=0;i<itemList.length;i++){
               //线别（去重）
-              let currentLineId =this.tempBarData[i].LineID+""
+              let currentLineId =itemList[i].LineID+""
               if(tempLineList.indexOf(currentLineId)==-1){
                 tempLineList.push(currentLineId)
               }
               //班别（去重）
-              let currentClassId = this.tempBarData[i].ClassID+""
+              let currentClassId = itemList[i].ClassID+""
               if(tempClassList.indexOf(currentClassId)==-1){
                 tempClassList.push(currentClassId)
               }
@@ -166,10 +192,27 @@ export default {
       },
       //根据条件过滤当前数据 当天day，本周week，本月month
       handleDataFilter(type){
-          this.isSearchData =false
-          this.currentDateType = type
-          let currentData =this.dateFilter(this)
-          this.barData  = currentData
+           this.isSearchData =false
+         
+          
+          // this.barData  = currentData
+            //  if(type =='day'){
+            //      this.StartDate =this.getCurrentData().toString()
+            //      this.EndDate = this.getCurrentData().toString()
+            //  }else if(type =='week'){
+            //       this.StartDate =this.getCurrentData(-7).toString()
+            //      this.EndDate = this.getCurrentData().toString()
+            //  }else{ //month
+            //      this.StartDate =this.getCurrentData(-30).toString()
+            //      this.EndDate = this.getCurrentData().toString()
+            //  }
+            // if(type =='month'){
+            //      this.StartDate =this.getCurrentData(-30).toString()
+            //      this.EndDate = this.getCurrentData().toString()
+            // }
+           // this.handleSearch()
+            this.currentDateType = type
+            let currentData =this.dateFilter(this)
       },
       //数据过滤
       dateFilter(thisItem){
@@ -185,27 +228,28 @@ export default {
             
              if(type =='day'){
              let currentDate =_self.getCurrentData().replace('-','/').replace('-','/')
-              currentFilterData = _self.currentMonthBarData.filter(item=>{
+              currentFilterData = _self.tempBarData.filter(item=>{
                     return item.PDate+"" == currentDate
               })
 
           }
           else if(type =='week'){
-             let currentWeekArray =[]
-                 for(let i=0;i<7;i++){
-                    let currentDate =_self.getCurrentData(-i).replace('-','/').replace('-','/')
-                    currentWeekArray.push(currentDate)
-                 }
+             let currentWeekArray = this.getCurrentWeekList()
+                //  for(let i=0;i<7;i++){
+                //     let currentDate =_self.getCurrentData(-i).replace('-','/').replace('-','/')
+                //     currentWeekArray.push(currentDate)
+                //  }
 
-              currentFilterData = _self.currentMonthBarData.filter(item=>{
+              currentFilterData = _self.tempBarData.filter(item=>{
                      let flag = (currentWeekArray.indexOf(item.PDate+"")==-1 ? false : true)
                     return flag
               })
 
-          }else{ //month
+          }
+          else{ //month
              let currentYearAndMonth = _self.getCurrentYearAndMonth()
 
-              currentFilterData = _self.currentMonthBarData.filter(item=>{
+              currentFilterData = _self.tempBarData.filter(item=>{
                      let flag = ((item.PDate).indexOf(currentYearAndMonth)==-1 ? false : true)
                     return flag
               })
@@ -233,11 +277,30 @@ export default {
 
          }
 
-          _self.getGoodsAllLineOrClass()
+          _self.getGoodsAllLineOrClass(currentFilterData)
           _self.barData  = currentFilterData
          // debugger
           return currentFilterData
           
+      },
+      //获取本周日期 列表
+      getCurrentWeekList(){
+        //debugger
+        let firstDayOfWeek =''
+        let currentWeekArray =[]
+        for(let i=1;i<7;i++){
+             let day = new Date();
+             let num = day.getDay()-1;
+             day.setDate(day.getDate() - num); //本周第一天
+             if(firstDayOfWeek==''){
+                firstDayOfWeek = day.format("yyyy-MM-dd");
+                currentWeekArray.push(firstDayOfWeek)
+             }
+             day.setDate(day.getDate() + i)   
+             let currentDate = day.format("yyyy-MM-dd");
+             currentWeekArray.push(currentDate)
+         }
+        return currentWeekArray
       },
       //获取当前年月 字符串 ：2019/06
       getCurrentYearAndMonth(){
@@ -340,6 +403,10 @@ export default {
      },
       //查询报表数据
       handleSearch(){
+        if(!this.checkInputData())
+        {
+            //return
+        }
         this.currentDateType ='null' //置空 星期类型
         this.isSearchData =true
         let params = {
@@ -356,22 +423,40 @@ export default {
            _self.dateFilter(_self)
            _self.$toast('获取数据成功')
         }).catch(err=>{
+           _self.tempBarData = []
+           _self.dateFilter(_self)
            _self.$toast(err)
         })
       }
    },
    //初始化数据
    beforeMount(){
-     this.StartDate =this.getCurrentData(-30).toString()
-     this.EndDate = this.getCurrentData(1).toString()
-     this.handleSearch()
-     this.currentDateType ='week'
+     this.StartDate =this.getCurrentData(-60).toString() //测试 60 天 数据
+     this.EndDate = this.getCurrentData().toString()
+   
    },
     
    mounted(){
    //测试
     //  let currentData =this.dateFilter(this)
     //  this.barData  = currentData
+      //this.getCurrentWeekList()
+      this.handleSearch()
+      this.currentDateType ='month'
+
+    //  let currentData = this.$store.getters.goodsReport_state
+    //  if(!currentData){
+    //    this.handleSearch()
+    //    this.currentDateType ='month'
+    //  }else{
+    //   // debugger
+    //     if(currentData!=""){
+    //         this.currentDateType ='null'
+    //         this.barData =JSON.parse(currentData)
+    //     }
+    //     let currentData =this.dateFilter(this)
+    //  }
+     
    }
 
 }
