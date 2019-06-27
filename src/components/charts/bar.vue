@@ -3,7 +3,9 @@
 </template>
 
 <script>
-import echarts from 'echarts'
+// import echarts from 'echarts'
+ // 重点：此位置引入的是你单独配置的echarts
+ import echarts from '@/libs/echarts' //按需加载
 import tdTheme from './theme.json'
 import { on, off } from '@/libs/tools'
 echarts.registerTheme('tdTheme', tdTheme)
@@ -102,7 +104,7 @@ export default {
            top:16,
            left:8,
            selectedMode:'single', //单选
-           type: 'scroll',
+           //type: 'scroll',
            inactiveColor:'rgba(0,23,11,0.3)',
            textStyle:{color:'#000'}
         },
@@ -119,8 +121,7 @@ export default {
           // 相对位置，放置在容器正中间
           position: ['50%', '5%']
         },
-        toolbox: {
-        },
+      
         dataset: {
             // 提供一份数据。
             dimensions:  ['product', '面积', '米数', '车速','损耗','停次'],

@@ -7,10 +7,10 @@
         <van-cell title="生产线数" >
             <div slot="title">
               <van-row>
-                <van-col span="8" style="text-align:center;line-height: 50px;">
+                <!-- <van-col span="8" style="text-align:center;line-height: 50px;">
                   <span>生产线条数</span>
-                </van-col>
-                <van-col span="16">
+                </van-col> -->
+                <van-col span="24">
                    <van-dropdown-menu >
                     <van-dropdown-item @change="handleLineChange" v-model="valueOfChargeNum" :options="chargeListNum" />
                   </van-dropdown-menu>
@@ -78,7 +78,7 @@ export default {
                 let user =JSON.parse(userInfo)
                 for(let i =1;i<=user.totalLine;i++){
                   let params ={
-                    text:i,
+                    text:'生产线/数 '+i+' 条',
                     value:i
                   }
                   tempArray.push(params)

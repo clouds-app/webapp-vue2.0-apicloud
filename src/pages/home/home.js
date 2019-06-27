@@ -17,14 +17,14 @@ Vue.use(Vant);
 Vue.prototype.$config = config
 Vue.config.productionTip = false
 
-// 引入样式
-import 'vue-easytable/libs/themes-base/index.css'
-// 导入 table 和 分页组件   @使用说明:http://csxiazai.cn/share/app3/app.html#/install
-import {VTable,VPagination} from 'vue-easytable'
+// // 引入样式
+// import 'vue-easytable/libs/themes-base/index.css'
+// // 导入 table 和 分页组件   @使用说明:http://csxiazai.cn/share/app3/app.html#/install
+// import {VTable,VPagination} from 'vue-easytable'
 
-// 注册到全局
-Vue.component('v-table',VTable)
-Vue.component('v-tablePage',VPagination)
+// // 注册到全局
+// Vue.component('v-table',VTable)
+// Vue.component('v-tablePage',VPagination)
 
 /* eslint-disable no-new */
 if(process.env.NODE_ENV === 'production'){

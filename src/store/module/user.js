@@ -73,7 +73,7 @@ export default {
               const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
               if(data.success)
               {
-                debugger
+               // debugger
                 commit('setUserInfo',data.data)
                 //import config from '@/config'
                 const config  = require('@/config');
@@ -87,7 +87,7 @@ export default {
               }
               else
               {
-                debugger
+               // debugger
                 let errData=data.data  //到期续费的 需要重新赋值setUserInfo
                 if(errData!=null){
                   commit('setUserInfo',data.data)

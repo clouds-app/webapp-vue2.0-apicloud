@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-      <div id="lineData" >
+      <div id="lineData" title='123' >
         <NavBar title="生产数据" :isHideTitleAndArrow="false" :offSetHight="true">
           <div >
               <van-tabs @click="getDataDetailByLine">
@@ -17,8 +17,8 @@
                       <div class="dataTable">
                           <v-table
                           titleBgColor="#1989fa"
-                          id="dataTable"
-                          ref="dataTable"
+                          id="dataTableLine"
+                          ref="dataTableLine"
                           is-vertical-resize
                           style="width:100%;"
                           is-horizontal-resize
@@ -88,7 +88,8 @@ export default {
                  columns: [
                     {field: 'LineID', title:'订单', width: 36, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
-                               return '<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">本笔</span>'
+                               return '<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">上刀</span><br/><span style="font-weight: bold;">下刀</span>'
+                               
                         },isFrozen: true},
                     {field: 'LineID', title:'总数', width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
@@ -126,10 +127,41 @@ export default {
                         }
                     },
                    
-                    {field: 'ClassProdTime', title: '生产时间(s)',width: 80, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassProdTime', title: '生产时间',width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             //rowData.ClassProdTime = 1000
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
+                            function formatSeconds(value){
+                               let secondTime = parseInt(value);// 秒
+                                let minuteTime = 0;// 分
+                                let hourTime = 0;// 小时
+                                if(secondTime > 60) {//如果秒数大于60，将秒数转换成整数
+                                    //获取分钟，除以60取整数，得到整数分钟
+                                    minuteTime = parseInt(secondTime / 60);
+                                    //获取秒数，秒数取佘，得到整数秒数
+                                    secondTime = parseInt(secondTime % 60);
+                                    //如果分钟大于60，将分钟转换成小时
+                                    if(minuteTime > 60) {
+                                        //获取小时，获取分钟除以60，得到整数小时
+                                        hourTime = parseInt(minuteTime / 60);
+                                        //获取小时后取佘的分，获取分钟除以60取佘的分
+                                        minuteTime = parseInt(minuteTime % 60);
+                                    }
+                                }
+                                let result = "" + parseInt(secondTime);
+                                if(minuteTime > 0) {
+                                  result = "" + parseInt(minuteTime) + ":" + result;
+                                }else{
+                                  result = "00"  +":" + result;
+                                }
+                                if(hourTime > 0) {
+                                  result = "" + parseInt(hourTime) + ":" + result;
+                                }else{
+                                   result = "00"+ ":" + result;
+                                }
+                                
+                                return result;
+                            }
+                            return '<span style="color:green;font-weight: bold;">' + formatSeconds(rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + formatSeconds(rowData.CurProdTime) + '</span>'
                         }
                     },
                     {field: 'ClassBreakCount', title: '停车次数',width: 40, titleAlign: 'center',columnAlign:'right',
@@ -137,9 +169,9 @@ export default {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakCount) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakCount) + '</span>'
                         }
                     },
-                    {field: 'ClassBreakTime', title: '停车时间(s)',width: 80, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBreakTime', title: '停车时间',width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                           rowData.ClassBreakTime = 1000
+                           //rowData.ClassBreakTime = 1000
 
                             function formatSeconds(value){
                                let secondTime = parseInt(value);// 秒
@@ -159,12 +191,23 @@ export default {
                                     }
                                 }
 
-                                let result = "" + parseInt(secondTime) + "秒";
+                                // let result = "" + parseInt(secondTime) + "秒";
+                                // if(minuteTime > 0) {
+                                //   result = "" + parseInt(minuteTime) + "分" + result;
+                                // }
+                                // if(hourTime > 0) {
+                                //   result = "" + parseInt(hourTime) + "小时" + result;
+                                // }
+                                let result = "" + parseInt(secondTime);
                                 if(minuteTime > 0) {
-                                  result = "" + parseInt(minuteTime) + "分" + result;
+                                  result = "" + parseInt(minuteTime) + ":" + result;
+                                }else{
+                                  result = "00"  +":" + result;
                                 }
                                 if(hourTime > 0) {
-                                  result = "" + parseInt(hourTime) + "小时" + result;
+                                  result = "" + parseInt(hourTime) + ":" + result;
+                                }else{
+                                   result = "00"+ ":" + result;
                                 }
                                 
                                 return result;
@@ -180,6 +223,11 @@ export default {
                     {field: 'ClassProdTime', title: '预估完工时间',width: 70, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
+                        }
+                    },
+                     {field: 'ClassProdTime', title: '热板车速',width: 70, titleAlign: 'center',columnAlign:'right',isResize:true,
+                     formatter: function (rowData, index) {
+                            return '<div style="line-height: 40px !important;"><span style="color:blue;font-weight: bold;">' + (rowData.Speed_H) + '</span></div>'
                         }
                     },
                     ],
@@ -295,10 +343,10 @@ export default {
               let _self=this
               let myPayLines = []
               for (const chargeItem of this.myChargeListDetail) {
-                   myPayLines.push(chargeItem.custLineId+"")
+                   myPayLines.push(Number(chargeItem.custLineId))
               }
               let afterData = itemList.filter(item=>{
-                  return myPayLines.indexOf(item.LineID) ==-1 ? false :true
+                  return myPayLines.indexOf(Number(item.LineID)) ==-1 ? false :true
               })
               return afterData
           },
@@ -336,6 +384,12 @@ export default {
               //debugger
                this.$toast('获取生产详细数据列表失败：'+err);
             })
+          },
+          zeptoSetCss(){
+            //debugger
+         // $('#dataTableLine .table-title').css('font-size','20px')
+         //  console.warn($('.v-table-body-cell').css('line-height','20px!important'));
+          // console.warn($('.v-table-row').css('font-size','20px'));
           }
    },
    computed:{
@@ -367,15 +421,22 @@ export default {
        this.$refs.dataTableDetail.resize()
         //设置样式
        // let header = $api.byId('dataTable');
-
+       this.$nextTick(()=>{
+           // this.zeptoSetCss() //设置样式
+       })
+      
+       
    }
 
 }
 </script>
 
 <style >
-.v-table-body-cell{
-  line-height: 20px !important;
+#dataTableLine .v-table-body-cell{
+  line-height: 13px !important;
+}
+#dataTableDetail .v-table-body-cell{
+  line-height: 40px !important;
 }
 body{
   width: 100%;
@@ -414,17 +475,8 @@ font-size: 12px;
 .table-title{
   color: #fff;
 }
-  /* .dataTable{
-      position: fixed;
-      left:0px;
-      top:50px;
-  } */
-  .dataTableDetail{
-     /* position: fixed;
-      left:0px;
-      top:50px; */
-   
-  }
+
+ 
 </style>
 
 

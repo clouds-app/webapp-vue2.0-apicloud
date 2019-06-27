@@ -70,7 +70,7 @@ module.exports = {
     cssSourceMap: false
   },
 
-  build: {
+  build: { 
     // Template for index.html
     index: path.resolve(__dirname, '../dist/index.html'),
 
@@ -80,10 +80,10 @@ module.exports = {
     assetsPublicPath: process.env.NODE_ENV === 'production'?'./':'/', //修改为相对路径
 
     /**
-     * Source Maps
+     * Source Maps 
      */
 
-    productionSourceMap: false,
+    productionSourceMap: false,// 屏蔽sourceMap // 打包优化1
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 
@@ -91,8 +91,9 @@ module.exports = {
     // Surge or Netlify already gzip all static assets for you.
     // Before setting to `true`, make sure to:
     // npm install --save-dev compression-webpack-plugin
-    productionGzip: false,
-    productionGzipExtensions: ['script', 'css'],
+    //启用压缩功能前提是需要webpack的支持，安装压缩插件： npm install --save-dev compression-webpack-plugin
+    productionGzip: false, // 启用压缩插件  // 打包优化2
+    productionGzipExtensions: ['script','js', 'css','svg'], //顶压缩文件的类型 // 打包优化3
 
     // Run the build command with an extra argument to
     // View the bundle analyzer report after build finishes:

@@ -33,8 +33,10 @@ const webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
-    new UglifyJsPlugin({
+    new UglifyJsPlugin({ //启用 uglifyjs-webpack-plugin 缓存,构建优化
       uglifyOptions: {
+        parallel: true, // 并行
+        cache: true,  // 缓存
         compress: {
           warnings: false
         }

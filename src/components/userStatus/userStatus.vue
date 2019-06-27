@@ -2,23 +2,24 @@
     <div class="userStatus">
 <!-- :value="userPaymentMsg" -->
          <van-cell :title="userTelephone"  :label="userName"  > 
-              <van-image slot="icon" style="margin:0 10px"
+              <!-- <van-image slot="icon" style="margin:0 10px"
                 width="50"
                 height="50"
                 src="https://img.yzcdn.cn/vant/cat.jpeg"
-                />
+                /> -->
+                <van-icon name="user-o" slot="icon" size="40"  color="#1989fa" style="margin:0 10px"/>
                 <template slot="label">
                     <div>
                        {{this.userName}} 
                     </div>
                 </template>
-                 <!-- <template>
+                 <template>
                     <div>
                         <div> {{this.userPaymentMsg}} </div>
-                        <div>  到期时间 {{this.endTime}}  </div>
+                        <!-- <div>  到期时间 {{this.endTime}}  </div> -->
                       
                     </div>
-                </template> -->
+                </template>
           </van-cell>
           <!-- <van-cell :title="`到期时间(${this.userStatus.endTime})`" > </van-cell> -->
     </div>

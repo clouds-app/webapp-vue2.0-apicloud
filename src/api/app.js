@@ -40,7 +40,7 @@ export const orderSubmit = ({systemId,serverId,lineNumber}) => {
         serverId,
         lineNumber
     }
-    debugger
+    //debugger
     if(process.env.NODE_ENV === 'production'){
       //apiCloud 参数传递封装，其它另行处理，参考：https://docs.apicloud.com/Client-API/api#3  ajax
       data= {values: data} 

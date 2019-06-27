@@ -1,23 +1,23 @@
 <template>
   <div id="app">
    <NavBar title="图 表" :isHideTitleAndArrow="false"> </NavBar>
-    <van-row style="background-color:#fff">
+    <van-row style="background-color:#fff" type="flex" justify="space-between">
         <van-col span="8" class="dayWeekMonthButton"> 
            <!-- <van-icon name="arrow-left" /> -->
            <van-button tapmode :disabled="currentDateType=='day'" size="mini" style="minWidth:40px;width:auto;"   @click="handleDataFilter('day')"   type="primary" >当 天</van-button>
            <van-button tapmode :disabled="currentDateType=='week'" size="mini" style="minWidth:40px;width:auto"   @click="handleDataFilter('week')"   type="info" >本 周</van-button>
            <van-button tapmode :disabled="currentDateType=='month'" size="mini" style="minWidth:40px;width:auto"   @click="handleDataFilter('month')"   type="danger" >本 月</van-button>
         </van-col>
-        <van-col span="16" >
+        <van-col span="12" style="margin-right:15px;">
             <van-row > 
               <van-col span="8"> 
-                <van-button tapmode icon="clock" size="mini" style="minWidth:90px;width:auto;" @click="handlePickupData(1)" type="default">{{StartDate}}</van-button>
+                <van-button tapmode icon="clock" size="mini" style="minWidth:90px;width:auto;" @click="handlePickupData('start')" type="default">{{StartDate}}</van-button>
                 </van-col>
                 <van-col span="2"> 
                     <span> -> </span>
                 </van-col>
               <van-col span="8">
-                <van-button tapmode  icon="clock" size="mini" style="minWidth:90px;width:auto;" @click="handlePickupData(2)" type="default">{{EndDate}}</van-button>
+                <van-button tapmode  icon="clock" size="mini" style="minWidth:90px;width:auto;" @click="handlePickupData('end')" type="default">{{EndDate}}</van-button>
               </van-col>
               <van-col span="6"><van-button size="mini" style="minWidth:80px;width:auto"   @click="handleSearch()"   type="warning">查询</van-button></van-col>
             </van-row>
@@ -43,16 +43,16 @@
        <div class="subButton">
                <chart-bar style="min-height:268px;height:auto;" :value="barData" text="生产报表图"/>
        </div>
-       <div class="lineButton">
+       <div class="lineButton" id="lineButton">
             <div>
               <van-button tapmode  size="mini"    @click="filterDataByLineId(allLineList.toString())"   type="primary" >线 别</van-button>
               <van-button  tapmode size="mini"    @click="filterDataByLineId(allLineList.toString())"   type="info" >全 部</van-button>
-              <van-button tapmode v-for="item in allLineList" :key="item" round size="mini" :disabled="currentSelectLineId==item"   @click="filterDataByLineId(item)"   type="danger" >{{item}}</van-button>
+              <van-button tapmode v-for="item in allLineList" :key="item" round :plain="currentSelectLineId!=item" size="mini"    @click="filterDataByLineId(item)"   type="danger" >{{item}}</van-button>
             </div>
               <div style="margin-top:6px;">
                 <van-button tapmode size="mini"    @click="filterDataByClassId(allClassList.toString())"   type="primary" >班 别</van-button>
                 <van-button tapmode size="mini"    @click="filterDataByClassId(allClassList.toString())"   type="info" >全 部</van-button>
-                <van-button tapmode v-for="item in allClassList" :key="item" size="mini" :disabled="currentSelectClassId==item" round   @click="filterDataByClassId(item)"   type="danger" >{{item}}</van-button>
+                <van-button tapmode v-for="item in allClassList"  :key="item" size="mini" round :plain="currentSelectClassId!=item"  @click="filterDataByClassId(item)"   type="danger" >{{item}}</van-button>
             </div>
        </div>
        <div class="jumpButton">
@@ -68,7 +68,7 @@ import userStatus from '_c/userStatus'
 import base_mixin from '@/pages/mixins/common'
 import NavBar from '_c/header'
 import Footer from '@/components/footer'
-import { ChartPie, ChartBar } from '_c/charts'
+import {ChartBar } from '_c/charts'
 import * as switchMethods  from '@/libs/switchMethods'
 import {getCookie,getLocalStorage} from '@/libs/util'
 import {getDate,dataDiff} from '@/libs/tools'
@@ -76,7 +76,7 @@ export default {
   name: 'dataEcharts',
   mixins:[base_mixin],
   components:{
-    Footer,NavBar,userStatus,ChartPie,ChartBar,
+    Footer,NavBar,userStatus,ChartBar,
   },
    data() {
             return {
@@ -91,7 +91,7 @@ export default {
                   EndDate:'',
                   barData: [],
                   currentMonthBarData:[],
-                  tempBarData:[],//[...mockData] || [],
+                  tempBarData:[...mockData] || [],
                   currentDateType:'week',//当天 day （默认），本周 week，本月 month :null
                   currentSelectLineId:'', //当前选中线别
                   currentSelectClassId:'',//当前选中班别
@@ -114,11 +114,13 @@ export default {
               let _self=this
               let myPayLines = []
               for (const chargeItem of this.myChargeListDetail) {
-                   myPayLines.push(chargeItem.custLineId+"")
+                   myPayLines.push(Number(chargeItem.custLineId))
               }
+             // console.warn('myPayLines:'+myPayLines)
               let afterData = itemList.filter(item=>{
-                  return myPayLines.indexOf(item.LineID) ==-1 ? false :true
+                  return myPayLines.indexOf(Number(item.LineID)) ==-1 ? false :true
               })
+             // console.warn('afterData:'+JSON.stringify(afterData))
               return afterData
           },
      //验证两个输入的日期 是否有效
@@ -224,8 +226,8 @@ export default {
                  this.StartDate =this.getCurrentMonthList()[0] //本月第一天
                  this.EndDate = this.getCurrentData().toString()
              }
-             //如果列表没有数据，需要重新查询
-            if(this.tempBarData.length==0){
+             //如果列表没有数据，需要重新查询_self.currentMonthBarData
+            if(this.currentMonthBarData.length==0){
                  this.handleSearch()
             }
            
@@ -243,10 +245,11 @@ export default {
 
          //当前日期数据
          if(!this.isSearchData){
-            
+              debugger
+              currentFilterData = _self.currentMonthBarData
              if(type =='day'){
              let currentDate =_self.getCurrentData().replace('-','/').replace('-','/')
-              currentFilterData = _self.tempBarData.filter(item=>{
+              currentFilterData = currentFilterData.filter(item=>{
                     return item.PDate+"" == currentDate
               })
 
@@ -258,7 +261,7 @@ export default {
                 //     currentWeekArray.push(currentDate)
                 //  }
 
-              currentFilterData = _self.tempBarData.filter(item=>{
+              currentFilterData = currentFilterData.filter(item=>{
                      let flag = (currentWeekArray.indexOf(item.PDate+"")==-1 ? false : true)
                     return flag
               })
@@ -267,7 +270,7 @@ export default {
           else{ //month
              let currentYearAndMonth = _self.getCurrentYearAndMonth() //2019/06
 
-              currentFilterData = _self.tempBarData.filter(item=>{
+              currentFilterData = currentFilterData.filter(item=>{
                      let flag = ((item.PDate).indexOf(currentYearAndMonth)==-1 ? false : true)
                     return flag
               })
@@ -302,7 +305,7 @@ export default {
           return currentFilterData
           
       },
-      //获取本周日期 列表//type = first,last,all
+      //获取本周日期 列表
       getCurrentWeekList(){
         //debugger
         let firstDayOfWeek =''
@@ -368,7 +371,7 @@ export default {
       handlePickupData(type){
         this.showGetContainer=true
         this.currentDate =new Date()
-        if(type=='1'){
+        if(type=='start'){
            //开始日期 绑定选择日期
            this.currentDate =new Date(this.stringToDate(this.StartDate))
           this.isSelectedEndDate =false;
@@ -436,7 +439,7 @@ export default {
       //查询报表数据
       handleSearch(){
 
-        if(!this.checkInputData())
+        if(!this.checkInputData()) //日期验证 是否有效
         {
             //return
         }
@@ -450,11 +453,13 @@ export default {
         }
         let _self=this
         this.$store.dispatch('getQueryDatasList_actions',params).then(res=>{
-           //console.log(JSON.stringify(res))
-          // debugger
            let currentData = [...res]
              
            _self.tempBarData = _self.filterLine(currentData)
+           
+           if(_self.currentDateType=='month'){ //当前月数据保存，避免重现查询覆盖
+             _self.currentMonthBarData = _self.tempBarData
+           }
          
            _self.dateFilter(_self)
            _self.$toast('获取数据成功')
@@ -468,39 +473,29 @@ export default {
    //初始化数据
    beforeMount(){
      this.StartDate =this.getCurrentData(-60).toString() //测试 60 天 数据
-     this.EndDate = this.getCurrentData().toString()
-     this.getChargeListDetail()
+    // this.StartDate =this.getCurrentMonthList()[0] //本月第一天 ，上线 时，应该是这个数据
+     this.EndDate = this.getCurrentData().toString() //今天
+     this.getChargeListDetail() //缓存购买的 生产线 信息
    
    },
     
    mounted(){
      
-   //测试
-    //  let currentData =this.dateFilter(this)
-    //  this.barData  = currentData
-      //this.getCurrentWeekList()
       this.handleSearch()
-      this.currentDateType ='month'
+      this.currentDateType ='month' //首次查询当前月
+    //测试
+    //this.barData =this.tempBarData
 
-    //  let currentData = this.$store.getters.goodsReport_state
-    //  if(!currentData){
-    //    this.handleSearch()
-    //    this.currentDateType ='month'
-    //  }else{
-    //   // debugger
-    //     if(currentData!=""){
-    //         this.currentDateType ='null'
-    //         this.barData =JSON.parse(currentData)
-    //     }
-    //     let currentData =this.dateFilter(this)
-    //  }
-     
    }
 
 }
 </script>
 <style>
-   
+/* #lineButton .van-button--danger{
+    color: #fff;
+    background-color: #5c6960;
+    border: 1px solid #f44;
+}  */
 #app {
   text-align: center;
   font-size: 14px;
