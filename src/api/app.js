@@ -5,11 +5,12 @@ import Qs from 'qs'
 var axios = process.env.NODE_ENV === 'development' ? vueAxios : ApiCloudAjax
 /**
 * @description 获取收费信息
-* @params { null }
+* @params { lineNumber }
 */
-export const getChargeList = () => {
+export const getChargeList = ({lineNumber}) => {
     //参数
     let data = {
+      lineNumber
     }
 
     if(process.env.NODE_ENV === 'production'){
@@ -18,7 +19,7 @@ export const getChargeList = () => {
     } 
 
     return axios.request({
-      url: '/api/charge/list',
+      url: `/api/charge/list`,
       data,
       method: 'post',
       transformRequest: [function (data) {
@@ -33,12 +34,13 @@ export const getChargeList = () => {
 * @description 提交订单
 * @params { systemId,serverId }
 */
-export const orderSubmit = ({systemId,serverId}) => {
+export const orderSubmit = ({systemId,serverId,lineNumber}) => {
     //参数
     let data = {
-        serverId
+        serverId,
+        lineNumber
     }
-
+    debugger
     if(process.env.NODE_ENV === 'production'){
       //apiCloud 参数传递封装，其它另行处理，参考：https://docs.apicloud.com/Client-API/api#3  ajax
       data= {values: data} 

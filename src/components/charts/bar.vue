@@ -38,22 +38,32 @@ export default {
         //debugger
         //损耗率=不良面积/良品面积*100    保留两位小数
         let WasteArea =  0
-        if(itemList[item].FinishArea!="" && itemList[item].FinishArea!="0"){
-         WasteArea= (Number.parseFloat(itemList[item].BadArea)/Number.parseFloat(itemList[item].FinishArea) * 100).toFixed(2)
+        if(itemList[item].FinishArea!="" && itemList[item].FinishArea!="0" && itemList[item].BadArea!='0'){
+         // debugger
+          let up1 =Number.parseFloat(itemList[item].BadArea)
+          let down1 =Number.parseFloat(itemList[item].FinishArea)
+          WasteArea= (up1/down1 * 100)
+          WasteArea = WasteArea.toFixed(2)
         }
 
         //车速=生产米数/生产时间     车速单位：米/秒
         let runSpeed = 0
         if(itemList[item].ProdTime!="" && itemList[item].ProdTime!="0"){
-         runSpeed= Number.parseFloat(itemList[item].FinishLength)/Number.parseFloat(itemList[item].ProdTime)
+          let up1= Number.parseFloat(itemList[item].FinishLength)
+          let down1 =Number.parseFloat(itemList[item].ProdTime)
+          runSpeed= up1/down1
+          runSpeed = runSpeed.toFixed(2)
         }
        
+       let currentData = new Date()
+       let currentYear=  currentData.getFullYear()
+
         let params = {
-                  PDate:itemList[item].PDate,
+                  PDate:itemList[item].PDate.replace(currentYear+'/',''),
                   FinishArea:Number.parseFloat(itemList[item].FinishArea),
                   FinishLength:Number.parseFloat(itemList[item].FinishLength),
-                  WasteArea:WasteArea,
                   runSpeed:runSpeed,
+                  WasteArea:WasteArea,
                   BreakCount:Number.parseFloat(itemList[item].BreakCount),
                   } 
               
@@ -89,7 +99,7 @@ export default {
            orient:'vertical',
            itemWidth:38,
            itemHeight:22,
-           top:50,
+           top:16,
            left:8,
            selectedMode:'single', //单选
            type: 'scroll',
@@ -97,7 +107,7 @@ export default {
            textStyle:{color:'#000'}
         },
          grid: [
-                 {top:40,left:140} //x: '100%', y: '7%', width: '38%', height: '38%',
+                 {top:26,left:140} //x: '100%', y: '7%', width: '38%', height: '38%',
          ],
         tooltip: {
           // 绝对位置，相对于容器左侧 10px, 上侧 10 px

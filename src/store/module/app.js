@@ -65,22 +65,10 @@ export default {
                     const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
                     if(data.success)
                     {
-                      debugger
+                     // debugger
                       commit('setOrderInfo',data.data)
                       resolve(data)
-                        //   {
-                        //     "data": {
-                        //         "orderNo": "20190606104844846164",  订单号
-                        //         "payPrice": 557.07,  支付金额
-                        //         "discount": 9.3,   折扣0.1-10
-                        //         "orderPrice": 599,  原价
-                        //         "usetime": 360,   使用时长
-                        //         "orderName": "年度会员"   订单名称
-                        //     },
-                        //     "msg": "执行成功",
-                        //     "status": 0,
-                        //     "success": true
-                        // }
+  
                     }
                     else
                     {

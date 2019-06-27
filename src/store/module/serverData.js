@@ -118,11 +118,13 @@ export default {
                     }
                 }).catch(err=>{
                     console.error(JSON.stringify(err))
-                    reject(serverBusyTips)
+                    //reject(serverBusyTips)
+                    reject(serverDataZero)
                 })
             } catch (error) {
                 console.error(JSON.stringify(error))
                 reject(serverBusyTips)
+               // reject(serverDataZero +"::"+error)
             }
            
         })

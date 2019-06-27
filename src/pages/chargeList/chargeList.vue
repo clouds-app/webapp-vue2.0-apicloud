@@ -3,9 +3,24 @@
       <NavBar title="套 餐"/>
        <userStatus :userStatus="userStatus"/>
     
-        <van-tabs v-model="active">
-          <van-tab title="套 餐">
-              <van-col
+      <van-cell-group>
+        <van-cell title="生产线数" >
+            <div slot="title">
+              <van-row>
+                <van-col span="8" style="text-align:center;line-height: 50px;">
+                  <span>生产线条数</span>
+                </van-col>
+                <van-col span="16">
+                   <van-dropdown-menu >
+                    <van-dropdown-item @change="handleLineChange" v-model="valueOfChargeNum" :options="chargeListNum" />
+                  </van-dropdown-menu>
+                </van-col>
+          </van-row>
+        </div>
+        </van-cell>
+        <van-cell title="套 餐">
+            <div slot="title">
+               <van-col
                 v-for="(item) in ChargeList"
                 :key="item.id"
                 span="8" 
@@ -16,11 +31,16 @@
                     <div > <span class="serverPrice">￥{{ item.serverPrice }}</span></div>
                     <div class="serverUseTime"> <span >有效时长 {{ item.serverUseTime }} 天</span></div>
               </div>
+               </van-col>
+            </div>
+        </van-cell>
+      </van-cell-group>
+        
+        <!-- <van-tabs v-model="active">
+          <van-tab title="套 餐">
              
-            
-             </van-col>
           </van-tab>
-        </van-tabs>
+        </van-tabs> -->
       
   </div>
 </template>
@@ -40,6 +60,8 @@ export default {
   },
    data() {
             return {
+                  valueOfChargeNum: 1,
+                  chargeListNum: [],
                   userStatus:{},
                   active:"1",
                   isLoding:false,
@@ -48,6 +70,26 @@ export default {
                 }
         },
    methods:{
+        //获取 生产线 条数
+        getTotalChargeListNum(){
+            let userInfo = getLocalStorage('userInfo')
+            let tempArray =[]
+               if(userInfo!=""){
+                let user =JSON.parse(userInfo)
+                for(let i =1;i<=user.totalLine;i++){
+                  let params ={
+                    text:i,
+                    value:i
+                  }
+                  tempArray.push(params)
+                }
+                this.chargeListNum = tempArray
+            }
+        },
+        //处理生产线条数 选择 改变事件
+        handleLineChange(value){
+          this.getChargeList() //价格变动，重新获取
+        },
         //更新用户状态
         refreshUserStatus(){
           //debugger
@@ -61,7 +103,9 @@ export default {
        getChargeList(){
          let currentHasAccress = getLocalStorage('hasAccess')
        
-         let params ={}
+         let params ={
+           lineNumber:this.valueOfChargeNum
+         }
           let _self=this
           this.$store.dispatch('getChargeList_actions',params).then(res=>{
             // debugger
@@ -92,7 +136,8 @@ export default {
               if(item && item.id!=null){
                 let params={
                   systemId : getLocalStorage('userSystemId'),
-                  serverId :item.id
+                  serverId :item.id,
+                  lineNumber:_self.valueOfChargeNum //new 
                 }
                   _self.$store.dispatch('orderSubmit_action',params).then(res=>{
                    setTimeout(done, 0);
@@ -121,6 +166,7 @@ export default {
    mounted(){
      this.getChargeList()
      this.refreshUserStatus()
+     this.getTotalChargeListNum()
    }
 
 }
@@ -151,6 +197,7 @@ export default {
   margin: 10px 0 10px 0;
 }
 .changeBox{
+  text-align: center;
   background-color: rgba(235, 237, 240, 0.5);
   border-radius: 0.5rem;
   border: 1px solid #ccc;

@@ -53,6 +53,10 @@ module.exports = {
         options: vueLoaderConfig
       },
       {
+        test: require.resolve('zepto'),
+        loader: 'exports-loader?window.Zepto!script-loader'   //解决zepto不支持commonJS的问题
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test'), resolve('node_modules/webpack-dev-server/client')]

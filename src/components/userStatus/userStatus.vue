@@ -12,13 +12,13 @@
                        {{this.userName}} 
                     </div>
                 </template>
-                 <template>
+                 <!-- <template>
                     <div>
                         <div> {{this.userPaymentMsg}} </div>
                         <div>  到期时间 {{this.endTime}}  </div>
                       
                     </div>
-                </template>
+                </template> -->
           </van-cell>
           <!-- <van-cell :title="`到期时间(${this.userStatus.endTime})`" > </van-cell> -->
     </div>

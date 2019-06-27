@@ -12,7 +12,7 @@
                     <div slot="title">
                             <van-icon :name="handleLineStatusIcon(index.LineStatus)" 
                             :color="handleLineStatusIconColor(index.LineStatus)"/>
-                            {{`第 ${index.LineID} 线(${handleLineStatus(index.LineStatus)})`}}
+                            {{`第 ${getChargeListTitle(index.LineID)} 线(${handleLineStatus(index.LineStatus)})`}}
                       </div>
                       <div class="dataTable">
                           <v-table
@@ -63,8 +63,10 @@ import virtualList from 'vue-virtual-scroll-list'
 import base_mixin from '@/pages/mixins/common'
 import NavBar from '_c/header'
 import LoginForm from '_c/login-form'
+import {getCookie,getLocalStorage} from '@/libs/util'
 import axios from 'axios'
 import * as type from '@/enums'
+
 import Footer from '@/components/footer'
 const isApp = process.env.NODE_ENV === 'development' ? false : true
 export default {
@@ -75,7 +77,8 @@ export default {
   },
    data() {
             return {
-                  resizeOffset:1,
+                 myChargeListDetail:{},
+                 resizeOffset:1,
                  virtualMarginHeight:'126px', //区分真机和网页的不兼容问题
                  dataWindowH: window.innerHeight || document.body.clientHeight,
                  currentIndex:0,
@@ -125,7 +128,7 @@ export default {
                    
                     {field: 'ClassProdTime', title: '生产时间(s)',width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                            rowData.ClassProdTime = 1000
+                            //rowData.ClassProdTime = 1000
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurProdTime) + '</span>'
                         }
                     },
@@ -137,7 +140,36 @@ export default {
                     {field: 'ClassBreakTime', title: '停车时间(s)',width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                            rowData.ClassBreakTime = 1000
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakTime) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakTime) + '</span>'
+
+                            function formatSeconds(value){
+                               let secondTime = parseInt(value);// 秒
+                                let minuteTime = 0;// 分
+                                let hourTime = 0;// 小时
+                                if(secondTime > 60) {//如果秒数大于60，将秒数转换成整数
+                                    //获取分钟，除以60取整数，得到整数分钟
+                                    minuteTime = parseInt(secondTime / 60);
+                                    //获取秒数，秒数取佘，得到整数秒数
+                                    secondTime = parseInt(secondTime % 60);
+                                    //如果分钟大于60，将分钟转换成小时
+                                    if(minuteTime > 60) {
+                                        //获取小时，获取分钟除以60，得到整数小时
+                                        hourTime = parseInt(minuteTime / 60);
+                                        //获取小时后取佘的分，获取分钟除以60取佘的分
+                                        minuteTime = parseInt(minuteTime % 60);
+                                    }
+                                }
+
+                                let result = "" + parseInt(secondTime) + "秒";
+                                if(minuteTime > 0) {
+                                  result = "" + parseInt(minuteTime) + "分" + result;
+                                }
+                                if(hourTime > 0) {
+                                  result = "" + parseInt(hourTime) + "小时" + result;
+                                }
+                                
+                                return result;
+                            }
+                            return '<span style="color:green;font-weight: bold;">' + formatSeconds(rowData.ClassBreakTime) + '</span><br/><span style="font-weight: bold;">' + formatSeconds(rowData.CurBreakTime) + '</span>'
                         }
                     },
                     {field: 'ClassBadLength', title:'剩余米数', width: 40, titleAlign: 'center',columnAlign:'right',
@@ -161,6 +193,7 @@ export default {
                     {field: 'ArtID', title: '纸质', width: 40, titleAlign: 'center',columnAlign:'left',isResize:true},
                     {field: 'ArtLB', title: '楞别', width: 40, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
+                          
                             return '<span>' + (rowData.ArtLB) + '</span>'
                         }
                     },
@@ -180,6 +213,22 @@ export default {
             }
         },
    methods:{
+          //获取购买的生产线信息
+          getChargeListDetail(){
+            let userInfo = getLocalStorage('userInfo')
+               if(userInfo!=""){
+                let user =JSON.parse(userInfo)
+                  this.myChargeListDetail = user.chargeList
+                }
+          },
+          //获取线别显示名称
+          getChargeListTitle(lineId){
+             // debugger
+              let showItem =this.myChargeListDetail.filter(item=>{
+                return item.custLineId ==lineId
+              })
+              return showItem[0].lineId
+          },
           //设置class
           columnCellClass(rowIndex,columnName,rowData){
               // 给三行column为‘Parts1Material’和‘Parts2Material’的列设置className
@@ -187,15 +236,9 @@ export default {
               //debugger
               if (columnName==='ClassProdTime'||columnName==='ClassBreakTime'){
                // debugger
-                console.log('rowData.ClassBreakTime:'+rowData.ClassBreakTime)
-                  this.tableData.ClassBreakTime = this.totalData(rowData.ClassBreakTime)
-                   console.log('this.tableData.ClassBreakTime:'+this.tableData.ClassBreakTime)
                 //return 'column-cell-class-name-cailiao';//这是你的css名字
+              
               }
-          },
-         //计算数据合并
-          totalData(val1){
-              return val1+100
           },
             //tab切换获取对应的生产数据
           getDataByLine(lineId){
@@ -247,16 +290,33 @@ export default {
                     break
               }
           },
+          //过滤生产线 BY 购买条数 //剩余可用产线数据
+          filterLine(itemList){
+              let _self=this
+              let myPayLines = []
+              for (const chargeItem of this.myChargeListDetail) {
+                   myPayLines.push(chargeItem.custLineId+"")
+              }
+              let afterData = itemList.filter(item=>{
+                  return myPayLines.indexOf(item.LineID) ==-1 ? false :true
+              })
+              return afterData
+          },
           //获取生产数据列表
           GetLineList(){
+            let _self=this
             let params = {}
             this.$store.dispatch('getGoodsList_actions',params).then(res=>{
               //debugger
               let currentData =[...res]
+                
               //console.warn(JSON.stringify(currentData))
-              this.tableData = currentData
-               this.currentIndex = currentData[0].LineID
-               this.GetLineDetailList(currentData[0].LineID)
+              _self.tableData = _self.filterLine(currentData) 
+              if(_self.tableData.length>0){
+                    this.currentIndex = _self.tableData[0].LineID
+                    this.GetLineDetailList(_self.tableData[0].LineID)
+              }
+            
             }).catch(err=>{
               //debugger
               this.$toast('获取生产数据列表失败：'+err);
@@ -293,6 +353,7 @@ export default {
      }
    },
    mounted(){
+       this.getChargeListDetail()
        this.GetLineList()
        let _selt =this
         window.addEventListener("orientationchange", function() {
@@ -300,10 +361,12 @@ export default {
          // this.dataWindowH =
        })
        if(isApp){
-         this.virtualMarginHeight ='116px'
+         this.virtualMarginHeight ='126px'
          this.resizeOffset=-1
        }
        this.$refs.dataTableDetail.resize()
+        //设置样式
+       // let header = $api.byId('dataTable');
 
    }
 

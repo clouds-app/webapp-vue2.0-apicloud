@@ -66,37 +66,37 @@ export default {
       * @params { systemId,deviceId } 
       */
       handleCheckLogin ({commit}, params) {
-        //
+        //debugger
         return new Promise((resolve, reject) => {
           try {
             checkLogin(params).then(res => {
               const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
               if(data.success)
               {
-               // debugger
+                debugger
                 commit('setUserInfo',data.data)
                 //import config from '@/config'
                 const config  = require('@/config');
                 if(data.data.serverPath!=""){
-                  console.log(' successdata.data.serverPath '+ data.data.serverPath);
+                  //console.log(' successdata.data.serverPath '+ data.data.serverPath);
                   config.default.serverPath.pro = data.data.serverPath
-                  console.log(' success config.default.serverPath.pro '+ config.default.serverPath.pro);
+                  //console.log(' success config.default.serverPath.pro '+ config.default.serverPath.pro);
                 }
                 commit('setUserSystemId',data.data.systemId)
                 resolve(data)
               }
               else
               {
-                //debugger
+                debugger
                 let errData=data.data  //到期续费的 需要重新赋值setUserInfo
                 if(errData!=null){
                   commit('setUserInfo',data.data)
 
                   const config  = require('@/config');
                   if(data.data.serverPath!=""){
-                    console.log(' errData data.data.serverPath '+ data.data.serverPath);
+                    ///console.log(' errData data.data.serverPath '+ data.data.serverPath);
                     config.default.serverPath.pro = data.data.serverPath
-                    console.log(' errData config.default.serverPath.pro '+ config.default.serverPath.pro);
+                    //console.log(' errData config.default.serverPath.pro '+ config.default.serverPath.pro);
                   }
 
                   commit('setUserSystemId',data.data.systemId)

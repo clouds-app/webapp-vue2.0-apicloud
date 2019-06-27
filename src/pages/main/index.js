@@ -7,6 +7,7 @@ import store from '@/store'
 import config from '@/config'
 import Vant from 'vant';
 import 'vant/lib/index.css';
+ //import $ from 'zepto'
 // import FastClick from 'fastclick'
 
 // // 使用
