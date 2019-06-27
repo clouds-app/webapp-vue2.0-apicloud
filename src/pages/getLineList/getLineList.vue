@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" v-cloak>
       <div id="lineData" title='123' >
         <NavBar title="生产数据" :isHideTitleAndArrow="false" :offSetHight="true">
           <div >
@@ -77,11 +77,14 @@ export default {
   },
    data() {
             return {
+                 scroll: 0, //当前滚动条位置
+                 timer: null, //定时器
+                 timerValue: 0,//测试 定时器
                  myChargeListDetail:{},
                  resizeOffset:1,
                  virtualMarginHeight:'126px', //区分真机和网页的不兼容问题
                  dataWindowH: window.innerHeight || document.body.clientHeight,
-                 currentIndex:0,
+                 currentIndex:1,//默认查询详细线别LineId
                  tableWidth:window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                  tableData: [],
                  tableDataDetail:[],
@@ -260,6 +263,11 @@ export default {
                     ]
             }
         },
+   activated(){
+        //在vue对象存活的情况下，进入当前存在activated()函数的页面时，一进入页面就触发；可用于初始化页面数据等
+        this.$refs.wrapper.scrollTop = this.scroll
+      //  console.log('开始定时...每过6秒执行一次')
+        },
    methods:{
           //获取购买的生产线信息
           getChargeListDetail(){
@@ -352,6 +360,8 @@ export default {
           },
           //获取生产数据列表
           GetLineList(){
+            // this.timerValue++
+            // console.log(this.timerValue)
             let _self=this
             let params = {}
             this.$store.dispatch('getGoodsList_actions',params).then(res=>{
@@ -361,8 +371,8 @@ export default {
               //console.warn(JSON.stringify(currentData))
               _self.tableData = _self.filterLine(currentData) 
               if(_self.tableData.length>0){
-                    this.currentIndex = _self.tableData[0].LineID
-                    this.GetLineDetailList(_self.tableData[0].LineID)
+                   // this.currentIndex = _self.tableData[0].LineID
+                    _self.GetLineDetailList(_self.currentIndex)
               }
             
             }).catch(err=>{
@@ -390,7 +400,18 @@ export default {
          // $('#dataTableLine .table-title').css('font-size','20px')
          //  console.warn($('.v-table-body-cell').css('line-height','20px!important'));
           // console.warn($('.v-table-row').css('font-size','20px'));
-          }
+          },
+        setTimer() { 
+                //定时任务
+                if(this.timer == null) {
+                    let _self = this
+                    this.timer = setInterval( () => {
+                       // console.log('开始定时...每过6秒执行一次')
+                         //定时任务开启-》获取线别数据
+                        _self.GetLineList()
+                    }, 6000)
+                }
+            }
    },
    computed:{
      tableHeight(){
@@ -407,8 +428,10 @@ export default {
      }
    },
    mounted(){
+      
        this.getChargeListDetail()
        this.GetLineList()
+       
        let _selt =this
         window.addEventListener("orientationchange", function() {
           //监听横屏事件
@@ -419,13 +442,19 @@ export default {
          this.resizeOffset=-1
        }
        this.$refs.dataTableDetail.resize()
-        //设置样式
-       // let header = $api.byId('dataTable');
-       this.$nextTick(()=>{
-           // this.zeptoSetCss() //设置样式
-       })
       
        
+   },
+   created(){
+      // 每次进入界面时，先清除之前的所有定时器，然后启动新的定时器
+       clearInterval(this.timer)
+       this.timer = null
+       this.setTimer()
+   },
+   beforeDestroy(){
+       // 每次离开当前界面时，清除定时器 ，防止内存溢出
+         clearInterval(this.timer)
+         this.timer = null
    }
 
 }
@@ -476,7 +505,9 @@ font-size: 12px;
   color: #fff;
 }
 
- 
+[v-cloak] {
+    display: none !important;
+}
 </style>
 
 
