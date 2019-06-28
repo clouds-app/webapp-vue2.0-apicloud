@@ -1,6 +1,6 @@
 <template>
   <div id="app" v-cloak>
-      <div id="lineData" title='123' >
+      <div id="lineData" >
         <NavBar title="生产数据" :isHideTitleAndArrow="false" :offSetHight="true">
           <div >
               <van-tabs @click="getDataDetailByLine">
@@ -89,23 +89,43 @@ export default {
                  tableData: [],
                  tableDataDetail:[],
                  columns: [
+                  
                     {field: 'LineID', title:'订单', width: 36, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
-                               return '<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">上刀</span><br/><span style="font-weight: bold;">下刀</span>'
-                               
+                               if(rowData.IsDblCut=='0'){
+                                 return `<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">本笔</span>`
+                               }else{
+                                   return '<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">上刀</span><br/><span style="font-weight: bold;">下刀</span>'
+                               } 
                         },isFrozen: true},
+
                     {field: 'LineID', title:'总数', width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                             return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty)) + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '</span>'
+                       if(rowData.IsDblCut=='0'){
+                          return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty)) + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '</span>'
+                       }else{
+                          return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty)) + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurLoQty)+Number(rowData.CurLoBadQty))+ '</span>'
+                       }
+                            
                         },isFrozen: true},
                     {field: 'ClassQty', title:'良品', width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty) + '</span>'
+                            if(rowData.IsDblCut=='0'){
+                                 return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty) + '</span>'
+                            }else{
+                                 return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurLoQty) + '</span>'
+                            }
+                         
                         }
                     },
                     {field: 'ClassBadQty', title: '不良', width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
+                         if(rowData.IsDblCut=='0'){
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty) + '</span>'
+                         }else{
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurLoBadQty) + '</span>'
+                         }
+                           
                         }
                     },
                     {field: 'ClassGoodLength', title:'良品米数', width: 40, titleAlign: 'center',columnAlign:'right',
@@ -233,39 +253,135 @@ export default {
                             return '<div style="line-height: 40px !important;"><span style="color:blue;font-weight: bold;">' + (rowData.Speed_H) + '</span></div>'
                         }
                     },
+                     //样式控制 Line-heigh 是否双刀
+                      {field: 'LineID', title:'', width: 0.1, 
+                     formatter: function (rowData, index) {
+                         if(rowData.IsDblCut=='0'){
+                            return '<style>#dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >'
+                         }else
+                         {
+                            return '<style>#dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >'
+                         }
+                            
+                        }},
                     ],
 
              
 
                   columnsDetail:[ 
-                    {field: 'TotalWidthmm', title: '门幅',width: 40, titleAlign: 'center',columnAlign:'center',isFrozen: true,},
                    
-                    {field: 'CustName', title:'客户名称', width: 80, titleAlign: 'center',columnAlign:'left',isResize:true},
-                    {field: 'ArtID', title: '纸质', width: 40, titleAlign: 'center',columnAlign:'left',isResize:true},
+                    {field: 'TotalWidthmm', title: '门幅',width: 40, titleAlign: 'center',columnAlign:'center',isFrozen: true,
+                     formatter: function (rowData, index) {
+                            if(rowData.LoOrderNo!=''){
+                                return '<span>' + (rowData.TotalWidthmm) + '</span><br/><span>' + (rowData.TotalWidthmm) + '</span>'
+                           }else{
+                               return '<span>' + (rowData.TotalWidthmm) + '</span>'
+                           }
+                         
+                        }},
+                    {field: 'CustName', title:'客户名称', width: 80, titleAlign: 'center',columnAlign:'left',isResize:true,
+                     formatter: function (rowData, index) {
+                           if(rowData.LoOrderNo!=''){
+                              return '<span>' + (rowData.CustName) + '</span><br/><span>' + (rowData.LoCustName) + '</span>'
+                           }else{
+                              return '<span>' + (rowData.CustName) + '</span>'
+                           }
+                          
+                        }},
+                    {field: 'ArtID', title: '纸质', width: 40, titleAlign: 'center',columnAlign:'left',isResize:true,
+                     formatter: function (rowData, index) {
+                            if(rowData.LoOrderNo!=''){
+                               return '<span>' + (rowData.ArtID) + '</span><br/><span>' + (rowData.ArtLB) + '</span>'
+                           }else{
+                              return '<span>' + (rowData.ArtID) + '</span>'
+                           }
+                          
+                        }},
                     {field: 'ArtLB', title: '楞别', width: 40, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
-                          
-                            return '<span>' + (rowData.ArtLB) + '</span>'
+                           if(rowData.LoOrderNo!=''){
+                             return '<span>' + (rowData.ArtLB) + '</span><br/><span>' + (rowData.ArtLB) + '</span>'
+                           }else{
+                              return '<span>' + (rowData.ArtLB) + '</span>'
+                           }
+                            
                         }
                     },
                     {field: 'CSizeW', title: '规格',width: 66, titleAlign: 'center',columnAlign:'center',isResize:true,
                       formatter: function (rowData, index) {
-                            return '<span>' + (rowData.CSizeW) + '</span> * <span>' + (rowData.CSizeL) + '</span>'
+                          if(rowData.LoOrderNo!=''){
+                             return '<span>' + (rowData.CSizeW) + '</span> * <span>' + (rowData.CSizeL) + '</span><br/><span>' + (rowData.LoCSizeW) + '</span> * <span>' + (rowData.LoCSizeL) + '</span>'
+                           }else{
+                             return '<span>' + (rowData.CSizeW) + '</span> * <span>' + (rowData.CSizeL) + '</span>'
+                           }
+                            
                         }
                     },
-                    // {field: 'CSizeW', title: '幅宽',width: 50, titleAlign: 'center',columnAlign:'right'},
-                    // {field: 'CSizeL', title:'切长', width: 50, titleAlign: 'center',columnAlign:'right'},
-                    {field: 'OrderQty', title: '数量', width: 40, titleAlign: 'center',columnAlign:'right',},
-                    {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',},
-                    {field: 'Cut', title: '完工时间', width: 50, titleAlign: 'center',columnAlign:'right',isResize:true},
-                    {field: 'Cut', title: '总长', width: 30, titleAlign: 'center',columnAlign:'right',isResize:true},
-                    {field: 'OrderNo', title: '订单号', width: 80, titleAlign: 'center',columnAlign:'center',},
+                   
+                    {field: 'OrderQty', title: '数量', width: 40, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                         if(rowData.LoOrderNo!=''){
+                            return '<span>' + (rowData.OrderQty) + '</span><br/><span>' + (rowData.LoOrderQty) + '</span>'
+                           }else{
+                             return '<span>' + (rowData.OrderQty) + '</span>'
+                           }
+                           
+                        }},
+                    {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                         if(rowData.LoOrderNo!=''){
+                            return '<span>' + (rowData.Cut) + '</span><br/><span>' + (rowData.LoCut) + '</span>'
+                           }else{
+                              return '<span>' + (rowData.Cut) + '</span>'
+                           }
+                          
+                        }},
+                    {field: 'Cut', title: '完工时间', width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                     formatter: function (rowData, index) {
+                         if(rowData.LoOrderNo!=''){
+                              return '<span>' + (rowData.Cut) + '</span><br/><span>' + (rowData.LoCut) + '</span>'
+                           }else{
+                              return '<span>' + (rowData.Cut) + '</span>'
+                           }
+                          
+                        }
+                        },
+                    {field: 'Cut', title: '总长', width: 30, titleAlign: 'center',columnAlign:'right',isResize:true,
+                     formatter: function (rowData, index) {
+                         if(rowData.LoOrderNo!=''){
+                               return '<span>' + (rowData.Cut) + '</span><br/><span>' + (rowData.LoCut) + '</span>'
+                           }else{
+                             return '<span>' + (rowData.Cut) + '</span>'
+                           }
+                           
+                        }
+                    },
+                    {field: 'OrderNo', title: '订单号', width: 80, titleAlign: 'center',columnAlign:'center',
+                     formatter: function (rowData, index) {
+                          if(rowData.LoOrderNo!=''){
+                               return '<span>' + (rowData.OrderNo) + '</span><br/><span>' + (rowData.LoOrderNo) + '</span>'
+                           }else{
+                              return '<span>' + (rowData.OrderNo) + '</span>'
+                           }
+                          
+                        }
+                        },
+                      {field: 'OrderNo', title: '样式设置', width: 0.1,
+                     formatter: function (rowData, index) {
+                          if(rowData.LoOrderNo!=''){
+                                return '<style>#dataTableDetail .v-table-body-cell{line-height: 20px !important;}</style >'
+                           }else{
+                               return '<style>#dataTableDetail .v-table-body-cell{line-height: 40px !important;}</style >'
+                           }
+                          
+                        }
+                        },
                     ]
             }
         },
    activated(){
         //在vue对象存活的情况下，进入当前存在activated()函数的页面时，一进入页面就触发；可用于初始化页面数据等
-        this.$refs.wrapper.scrollTop = this.scroll
+       // this.$refs.wrapper.scrollTop = this.scroll
       //  console.log('开始定时...每过6秒执行一次')
         },
    methods:{
@@ -406,10 +522,10 @@ export default {
                 if(this.timer == null) {
                     let _self = this
                     this.timer = setInterval( () => {
-                       // console.log('开始定时...每过6秒执行一次')
+                        console.log('开始定时...每过6秒执行一次')
                          //定时任务开启-》获取线别数据
                         _self.GetLineList()
-                    }, 6000)
+                    }, 10000)
                 }
             }
    },
@@ -461,12 +577,12 @@ export default {
 </script>
 
 <style >
-#dataTableLine .v-table-body-cell{
+/* #dataTableLine .v-table-body-cell{
   line-height: 13px !important;
-}
-#dataTableDetail .v-table-body-cell{
+} */
+/* #dataTableDetail .v-table-body-cell{
   line-height: 40px !important;
-}
+} */
 body{
   width: 100%;
   position: absolute;

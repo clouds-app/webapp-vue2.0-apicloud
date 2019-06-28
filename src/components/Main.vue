@@ -124,12 +124,13 @@ export default {
             let _self=this
             this.$store.dispatch('handleCheckLogin',params).then(res=>{
                  
-                 _self.$toast.success('欢迎回来');
+                 //_self.$toast.success('欢迎回来');
                  let currentStatus = res.data
                  _self.userStatus = currentStatus
                 _self.hasAccess = (res.status===0)
                 //debugger
                 this.$store.commit('setHasAccess',_self.hasAccess)
+                 this.turnToPageBack('dataEcharts') 
             }).catch(err=>{
                 //debugger
                 //根据返回状态，判断跳转的页面
@@ -145,6 +146,15 @@ export default {
          })
         
        },
+        //跳转到指定页面，默认字符串
+      turnToPageBack(path){
+          let params ={
+              name:path,
+              slidBackEnabled:true //划屏 回 退
+
+          }
+          switchMethods.turnToPage(params)
+      },
        //首页 公司名称赋值
        getCompanyName(){
            //debugger

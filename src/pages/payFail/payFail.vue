@@ -7,9 +7,19 @@
 			<p>支付失败<p>
 		     <br/>  <br/>
 			<p>订单号:{{orderItem.orderNo}}</p>
-			<!-- <p><van-button size="small" @click="orderList">查看订单</van-button></p> -->
+			<br/>
+			<br/>
+			<br/>
+			<br/>
+			<div>
+				<p>
+				<van-button size="normal"  style="width:250px;"  round  type="primary" @click="turnToPage('index')">跳转到 首页</van-button>
+				</p>
+			</div>
 		</div>
-  </div>
+		
+			
+  	  </div>
 </template>
 
 <script>
@@ -63,4 +73,8 @@ const isApp = process.env.NODE_ENV === 'development' ? false : true
 </script>
 
 <style>
+.turnToPage{
+	position: relative;
+	bottom: 0;
+}
 </style>

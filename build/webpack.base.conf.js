@@ -66,7 +66,8 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: utils.assetsPath('image/[name].[hash:7].[ext]') //修改 img =》 image 打包后图片输出路径
+          //name: utils.assetsPath('image/[name].[hash:7].[ext]') //修改 img =》 image 打包后图片输出路径
+          name: utils.assetsPath('image/[name].[ext]') //修改 img =》 image 打包后图片输出路径
         }
       },
       {
