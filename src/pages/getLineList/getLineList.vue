@@ -99,56 +99,56 @@ export default {
                                } 
                         },isFrozen: true},
 
-                    {field: 'LineID', title:'总数', width: 40, titleAlign: 'center',columnAlign:'right',
+                    {field: 'LineID', title:'总数', width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                        if(rowData.IsDblCut=='0'){
-                          return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty)) + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '</span>'
+                          return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty))/1000 + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))/1000+ '</span>'
                        }else{
-                          return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty)) + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurLoQty)+Number(rowData.CurLoBadQty))+ '</span>'
+                          return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassQty)+Number(rowData.ClassBadQty))/1000 + '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))/1000+ '</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurLoQty)+Number(rowData.CurLoBadQty))+ '</span>'
                        }
                             
                         },isFrozen: true},
-                    {field: 'ClassQty', title:'良品', width: 40, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassQty', title:'良品', width: 60, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             if(rowData.IsDblCut=='0'){
-                                 return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty) + '</span>'
+                                 return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty)/1000 + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty)/1000 + '</span>'
                             }else{
-                                 return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurLoQty) + '</span>'
+                                 return '<span style="color:green;font-weight: bold;">' + (rowData.ClassQty)/1000 + '</span><br/><span style="font-weight: bold;">' + (rowData.CurQty)/1000 + '</span><br/><span style="font-weight: bold;">' + (rowData.CurLoQty)/1000 + '</span>'
                             }
                          
                         }
                     },
-                    {field: 'ClassBadQty', title: '不良', width: 40, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBadQty', title: '不良', width: 60, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                          if(rowData.IsDblCut=='0'){
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty) + '</span>'
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadQty)/1000 + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty)/1000 + '</span>'
                          }else{
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurLoBadQty) + '</span>'
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadQty)/1000 + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty)/1000 + '</span><br/><span style="font-weight: bold;">' + (rowData.CurLoBadQty)/1000 + '</span>'
                          }
                            
                         }
                     },
-                    {field: 'ClassGoodLength', title:'良品米数', width: 40, titleAlign: 'center',columnAlign:'right',
-                     formatter: function (rowData, index) {
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassGoodLength) + '</span><br/><span style="font-weight: bold;">' + '</span>'
-                        }
-                    },
-                    {field: 'ClassBadLength', title:'不良米数', width: 40, titleAlign: 'center',columnAlign:'right',
-                     formatter: function (rowData, index) {
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadLength) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
-                        }
-                    },
+                    // {field: 'ClassGoodLength', title:'良品米数', width: 40, titleAlign: 'center',columnAlign:'right',
+                    //  formatter: function (rowData, index) {
+                    //         return '<span style="color:green;font-weight: bold;">' + (rowData.ClassGoodLength) + '</span><br/><span style="font-weight: bold;">' + '</span>'
+                    //     }
+                    // },
+                    // {field: 'ClassBadLength', title:'不良米数', width: 40, titleAlign: 'center',columnAlign:'right',
+                    //  formatter: function (rowData, index) {
+                    //         return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadLength) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                    //     }
+                    // },
                     {field: 'ClassGoodArea', title: '良品面积(㎡)', width: 58, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassGoodArea) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassGoodArea)/100 + '</span><br/><span style="font-weight: bold;">'  + '</span>'
                         }
                     },
-                    {field: 'ClassBadArea', title: '不良面积(㎡)',width: 58, titleAlign: 'center',columnAlign:'right',
-                     formatter: function (rowData, index) {
+                    // {field: 'ClassBadArea', title: '不良面积(㎡)',width: 58, titleAlign: 'center',columnAlign:'right',
+                    //  formatter: function (rowData, index) {
 
-                            return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadArea) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
-                        }
-                    },
+                    //         return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadArea) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                    //     }
+                    // },
                    
                     {field: 'ClassProdTime', title: '生产时间',width: 80, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
@@ -170,9 +170,18 @@ export default {
                                         minuteTime = parseInt(minuteTime % 60);
                                     }
                                 }
-                                let result = "" + parseInt(secondTime);
+                               let result = "" + parseInt(secondTime);
+                                if(parseInt(secondTime)<10){
+                                    result = "0" + parseInt(secondTime);
+                                }
                                 if(minuteTime > 0) {
-                                  result = "" + parseInt(minuteTime) + ":" + result;
+                                     if(parseInt(minuteTime)<10)
+                                     {
+                                        result = "" + "0"+parseInt(minuteTime) + ":" + result;
+                                     }else{
+                                        result = "" + parseInt(minuteTime) + ":" + result;
+                                     }
+
                                 }else{
                                   result = "00"  +":" + result;
                                 }
@@ -222,8 +231,17 @@ export default {
                                 //   result = "" + parseInt(hourTime) + "小时" + result;
                                 // }
                                 let result = "" + parseInt(secondTime);
+                                if(parseInt(secondTime)<10){
+                                    result = "0" + parseInt(secondTime);
+                                }
                                 if(minuteTime > 0) {
-                                  result = "" + parseInt(minuteTime) + ":" + result;
+                                     if(parseInt(minuteTime)<10)
+                                     {
+                                        result = "" + "0"+parseInt(minuteTime) + ":" + result;
+                                     }else{
+                                        result = "" + parseInt(minuteTime) + ":" + result;
+                                     }
+
                                 }else{
                                   result = "00"  +":" + result;
                                 }
@@ -250,7 +268,7 @@ export default {
                     },
                      {field: 'ClassProdTime', title: '热板车速',width: 70, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
-                            return '<div style="line-height: 40px !important;"><span style="color:blue;font-weight: bold;">' + (rowData.Speed_H) + '</span></div>'
+                            return '<div style="line-height: 40px !important;"><span style="color:blue;font-weight: bold;">' + (Number(rowData.Speed_H))/10 + '</span></div>'
                         }
                     },
                      //样式控制 Line-heigh 是否双刀
@@ -475,9 +493,9 @@ export default {
               return afterData
           },
           //获取生产数据列表
-          GetLineList(){
+          GetLineList(timer){
             // this.timerValue++
-            // console.log(this.timerValue)
+            console.log('item...每过2秒执行一次'+this.timerValue)
             let _self=this
             let params = {}
             this.$store.dispatch('getGoodsList_actions',params).then(res=>{
@@ -488,12 +506,27 @@ export default {
               _self.tableData = _self.filterLine(currentData) 
               if(_self.tableData.length>0){
                    // this.currentIndex = _self.tableData[0].LineID
-                    _self.GetLineDetailList(_self.currentIndex)
+                    // if(timer!="" && (_self.timerValue==15 || _self.timerValue >15)){
+                    //   _self.GetLineDetailList(_self.currentIndex) //详细 30秒 更新一次
+                    // }else{
+                    //    _self.GetLineDetailList(_self.currentIndex) //详细 30秒 更新一次
+                    // }
+                    if(timer!="" && timer!=null){
+                           if((_self.timerValue==15 || _self.timerValue >15)){
+                                console.log('详细...每过30秒执行一次'+_self.timerValue)
+                                _self.timerValue = 0
+                                _self.GetLineDetailList(_self.currentIndex) //详细 30秒 更新一次
+                           }
+                    }
+                    else{
+                        _self.GetLineDetailList(_self.currentIndex) //详细 30秒 更新一次
+                    }
+                  
               }
             
             }).catch(err=>{
               //debugger
-              this.$toast('获取生产数据列表失败：'+err);
+              //this.$toast('获取生产数据列表失败：'+err);
             })
           },
            //获取生产详细数据列表
@@ -522,10 +555,11 @@ export default {
                 if(this.timer == null) {
                     let _self = this
                     this.timer = setInterval( () => {
-                        console.log('开始定时...每过6秒执行一次')
+                        //console.log('开始定时...每过2秒执行一次')
                          //定时任务开启-》获取线别数据
-                        _self.GetLineList()
-                    }, 10000)
+                        _self.GetLineList('timer')
+                        _self.timerValue+=1
+                    }, 2000)
                 }
             }
    },

@@ -34,10 +34,13 @@ var options = {
     // 请求拦截器
     interceptorReq: (config) => {
        // 加载loading
-       window.api.showProgress({
-        title:"获取数据中...",
-        text: '请稍等...'
-        });
+       if(config.url.indexOf("GetOrdersByLineID")==-1 || config.url.indexOf("GetLineList")==-1){
+          window.api.showProgress({
+          title:"获取数据中...",
+          text: '请稍等...'
+          });
+       }
+      
       console.warn('请求拦截器:'+JSON.stringify(config))
       return config
     }
