@@ -34,7 +34,11 @@ var options = {
     // 请求拦截器
     interceptorReq: (config) => {
        // 加载loading
-       if(config.url.indexOf("GetOrdersByLineID")==-1 || config.url.indexOf("GetLineList")==-1){
+       console.warn('请求拦截器:'+JSON.stringify(config))
+       //请求拦截器:{"url":"http://120.78.91.203:12689/api/GetLineList","data":{"values":{"timer":"timerRun"}},"method":"post","transformRequest":[null]}
+      //let tempObj = JSON.stringify(config)
+      //console.warn('请求拦截器config.data.values.timer:'+config.data.values.timer)
+       if(config.data.values && (config.data.values.timer==null || config.data.values.timer=='')){
           window.api.showProgress({
           title:"获取数据中...",
           text: '请稍等...'

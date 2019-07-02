@@ -9,10 +9,12 @@ const api = process.env.NODE_ENV === 'development' ? '/apk' : ''
 * @description 获取生产线详情
 * @params { line }
 */
-export const getGoodsDetail = ({line}) => {
+export const getGoodsDetail = ({line,timer}) => {
     //参数
     let data = {
+      timer
     }
+    
 
     if(process.env.NODE_ENV === 'production'){
       //apiCloud 参数传递封装，其它另行处理，参考：https://docs.apicloud.com/Client-API/api#3  ajax
@@ -34,9 +36,10 @@ export const getGoodsDetail = ({line}) => {
 * @description 获取生产线数据列表
 * @params {  }
 */
-export const getGoodsList = () => {
+export const getGoodsList = ({timer}) => {
     //参数
     let data = {
+      timer
     }
 
     if(process.env.NODE_ENV === 'production'){
@@ -47,11 +50,11 @@ export const getGoodsList = () => {
     return axiosServer.request({
       url: `${api}/GetLineList`,
       data,
-      method: 'get',
-      // transformRequest: [function (data) {
-      //   // 对 data 进行任意转换处理
-      //   return Qs.stringify(data)
-      // }],
+      method: 'post',
+      transformRequest: [function (data) {
+        // 对 data 进行任意转换处理
+        return Qs.stringify(data)
+      }],
     })
   }
 
