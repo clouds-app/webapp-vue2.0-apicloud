@@ -80,6 +80,8 @@ export default {
   },
    data() {
             return {
+                 IsDblCut:0,//是否双刀，赋值到详细里面去判断
+                 errCount:0,//错误次数大于10 ，清空控制台日志
                  NewTotalCurQty:0,//本笔总数
                  detailFirstPrimaryKey:'',//详细中第一个PrimaryKey
                  mainCutQty :0,//主刀已生产数
@@ -113,7 +115,7 @@ export default {
                                } 
                         },isFrozen: true},
 
-                    {field: 'LineID', title:'总数', width: 100, titleAlign: 'center',columnAlign:'right',
+                    {field: 'LineID', title:'总数', width: 60, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                        if(rowData.IsDblCut=='0'){
                          let NewTotalCurQty =0
@@ -148,12 +150,13 @@ export default {
                     },
                       {field: 'ClassBadQty', title: '不良%', width: 60, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                         if(rowData.IsDblCut=='0'){
-                            //本班 
+                         //本班 
                             let notGoodTotal =(Number(rowData.ClassBadLength)/1000).toFixed(0)
                             let goodTotal = ((Number(rowData.ClassGoodLength)+Number(rowData.ClassBadLength))/1000).toFixed(0) 
                             let notGoodPersent = ((notGoodTotal/goodTotal)*100).toFixed(2)
-
+                            if(isNaN(notGoodPersent)){
+                              notGoodPersent =0
+                            }
                             //本笔
                             let NewTotalCurQty =0
                             if(!!rowData.NewTotalCurQty){
@@ -161,12 +164,30 @@ export default {
                             }
                             let loNotGoodTotal =rowData.CurBadQty
                             let loNotGoodPersent = ((loNotGoodTotal/NewTotalCurQty)*100).toFixed(2)
-                         
+                            if(isNaN(loNotGoodPersent)){
+                              loNotGoodPersent =0
+                            }
+                         if(rowData.IsDblCut=='0'){
                             return '<span style="color:green;font-weight: bold;">' + notGoodPersent + '</span><br/><span style="font-weight: bold;">' + (loNotGoodPersent) + '</span>'
                          }else{
                             return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassBadLength)/1000).toFixed(0) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurLoBadQty) + '</span>'
                          }
                            
+                        }
+                    },
+                     {field: 'ClassBadLength', title:'尚缺', width: 60, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                          let leftCurQty = rowData.CurQty
+                          if(!!rowData.NewTotalCurQty){
+                              leftCurQty =Number(rowData.NewTotalCurQty) - Number(rowData.CurQty) 
+                          }
+
+                          let allTotalLength = 0
+                          if(!!rowData.allTotalLength){
+                              allTotalLength =  (Number(rowData.allTotalLength)/1000).toFixed(0)
+                          }
+
+                            return '<span style="color:green;font-weight: bold;">'+ (allTotalLength) + '米</span><br/><span style="font-weight: bold;">'  +(leftCurQty)+ '张</span>'
                         }
                     },
                     // {field: 'ClassGoodLength', title:'良品米数', width: 40, titleAlign: 'center',columnAlign:'right',
@@ -193,7 +214,7 @@ export default {
                     //     }
                     // },
                    
-                    {field: 'ClassProdTime', title: '产时',width: 80, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassProdTime', title: '产时',width: 60, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             //rowData.ClassProdTime = 1000
                             function formatSeconds(value){
@@ -239,12 +260,12 @@ export default {
                             return '<span style="color:green;font-weight: bold;">' + formatSeconds(rowData.ClassProdTime) + '</span><br/><span style="font-weight: bold;">' + formatSeconds(rowData.CurProdTime) + '</span>'
                         }
                     },
-                    {field: 'ClassBreakCount', title: '停车次数',width: 40, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBreakCount', title: '停次',width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                             return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBreakCount) + '</span><br/><span style="font-weight: bold;">' + (rowData.CurBreakCount) + '</span>'
                         }
                     },
-                    {field: 'ClassBreakTime', title: '停时',width: 80, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBreakTime', title: '停时',width: 60, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                            //rowData.ClassBreakTime = 1000
 
@@ -299,16 +320,7 @@ export default {
                             return '<span style="color:green;font-weight: bold;">' + formatSeconds(rowData.ClassBreakTime) + '</span><br/><span style="font-weight: bold;">' + formatSeconds(rowData.CurBreakTime) + '</span>'
                         }
                     },
-                    {field: 'ClassBadLength', title:'尚缺', width: 40, titleAlign: 'center',columnAlign:'right',
-                     formatter: function (rowData, index) {
-                          let leftCurQty = rowData.CurQty
-                          if(!!rowData.NewTotalCurQty){
-                              leftCurQty =Number(rowData.NewTotalCurQty) - Number(rowData.CurQty) 
-                          }
-
-                            return '<span style="color:green;font-weight: bold;">'  + '米</span><br/><span style="font-weight: bold;">'  +(leftCurQty)+ '张</span>'
-                        }
-                    },
+                   
                     {field: 'ClassProdTime', title: '预估完工',width: 70, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                             let classDoneTime = 0
@@ -322,30 +334,37 @@ export default {
                             return '<span style="color:green;font-weight: bold;">' + (classDoneTime) + '</span><br/><span style="font-weight: bold;">' + (curDoneTime) + '</span>'
                         }
                     },
-                     {field: 'ClassProdTime', title: '车速',width: 70, titleAlign: 'center',columnAlign:'right',isResize:true,
+                     {field: 'ClassProdTime', title: '车速',width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
-                            return '<div style="line-height: 40px !important;"><span style="color:blue;font-weight: bold;">' + (Number(rowData.Speed_H))/10 + '</span></div>'
+                            return '<div style="line-height: 40px !important;"><span style="color:blue;font-weight: bold;font-size: 20px;">' + (Number(rowData.Speed_H))/10 + '</span></div>'
                         }
                     },
-                     //样式控制 Line-heigh 是否双刀
-                      {field: 'LineID', title:'', width: 0.1, 
-                     formatter: function (rowData, index) {
-                         if(rowData.IsDblCut=='0'){
-                            return '<style>#dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >'
-                         }else
-                         {
-                            return '<style>#dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >'
-                         }
+                     //样式控制  是否双刀
+                    //   {field: 'LineID', title:'样式设置', width: 0.1, 
+                    //  formatter: function (rowData, index) {
+                    //       console.warn('样式控制  是否双刀:'+rowData.IsDblCut)
+                    //       if(rowData.IsDblCut=='0'){
+                          
+                    //        return '<style>#dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >'
+                    //      }else
+                    //      {
+                    //          return '<style>#dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >' 
+                    //      }
                             
-                        }},
+                    //     }},
                     ],
 
              
-
+                  //详细数据
                   columnsDetail:[ 
-                     {field: 'OrderNo', title: '订单号', width: 80, titleAlign: 'center',columnAlign:'center',isFrozen: true,
+                    {field: 'OrderNo', title: '序号', width: 40, titleAlign: 'center',columnAlign:'center',isFrozen: true,
                      formatter: function (rowData, index) {
-                          if(rowData.LoOrderNo!=''){
+                         return '<div style="line-height: 40px !important;"><span>' +(index+1) + '</span></div>'
+                        }
+                      },
+                     {field: 'OrderNo', title: '订单号', width: 100, titleAlign: 'center',columnAlign:'right',isFrozen: true,isResize:true,
+                     formatter: function (rowData, index) {
+                          if(rowData.IsDblCut==1){
                                return '<span>' + (rowData.OrderNo) + '</span><br/><span>' + (rowData.LoOrderNo) + '</span>'
                            }else{
                               return '<span>' + (rowData.OrderNo) + '</span>'
@@ -353,9 +372,9 @@ export default {
                           
                         }
                         },
-                      {field: 'CustName', title:'客户名称', width: 80, titleAlign: 'center',columnAlign:'left',isResize:true,
+                      {field: 'CustName', title:'客户名称', width: 60, titleAlign: 'center',columnAlign:'left',
                      formatter: function (rowData, index) {
-                           if(rowData.LoOrderNo!=''){
+                         if(rowData.IsDblCut==1){
                               return '<span>' + (rowData.CustName) + '</span><br/><span>' + (rowData.LoCustName) + '</span>'
                            }else{
                               return '<span>' + (rowData.CustName) + '</span>'
@@ -363,14 +382,10 @@ export default {
                           
                         }},
  
-                    {field: 'ArtID', title: '纸质', width: 40, titleAlign: 'center',columnAlign:'left',isResize:true,
+                    {field: 'ArtID', title: '纸质', width: 60, titleAlign: 'center',columnAlign:'left',isResize:true,
                      formatter: function (rowData, index) {
-                            if(rowData.LoOrderNo!=''){
-                               return '<span>' + (rowData.ArtID)+'('+ (rowData.ArtLB)+ ')' + '</span><br/><span>' + (rowData.ArtLB) + '</span>'
-                           }else{
-                              return '<span>' + (rowData.ArtID) +'('+ (rowData.ArtLB)+ ')'+ '</span>'
-                           }
-                          
+                         
+                            return '<div style="line-height: 40px !important;"><span>' + (rowData.ArtID) +'('+ (rowData.ArtLB)+ ')' + '</span></div>'
                         }},
                     // {field: 'ArtLB', title: '楞别', width: 40, titleAlign: 'center',columnAlign:'center',
                     //  formatter: function (rowData, index) {
@@ -384,10 +399,10 @@ export default {
                     // },
                     {field: 'CSizeW', title: '规格',width: 66, titleAlign: 'center',columnAlign:'center',isResize:true,
                       formatter: function (rowData, index) {
-                          if(rowData.LoOrderNo!=''){
-                             return '<span>' + (rowData.CSizeW) + '</span> * <span>' + (rowData.CSizeL) + '</span><br/><span>' + (rowData.LoCSizeW) + '</span> * <span>' + (rowData.LoCSizeL) + '</span>'
+                          if(rowData.IsDblCut==1){
+                              return '<span>' + (rowData.Model) + '</span><br/><span>' + (rowData.LoModel) + '</span>'
                            }else{
-                             return '<span>' + (rowData.CSizeW) + '</span> * <span>' + (rowData.CSizeL) + '</span>'
+                             return '<span>' + (rowData.Model) + '</span>'
                            }
                             
                         }
@@ -395,7 +410,7 @@ export default {
                    
                     {field: 'OrderQty', title: '数量', width: 40, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                         if(rowData.LoOrderNo!=''){
+                         if(rowData.IsDblCut==1){
                             return '<span>' + (rowData.OrderQty) + '</span><br/><span>' + (rowData.LoOrderQty) + '</span>'
                            }else{
                              return '<span>' + (rowData.OrderQty) + '</span>'
@@ -404,53 +419,39 @@ export default {
                         }},
                       {field: 'TotalWidthmm', title: '门幅',width: 40, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
-                            if(rowData.LoOrderNo!=''){
-                                return '<span>' + (rowData.TotalWidthmm) + '</span><br/><span>' + (rowData.TotalWidthmm) + '</span>'
-                           }else{
-                               return '<span>' + (rowData.TotalWidthmm) + '</span>'
-                           }
-                         
+                          return '<div style="line-height: 40px !important;"><span>' + rowData.TotalWidthmm + '</span></div>'
                         }},
                     {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                         if(rowData.LoOrderNo!=''){
+                         if(rowData.IsDblCut==1){
                             return '<span>' + (rowData.Cut) + '</span><br/><span>' + (rowData.LoCut) + '</span>'
                            }else{
                               return '<span>' + (rowData.Cut) + '</span>'
                            }
                           
                         }},
-                    {field: 'Cut', title: '完工时间', width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                    {field: 'Cut', title: '完工时间', width: 70, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                           let curDoneTime =0
                           if(!!rowData.curDoneTime){
                              curDoneTime = rowData.curDoneTime
                           }
-                         if(rowData.LoOrderNo!=''){
-                              return '<span>' + (curDoneTime) + '</span><br/><span>' + (rowData.LoCut) + '</span>'
-                           }else{
-                              return '<span>' + (curDoneTime) + '</span>'
-                           }
-                          
+                          return '<div style="line-height: 40px !important;"><span>' + (curDoneTime) + '</span></div>'
                         }
                         },
-                    {field: 'Cut', title: '总长', width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
+                    {field: 'Cut', title: '总长', width: 50, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                         if(rowData.LoOrderNo!=''){
-                               return '<span>' +  (Number(rowData.MainCutLen)/1000).toFixed(0) + '</span><br/><span>' + NumberN((rowData.LoCut)/1000).toFixed(0) + '</span>'
-                           }else{
-                             return '<span>' + (Number(rowData.MainCutLen)/1000).toFixed(0) + '</span>'
-                           }
-                           
+                             return '<div style="line-height: 40px !important;"><span>' + (Number(rowData.MainCutLen)/1000).toFixed(0) + '</span></div>'
                         }
                     },
                   
                       {field: 'OrderNo', title: '样式设置', width: 0.1,
                      formatter: function (rowData, index) {
-                          if(rowData.LoOrderNo!=''){
-                                return '<style>#dataTableDetail .v-table-body-cell{line-height: 20px !important;}</style >'
+                        <style></style >
+                          if(rowData.IsDblCut==1){
+                                return '<style>#dataTableDetail .v-table-body-cell{line-height: 20px !important;} #dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >'
                            }else{
-                               return '<style>#dataTableDetail .v-table-body-cell{line-height: 40px !important;}</style >'
+                               return '<style>#dataTableDetail .v-table-body-cell{line-height: 40px !important;} #dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >'
                            }
                           
                         }
@@ -464,6 +465,7 @@ export default {
       //  console.log('开始定时...每过6秒执行一次')
         },
    methods:{
+         //时间格式化
          formatDateTime(value){
             let secondTime = parseInt(value);// 秒
                                 let minuteTime = 0;// 分
@@ -556,6 +558,7 @@ export default {
              let currentLineItem = this.getDataByLine(lineId)
              this.currentTipPrimaryKey = currentLineItem[0].PrimaryKey
              this.currentAvgSpeed = currentLineItem[0].SetAvgSpeed ////设定平均车速， 用来计算预估完工时间
+             this.IsDblCut = currentLineItem[0].IsDblCut //是否双刀
              if( this.currentAvgSpeed <=0){
                 this.currentAvgSpeed = 120
              }
@@ -617,8 +620,9 @@ export default {
             let params = {
               timer
             }
+
             this.$store.dispatch('getGoodsList_actions',params).then(res=>{
-             // debugger
+              
               let currentData =[...res]
              
               //console.warn(JSON.stringify(currentData))
@@ -629,6 +633,7 @@ export default {
                            if((_self.timerValue==15 || _self.timerValue >15)){
                                 //console.log('详细...每过30秒执行一次'+_self.timerValue)
                                 _self.timerValue = 0
+                                console.clear()
                                 _self.GetLineDetailList(_self.currentIndex,timer) //详细 30秒 更新一次
                            }
                     }
@@ -637,9 +642,9 @@ export default {
                     }
                    _self.getDataLinePrimaryKey(_self.currentIndex)
               }
-            
-             
+           
             }).catch(err=>{
+              _self.ClearLog()
               //debugger
               //this.$toast('获取生产数据列表失败：'+err);
             })
@@ -688,6 +693,7 @@ export default {
               }
             
             }).catch(err=>{
+               _self.ClearLog()
               //debugger
                _self.$toast('获取生产详细数据列表失败：'+err);
             })
@@ -709,8 +715,10 @@ export default {
                         let firstCurDoneTime  = this.getCurItemDoneTime(leftCutlen)
 
                         let params ={
-                           curDoneTime:firstCurDoneTime
+                           curDoneTime:firstCurDoneTime,
+                          // IsDblCut:this.IsDblCut //是否双刀        
                          }
+                        // console.warn('是否双刀:'+this.IsDblCut)
                          tableDetailList[i] = Object.assign({}, tableDetailList[i], params) //设置本笔 正在生产中ITEM 完工时间 
                       
                     }
@@ -794,7 +802,8 @@ export default {
              let newParams ={
                 setDoneTime:this.setDoneTime,
                 NewTotalCurQty:this.NewTotalCurQty,//本笔总数
-                curDoneTime:this.setCurDoneTime  //本笔预计完工时间
+                curDoneTime:this.setCurDoneTime,  //本笔预计完工时间
+                allTotalLength:this.allTotalLength
               }
               if(valueTime!=null && valueTime!=0){
                 newParams.setDoneTime =valueTime
@@ -819,6 +828,14 @@ export default {
             this.tableData = this.tableData.sort()
              //console.warn('this.tableData:' + JSON.stringify(this.tableData))
            
+          },
+          //，当服务无法连接，清空错误日志，防止内存溢出
+          ClearLog(){
+            this.errCount++
+            if(this.errCount>=10){
+              console.clear()
+              this.errCount=0
+            }
           },
          
         setTimer() { 
@@ -887,6 +904,7 @@ export default {
   .title-cell-class-name-test{
         background-color: #f60;
         color:#fff;
+        
     }
     .column-cell-class-name-test{
         background-color: #187;
