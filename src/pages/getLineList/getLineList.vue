@@ -29,9 +29,8 @@
                           :table-data="getDataByLine(index.LineID)"
                           :show-vertical-border="true">
                           </v-table>
-                              <!-- :width="tableWidth" -->
                       </div>
-                      
+                      <div v-html="IsDblCutLineCss"> <!-- //设置是否双刀样式-控制LINE-HEIGHT --></div>
                   </van-tab>
               </van-tabs>
         </div>
@@ -49,8 +48,9 @@
                               ref="dataTableDetail"
                               :height="tableHeight"
                               :columns="columnsDetail"
-                              :table-data="tableDataDetail"
+                              :table-data="tableDataDetailPaging"
                               :show-vertical-border="true"
+                              :error-content="errorContent"
                               even-bg-color="#f4f4f4"
                               row-hover-color="#eee"
                               row-click-color="#edf7ff"/>
@@ -80,6 +80,11 @@ export default {
   },
    data() {
             return {
+                 pageIndex: 1,
+                 pageSize: 50,
+                 total:'',
+                 errorContent:'数据加载中...',
+                 IsDblCutLineCss:'',//是否双刀打印行 line-height 的高度 达到两行的目的
                  IsDblCut:0,//是否双刀，赋值到详细里面去判断
                  errCount:0,//错误次数大于10 ，清空控制台日志
                  NewTotalCurQty:0,//本笔总数
@@ -104,6 +109,7 @@ export default {
                  tableWidth:window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                  tableData: [],
                  tableDataDetail:[],
+                 tableDataDetailPaging:[],
                  columns: [
                   
                     {field: 'LineID', title:'订单', width: 36, titleAlign: 'center',columnAlign:'center',
@@ -321,7 +327,7 @@ export default {
                         }
                     },
                    
-                    {field: 'ClassProdTime', title: '预估完工',width: 70, titleAlign: 'center',columnAlign:'right',isResize:true,
+                    {field: 'ClassProdTime', title: '预估完工',width: 60, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                             let classDoneTime = 0
                             let curDoneTime =0
@@ -357,12 +363,12 @@ export default {
              
                   //详细数据
                   columnsDetail:[ 
-                    {field: 'OrderNo', title: '序号', width: 40, titleAlign: 'center',columnAlign:'center',isFrozen: true,
+                    {field: 'OrderNo', title: '序号', width: 40, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
                          return '<div style="line-height: 40px !important;"><span>' +(index+1) + '</span></div>'
                         }
                       },
-                     {field: 'OrderNo', title: '订单号', width: 100, titleAlign: 'center',columnAlign:'right',isFrozen: true,isResize:true,
+                     {field: 'OrderNo', title: '订单号', width: 120, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                           if(rowData.IsDblCut==1){
                                return '<span>' + (rowData.OrderNo) + '</span><br/><span>' + (rowData.LoOrderNo) + '</span>'
@@ -381,8 +387,8 @@ export default {
                            }
                           
                         }},
- 
-                    {field: 'ArtID', title: '纸质', width: 60, titleAlign: 'center',columnAlign:'left',isResize:true,
+                   
+                    {field: 'ArtID', title: '纸质', width: 80, titleAlign: 'center',columnAlign:'left',isResize:true,
                      formatter: function (rowData, index) {
                          
                             return '<div style="line-height: 40px !important;"><span>' + (rowData.ArtID) +'('+ (rowData.ArtLB)+ ')' + '</span></div>'
@@ -397,7 +403,7 @@ export default {
                             
                     //     }
                     // },
-                    {field: 'CSizeW', title: '规格',width: 66, titleAlign: 'center',columnAlign:'center',isResize:true,
+                    {field: 'CSizeW', title: '规格',width: 100, titleAlign: 'center',columnAlign:'center',isResize:true,
                       formatter: function (rowData, index) {
                           if(rowData.IsDblCut==1){
                               return '<span>' + (rowData.Model) + '</span><br/><span>' + (rowData.LoModel) + '</span>'
@@ -439,21 +445,47 @@ export default {
                           return '<div style="line-height: 40px !important;"><span>' + (curDoneTime) + '</span></div>'
                         }
                         },
-                    {field: 'Cut', title: '总长', width: 50, titleAlign: 'center',columnAlign:'right',
+                    {field: 'MainCutLen', title: '总长', width: 50, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                              return '<div style="line-height: 40px !important;"><span>' + (Number(rowData.MainCutLen)/1000).toFixed(0) + '</span></div>'
+                        }
+                    },
+                     {field: 'CustName', title:'客户PO号', width: 80, titleAlign: 'center',columnAlign:'left',
+                     formatter: function (rowData, index) {
+                         if(rowData.IsDblCut==1){
+                              return '<span>' + (rowData.CustPO) + '</span><br/><span>' + (rowData.LoCustPO) + '</span>'
+                           }else{
+                              return '<span>' + (rowData.CustPO) + '</span>'
+                           }
+                          
+                        }},
+                     {field: 'Remark', title: '生产备注', width: 60, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                           if(rowData.IsDblCut==1){
+                            return '<span>' + (rowData.Remark) + '</span><br/><span>' + (rowData.LoRemark) + '</span>'
+                           }else{
+                             return '<span>' + (rowData.Remark) + '</span>'
+                           }
+                        }
+                    },
+                      {field: 'DRemark', title: '送货备注', width: 60, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                           if(rowData.IsDblCut==1){
+                            return '<span>' + (rowData.DRemark) + '</span><br/><span>' + (rowData.LoDRemark) + '</span>'
+                           }else{
+                             return '<span>' + (rowData.DRemark) + '</span>'
+                           }
                         }
                     },
                   
                       {field: 'OrderNo', title: '样式设置', width: 0.1,
                      formatter: function (rowData, index) {
-                        <style></style >
+
                           if(rowData.IsDblCut==1){
                                 return '<style>#dataTableDetail .v-table-body-cell{line-height: 20px !important;} #dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >'
                            }else{
                                return '<style>#dataTableDetail .v-table-body-cell{line-height: 40px !important;} #dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >'
-                           }
-                          
+                           } 
                         }
                         },
                     ]
@@ -462,9 +494,81 @@ export default {
    activated(){
         //在vue对象存活的情况下，进入当前存在activated()函数的页面时，一进入页面就触发；可用于初始化页面数据等
        // this.$refs.wrapper.scrollTop = this.scroll
-      //  console.log('开始定时...每过6秒执行一次')
+        //this.$refs['dataTableDetail'].scrollToTop = this.scroll
+        //console.log('scrollToTop:'+ this.$refs['dataTableDetail'].scrollToTop)
         },
    methods:{
+          getTableData() {
+           // debugger
+           //this.tableDataDetailPaging=[] //刷新的时候，数据重置为0
+           let tableDataDetail =this.tableDataDetail
+           let currentPageData =[]
+           this.total = tableDataDetail.length;
+           let totalPageSize = Number(this.total)/this.pageSize
+           if(this.tableDataDetailPaging.length==0){
+                 if(this.setPageDataWhenFirstOrLast(tableDataDetail)){
+                   return
+                 }
+                for(let i =1;i<=this.pageIndex;i++){
+                    currentPageData = tableDataDetail.slice(
+                    (i - 1) * this.pageSize,
+                    ((i * this.pageSize) >this.total ? this.total:(i * this.pageSize))
+                   )}
+           }else{
+                if(this.setPageDataWhenFirstOrLast(tableDataDetail)){
+                   return
+                 }
+               currentPageData = tableDataDetail.slice(
+                (this.pageIndex - 1) * this.pageSize,
+                ((this.pageIndex * this.pageSize) >this.total ? this.total:(this.pageIndex * this.pageSize))
+               )
+           }
+            this.tableDataDetailPaging.push(...currentPageData)
+          },
+          //首页或末页数据控制
+          setPageDataWhenFirstOrLast(tableDataDetail){
+              let totalPageSize = Number(this.total)/this.pageSize
+              let flag =false
+                if(this.total<this.pageSize){
+                    this.pageIndex =1
+                    this.tableDataDetailPaging =tableDataDetail
+                    flag =true
+                }
+                if((this.pageIndex * this.pageSize) >=this.total){
+                    this.pageIndex =totalPageSize
+                    this.tableDataDetailPaging =tableDataDetail
+                    flag =true
+                }
+                return flag
+          },
+          pageChange() {
+                let currentPage = this.pageIndex
+                let totalPageSize = Number(this.total)/this.pageSize
+                console.log('totalPageSize'+totalPageSize)
+                if(currentPage < totalPageSize){
+                    currentPage = this.pageIndex++
+                    this.getTableData();
+                   console.log('js get currentPage'+currentPage)
+                }
+
+          },
+         
+        //滚动条监控所在位置
+         scrollToTop(){
+         // debugger
+          let el= document.querySelector('.dataTableDetail .v-table-rightview .v-table-body')
+          const scrollTop = el.scrollTop;
+         
+          const scrollHeight = el.scrollHeight;
+          let leftScrollHeight =(el.offsetHeight + scrollTop) - scrollHeight
+          // console.log('js get scrollTop'+leftScrollHeight)
+          if (leftScrollHeight ==0) {//如果置底
+                // 需要执行的代码
+               // console.log('js get scrollTop'+leftScrollHeight) 
+                this.pageChange()
+            }
+          },
+        
          //时间格式化
          formatDateTime(value){
             let secondTime = parseInt(value);// 秒
@@ -546,15 +650,21 @@ export default {
            //tab切换获取对应的生产数据详细
           getDataDetailByLine(index,key){
             //debugger
+            this.tableDataDetail = [] //切换时 先把数据清空
             this.currentTipIndex = index
             this.$toast(`第 ${key} 线`);
             this.currentIndex = key
             this.getDataLinePrimaryKey(key)
             this.GetLineDetailList(key)
+            this.setIsDblCutLineCss(key)
+            this.errorContent ='数据加载中...'
+            this.pageIndex =1
+           this.tableDataDetailPaging =[]
           },
           //获取速度和PrimaryKey
           getDataLinePrimaryKey(lineId){
              //debugger
+           
              let currentLineItem = this.getDataByLine(lineId)
              this.currentTipPrimaryKey = currentLineItem[0].PrimaryKey
              this.currentAvgSpeed = currentLineItem[0].SetAvgSpeed ////设定平均车速， 用来计算预估完工时间
@@ -563,6 +673,18 @@ export default {
                 this.currentAvgSpeed = 120
              }
              this.addDoneTime(this.setDoneTime)
+          },
+          //设置当前线别 是否双刀 修改 样式 LINE-HEIGHT
+          setIsDblCutLineCss(){
+            //console.warn('print current this.IsDblCut:'+this.IsDblCut)
+             this.IsDblCutLineCss ="<style>#dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >"
+             let _self= this
+             setTimeout(function(){
+                      if(_self.IsDblCut==1){
+                        _self.IsDblCutLineCss ="<style>#dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >"
+                      }
+               },100);
+          
           },
           //获取当前tab 
           //处理运行状态
@@ -677,8 +799,8 @@ export default {
               timer
             }
             let _self = this
+            
             this.$store.dispatch('getGoodsDetail_actions',params).then(res=>{
-             
               let currentData =[...res]
                //debugger
               //延时，因为需要的值比较慢执行
@@ -686,10 +808,16 @@ export default {
                   _self.addDoneTime()
                },300);
 
+              setTimeout(function(){
+                 _self.errorContent ='暂无数据'
+               },20000);
               _self.tableDataDetail = currentData
-
+             
               if(_self.tableDataDetail.length>0){
                   _self.getClassDoneTime(_self.tableDataDetail)
+
+                  //this.tableDataDetailPaging=[] //刷新的时候，数据重置为0
+                  _self.getTableData() //分页数据开始
               }
             
             }).catch(err=>{
@@ -866,26 +994,31 @@ export default {
      }
    },
    mounted(){
+     //debugger
       
        this.getChargeListDetail()
        this.GetLineList()
        
        let _selt =this
-        window.addEventListener("orientationchange", function() {
-          //监听横屏事件
-         // this.dataWindowH =
-       })
+      //   window.addEventListener("orientationchange", function() {
+      //     //监听横屏事件
+      //    // this.dataWindowH =
+      //  })
        if(isApp){
          this.virtualMarginHeight ='126px'
          this.resizeOffset=-1
        }
-      
+      this.$nextTick(()=>{
+          this.setIsDblCutLineCss() //默认设置样式
+       let moniterDiv = document.querySelector('.dataTableDetail .v-table-rightview .v-table-body').addEventListener("scroll", this.scrollToTop,true)
+      })
      //  this.$refs.dataTableDetail.resize()
      //this.$refs['dataTableDetail'].resize();
-      
-       
+    // window.addEventListener('scroll', this.handleScroll, true)
+    
    },
    created(){
+     
       // 每次进入界面时，先清除之前的所有定时器，然后启动新的定时器
        clearInterval(this.timer)
        this.timer = null
@@ -895,6 +1028,8 @@ export default {
        // 每次离开当前界面时，清除定时器 ，防止内存溢出
          clearInterval(this.timer)
          this.timer = null
+ 
+        document.querySelector('.dataTableDetail .v-table-rightview .v-table-body').removeEventListener("scroll", this.scrollToTop,true)
    }
 
 }
