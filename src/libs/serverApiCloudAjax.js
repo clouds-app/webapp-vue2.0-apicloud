@@ -16,14 +16,14 @@ var options = {
     defSueHandle: () => {},
     // 响应成功拦截器
     interceptorResSuc: (res, fn) => {
-      console.warn('响应成功拦截器:'+JSON.stringify(res))
+      //console.warn('响应成功拦截器:'+JSON.stringify(res))
       return fn(res.data)
     },
     // 响应失败拦截器
     // 默认把错误信息和出错接口向上抛出
     interceptorResErr: (err,  res, rej) => {
       
-      console.warn('响应失败拦截器:'+JSON.stringify(err))
+      //console.warn('响应失败拦截器:'+JSON.stringify(err))
       let { data, config } = err;
       if (data.statusCode === 0) {
         // 广播网络错误
@@ -34,7 +34,7 @@ var options = {
     // 请求拦截器
     interceptorReq: (config) => {
        // 加载loading
-       console.warn('请求拦截器:'+JSON.stringify(config))
+       //console.warn('请求拦截器:'+JSON.stringify(config))
        //请求拦截器:{"url":"http://120.78.91.203:12689/api/GetLineList","data":{"values":{"timer":"timerRun"}},"method":"post","transformRequest":[null]}
       //let tempObj = JSON.stringify(config)
       //console.warn('请求拦截器config.data.values.timer:'+config.data.values.timer)
@@ -45,7 +45,7 @@ var options = {
           });
        }
       
-      console.warn('请求拦截器:'+JSON.stringify(config))
+      //console.warn('请求拦截器:'+JSON.stringify(config))
       return config
     }
   }

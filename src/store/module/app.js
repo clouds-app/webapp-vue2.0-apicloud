@@ -1,4 +1,4 @@
-import { getChargeList,orderSubmit,orderPayment,orderPayStatus} from '@/api/app'
+import { getChargeList,orderSubmit,orderPayment,orderPayStatus,checkAppUpdate} from '@/api/app'
 import { setCookie,getCookie,setLocalStorage,getLocalStorage} from '@/libs/util'
 const serverBusyTips="服务繁忙，请稍后再试！";
 export default {
@@ -147,6 +147,36 @@ export default {
               }
             })
         },
+        
+        /**
+        * @description 验证版本是否可以更新
+        * @params { version }
+        */
+       checkAppUpdate_action({commit},params){
+        //debugger
+          return new Promise((resolve,reject)=>{
+            try {
+              checkAppUpdate(params).then(res=>{
+                const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
+
+                if(data.success)
+                {
+                  resolve(data)
+                }
+                else
+                {
+                  reject(data)
+                }
+              }).catch(err=>{
+                console.error(JSON.stringify(err))
+                reject(serverBusyTips)
+              })
+            } catch (error) {
+              console.error(JSON.stringify(error))
+              reject(serverBusyTips)
+            }
+          })
+      },
     }
 }
 

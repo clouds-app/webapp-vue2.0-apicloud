@@ -44,6 +44,12 @@ export default {
             isLoading: false,
             hasAccess:false,
             userStatus:{},
+            serviceVerInfo:{
+                // version:'1.0.0',//app版本号
+                // mustUpdate,//是否强制更新
+                // versionRemark,//版本号备注
+                // appUrl,//更新地址
+            },//当前服务器版本信息
             statusCheck:getCookie('statusCheck'),
         }
     },
@@ -54,8 +60,7 @@ export default {
         setTimeout(() => {
             this.$toast('刷新成功');
             this.isLoading = false;
-               _self.checkLogin()  //必须使用 let _self=this 否则无法识别 方法函数
-              _self.getCompanyName()
+               _self.initData()  //必须使用 let _self=this 否则无法识别 方法函数
         }, 500);
         },
         NoAccess(){
@@ -116,35 +121,35 @@ export default {
        },
        //检查是否已经登陆
        checkLogin(){
-            this.$store.commit('setHasAccess','false')
-            let params ={
-                systemId:getLocalStorage('userSystemId'),
-                deviceId:this.getDeviceId()
-            }
-            let _self=this
-            this.$store.dispatch('handleCheckLogin',params).then(res=>{
-                 
-                 //_self.$toast.success('欢迎回来');
-                 let currentStatus = res.data
-                 _self.userStatus = currentStatus
-                _self.hasAccess = (res.status===0)
-                //debugger
-                this.$store.commit('setHasAccess',_self.hasAccess)
-                 this.turnToPageBack('dataEcharts') 
-            }).catch(err=>{
-                //debugger
-                //根据返回状态，判断跳转的页面
-                let errData =err
-                if(typeof(err) == "object" && err.status!="10002"){
-                    _self.$store.commit('setPaymentStatus',err)
-                }
-                if(errData && errData.status){
-                     //console.log("跳转login");
-                    _self.turnToPageByStatus(errData.status)
-                }
-              
-         })
-        
+         this.$store.commit('setHasAccess','false')
+                    let params ={
+                        systemId:getLocalStorage('userSystemId'),
+                        deviceId:this.getDeviceId()
+                    }
+                    let _self=this
+                    this.$store.dispatch('handleCheckLogin',params).then(res=>{
+                        
+                        //_self.$toast.success('欢迎回来');
+                        let currentStatus = res.data
+                        _self.userStatus = currentStatus
+                        _self.hasAccess = (res.status===0)
+                        //debugger
+                        this.$store.commit('setHasAccess',_self.hasAccess)
+                        this.turnToPageBack('dataEcharts') 
+                    }).catch(err=>{
+                        //debugger
+                        //根据返回状态，判断跳转的页面
+                        let errData =err
+                        if(typeof(err) == "object" && err.status!="10002"){
+                            _self.$store.commit('setPaymentStatus',err)
+                        }
+                        if(errData && errData.status){
+                            //console.log("跳转login");
+                            _self.turnToPageByStatus(errData.status)
+                        }
+                    
+                })
+                   
        },
         //跳转到指定页面，默认字符串
       turnToPageBack(path){
@@ -165,39 +170,137 @@ export default {
                 this.companyName = user.companyName
             }
        },
-       //下拉刷新 APICLOUD  取消 使用
-      initRefresh(){
+      /**
+     * 字符串替换
+     * @param  {string} str    要被替换的字符串
+     * @param  {string} substr 要替换的字符串
+     * @param  {string} newstr 用于替换的字符串
+     * @return {string}        替换后的新字符串 replace("ssssss", "ss", "s")
+     */
+    myReplace(str, substr, newstr) {
+    substr = substr.replace(/[.\\[\]{}()|^$?*+]/g, "\\$&"); // 转义字符串中的元字符
+    var re = new RegExp(substr, "g"); // 生成正则
+    return str.replace(re, newstr);
+    },
+      //版本更新提示
+      UpateAppTips(res){
+         let isDone =false
+         res =res.data
+         let _self =this
+         let updateInfo = '新版本型号:' + res.version + ';<br/>更新内容:' + res.versionRemark  + ';<br/>发布时间:' + res.createTime;
+        //是否强制更新
+        if(res.mustUpdate){
+             this.$dialog.alert({
+                    title: '版本更新',
+                    message: updateInfo
+                    }).then(() => {
+                     // on confirm
+                     isDone =true
+                    // alert(1)
+                      _self.appDownload(res.appUrl)
+                    }).catch(() => {
+                    // on cancel  
+                     isDone =false
+                    });      
+
+         }else{
+                this.$dialog.confirm({
+                    title: '更新提示',
+                    message: updateInfo
+                    }).then(() => {
+                     // on confirm
+                     isDone =true
+                      _self.appDownload(res.appUrl)
+                    }).catch(() => {
+                    // on cancel
+                     isDone =false
+                    });      
+         }       
+      },
+      //下载更新文件
+      appDownload(downLoadUrl){
+           //alert('下载开始....')
+           if (window.api.systemType == "android") {
+                                    window.api.download({
+                                        url : downLoadUrl,
+                                        report : true
+                                    }, function(ret, err) {
+                                        if (ret && 0 == ret.state) {/* 下载进度 */
+                                            window.api.toast({
+                                                msg : "正在下载应用" + ret.percent + "%",
+                                                duration : 2000
+                                            });
+                                        }
+                                        if (ret && 1 == ret.state) {/* 下载完成 */
+                                            let savePath = ret.savePath;
+                                            window.api.installApp({
+                                                appUri : savePath
+                                            });
+                                        }
+                                    });
+                                }
+         if (window.api.systemType == "ios") {
+                    window.api.alert({
+                            msg : "请到App store下载最新版本"
+                        });                
+          }
+            
+      },
+      //获取服务app版本信息,
+      getServiceVerInfo(){
             let _self=this
-            api.setRefreshHeaderInfo({
-            visible: true,
-            // loadingImg: 'widget://image/refresh.png',
-            bgColor: '#fff',
-            textColor: '#e1017e',
-            textDown: '下拉刷新...',
-            textUp: '松开刷新...',
-            showTime: true
-            }, function(ret, err) {
-                 //在这里从服务器加载数据，加载完成后调用api.refreshHeaderLoadDone()方法恢复组件到默认状态
-                    if(ret){
-                         _self.checkLogin()  //必须使用 let _self=this 否则无法识别 方法函数
-                         _self.getCompanyName()
-                    }
-                
-                  window.api.refreshHeaderLoadDone() //关闭下拉刷新窗口
-            })
-      }, 
+            let currentVersion = '0.1.0'
+            if(isApp){
+                //currentVersion:1.3.29
+                currentVersion =  window.api.appVersion 
+                //console.log('currentVersion:'+currentVersion)
+                //currentVersion = '0.1.0'
+            }
+             currentVersion =parseInt(this.myReplace(currentVersion,'.',''))
+              //console.log('currentVersion format:'+currentVersion)
+             
+          let params ={
+                version:currentVersion
+          }
+          return new Promise((resolve,reject)=>{
+               this.$store.dispatch('checkAppUpdate_action',params).then(res=>{
+                // debugger
+                 _self.serviceVerInfo =res
+                  resolve(res)
+                }).catch(err=>{
+                    // debugger
+                     _self.serviceVerInfo =err
+                    reject(err)
+                })
+          })
+         
+      },
+      //初始化数据
+      initData(){
+          let _self =this
+          this.getServiceVerInfo().then(res=>{
+               //alert('发现新版本！！')
+                _self.UpateAppTips(res)
+          }).catch(err=>{
+                  _self.checkLogin()
+                  _self.getCompanyName()
+          })
+            
+            
+      }
 
       
 
     },
+    created(){
+      //  this.getServiceVerInfo()
+    },
     mounted(){
-        this.checkLogin()
-        this.getCompanyName()
+         this.initData()
         if(isApp){
            let _self = this
            this.RefreshEventListener(function(){
-                _self.checkLogin()  //必须使用 let _self=this 否则无法识别 方法函数
-                _self.getCompanyName()
+                _self.initData()  //必须使用 let _self=this 否则无法识别 方法函数
            })
         }
     }

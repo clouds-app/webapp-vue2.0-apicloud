@@ -24,7 +24,7 @@ export default {
   watch:{
     value(val){
       if(val){
-         console.log('数据变化：...')
+         //console.log('数据变化：...')
         this.initData()
       }
     }

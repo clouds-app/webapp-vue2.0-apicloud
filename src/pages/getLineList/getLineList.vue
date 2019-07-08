@@ -83,12 +83,15 @@ export default {
                  pageIndex: 1,
                  pageSize: 50,
                  total:'',
+                 OrderLengthmm:0,//上刀客方切长
+                 LoOrderLengthmm:0,//下刀客方切长
+                 isTipChange:false,
                  errorContent:'数据加载中...',
                  IsDblCutLineCss:'',//是否双刀打印行 line-height 的高度 达到两行的目的
                  IsDblCut:0,//是否双刀，赋值到详细里面去判断
                  errCount:0,//错误次数大于10 ，清空控制台日志
                  NewTotalCurQty:0,//本笔总数
-                 detailFirstPrimaryKey:'',//详细中第一个PrimaryKey
+                 detailFirstPrimaryKeyIndex:'',//详细中第一个PrimaryKey
                  mainCutQty :0,//主刀已生产数
                  allTotalLength:0,
                  CurleftQty:0,//本笔尚缺
@@ -114,10 +117,14 @@ export default {
                   
                     {field: 'LineID', title:'订单', width: 36, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
+                              let className ='?班'
+                              if(!!rowData.ClassID){
+                                  className =rowData.ClassID+'班'
+                              }
                                if(rowData.IsDblCut=='0'){
-                                 return `<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">本笔</span>`
+                                 return `<span style="color:green;font-weight: bold;">${className}</span><br/><span style="font-weight: bold;">本笔</span>`
                                }else{
-                                   return '<span style="color:green;font-weight: bold;">本班</span><br/><span style="font-weight: bold;">上刀</span><br/><span style="font-weight: bold;">下刀</span>'
+                                   return `<span style="color:green;font-weight: bold;">${className}</span><br/><span style="font-weight: bold;">上刀</span><br/><span style="font-weight: bold;">下刀</span>`
                                } 
                         },isFrozen: true},
 
@@ -130,11 +137,11 @@ export default {
                          }
                           return '<span style="color:green;font-weight: bold;">' + ((Number(rowData.ClassGoodLength)+Number(rowData.ClassBadLength))/1000).toFixed(0) + '米</span><br/><span style="font-weight: bold;">' + (NewTotalCurQty)+ '张</span>'
                        }else{
-                          return '<span style="color:green;font-weight: bold;">' + ((Number(rowData.ClassGoodLength)+Number(rowData.ClassBadLength))/1000).toFixed(0) + '米</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty))+ '张</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurLoQty)+Number(rowData.CurLoBadQty))+ '张</span>'
+                          return '<span style="color:green;font-weight: bold;">' + ((Number(rowData.ClassGoodLength)+Number(rowData.ClassBadLength))/1000).toFixed(0) + '米</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurQty)+Number(rowData.CurBadQty)).toFixed(0)+ '张</span><br/><span style="font-weight: bold;">' + (Number(rowData.CurLoQty)+Number(rowData.CurLoBadQty)).toFixed(0)+ '张</span>'
                        }
                             
-                        },isFrozen: true},
-                    {field: 'ClassQty', title:'良品', width: 60, titleAlign: 'center',columnAlign:'right',
+                        },isFrozen: true,isResize:true,},
+                    {field: 'ClassQty', title:'良品', width: 60, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                             if(rowData.IsDblCut=='0'){
                                  return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassGoodLength)/1000).toFixed(0)+ '米</span><br/><span style="font-weight: bold;">' + (rowData.CurQty) + '张</span>'
@@ -144,7 +151,7 @@ export default {
                          
                         }
                     },
-                    {field: 'ClassBadQty', title: '不良', width: 60, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassBadQty', title: '不良', width: 50, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                          if(rowData.IsDblCut=='0'){
                             return '<span style="color:green;font-weight: bold;">' + (Number(rowData.ClassBadLength)/1000).toFixed(0) + '米</span><br/><span style="font-weight: bold;">' + (rowData.CurBadQty) + '张</span>'
@@ -154,7 +161,7 @@ export default {
                            
                         }
                     },
-                      {field: 'ClassBadQty', title: '不良%', width: 60, titleAlign: 'center',columnAlign:'right',
+                      {field: 'ClassBadQty', title: '不良%', width: 50, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
                          //本班 
                             let notGoodTotal =(Number(rowData.ClassBadLength)/1000).toFixed(0)
@@ -181,7 +188,7 @@ export default {
                            
                         }
                     },
-                     {field: 'ClassBadLength', title:'尚缺', width: 60, titleAlign: 'center',columnAlign:'right',
+                     {field: 'ClassBadLength', title:'尚缺', width: 60, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                           let leftCurQty = rowData.CurQty
                           if(!!rowData.NewTotalCurQty){
@@ -206,11 +213,48 @@ export default {
                     //         return '<span style="color:green;font-weight: bold;">' + (rowData.ClassBadLength) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
                     //     }
                     // },
-                    {field: 'ClassGoodArea', title: '面积(㎡)', width: 40, titleAlign: 'center',columnAlign:'right',
+                    {field: 'ClassGoodArea', title: '面积(㎡)', width: 60, titleAlign: 'center',columnAlign:'right',isResize:true,
                      formatter: function (rowData, index) {
                             let tempArea =(Number(rowData.ClassGoodArea)+Number(rowData.ClassBadArea))/100
                            // console.log(rowData.ClassGoodArea,rowData.ClassBadArea,tempArea)
                             return '<span style="color:green;font-weight: bold;">' +tempArea.toFixed(0) + '</span><br/><span style="font-weight: bold;">'  + '</span>'
+                        }
+                    },
+                    {field: 'ClassBadQty', title: '均速', width: 40, titleAlign: 'center',columnAlign:'right',
+                     formatter: function (rowData, index) {
+                         let classSpeed=0
+                         let curSpeed=0
+                         //班
+                         if(rowData.ClassProdTime!=0){
+                            let minuteTime = parseInt(rowData.ClassProdTime / 60) 
+                            //平均车速（米/分） = （当班良品+当班不良品）/1000 /生产时间
+                            let totalLen =((Number(rowData.ClassGoodLength)+Number(rowData.ClassBadLength))/1000).toFixed(0)
+                            classSpeed = (totalLen/minuteTime).toFixed(1)
+
+                         }
+                         //笔
+                         if(rowData.CurProdTime!=0){
+                           let minuteTime = parseInt(rowData.CurProdTime / 60)
+                           //主刀平均车速（米/分） = （本笔良品+本笔不良品）*本笔切长/生产时间
+                           //上刀
+                           let totalLen =(Number(rowData.CurQty)+Number(rowData.CurBadQty))/1000 * rowData.OrderLengthmm
+                           let mainSpeed =totalLen /minuteTime
+
+                           //下刀
+                           let totalLenSub =(Number(rowData.CurLoQty)+Number(rowData.CurLoBadQty))/1000 * rowData.LoOrderLengthmm
+                           let subSpeed =totalLenSub /minuteTime
+
+                           if(mainSpeed>=subSpeed){
+                               curSpeed = mainSpeed.toFixed(1)
+                           }else{
+                               curSpeed = subSpeed.toFixed(1)
+                           }
+
+                         
+                         }
+
+                         return '<span style="color:green;font-weight: bold;">' +classSpeed + '</span><br/><span style="font-weight: bold;">'+ curSpeed + '</span>'
+                           
                         }
                     },
                     // {field: 'ClassBadArea', title: '不良面积(㎡)',width: 58, titleAlign: 'center',columnAlign:'right',
@@ -345,6 +389,7 @@ export default {
                             return '<div style="line-height: 40px !important;"><span style="color:blue;font-weight: bold;font-size: 20px;">' + (Number(rowData.Speed_H))/10 + '</span></div>'
                         }
                     },
+                  
                      //样式控制  是否双刀
                     //   {field: 'LineID', title:'样式设置', width: 0.1, 
                     //  formatter: function (rowData, index) {
@@ -536,21 +581,34 @@ export default {
                 }
                 if((this.pageIndex * this.pageSize) >=this.total){
                     this.pageIndex =totalPageSize
+                    if(this.pageIndex==0){
+                       this.pageIndex =1
+                    }
                     this.tableDataDetailPaging =tableDataDetail
                     flag =true
                 }
                 return flag
           },
           pageChange() {
+              
                 let currentPage = this.pageIndex
                 let totalPageSize = Number(this.total)/this.pageSize
-                console.log('totalPageSize'+totalPageSize)
+              
+               // console.log('totalPageSize'+totalPageSize)
                 if(currentPage < totalPageSize){
                     currentPage = this.pageIndex++
                     this.getTableData();
-                   console.log('js get currentPage'+currentPage)
+                  // console.log('js get currentPage'+currentPage)
+                  if(this.isTipChange){
+                       this.$toast(`第 ${currentPage+1}/${Math.ceil(totalPageSize)} 页`)
+                  }
+                  
+                  
                 }
-
+              
+                if(totalPageSize > currentPage){
+                   this.isTipChange = true
+                }
           },
          
         //滚动条监控所在位置
@@ -563,8 +621,10 @@ export default {
           let leftScrollHeight =(el.offsetHeight + scrollTop) - scrollHeight
           // console.log('js get scrollTop'+leftScrollHeight)
           if (leftScrollHeight ==0) {//如果置底
+
+                
                 // 需要执行的代码
-               // console.log('js get scrollTop'+leftScrollHeight) 
+                // console.log('js get scrollTop'+leftScrollHeight) 
                 this.pageChange()
             }
           },
@@ -658,8 +718,10 @@ export default {
             this.GetLineDetailList(key)
             this.setIsDblCutLineCss(key)
             this.errorContent ='数据加载中...'
+            this.isTipChange = false
             this.pageIndex =1
            this.tableDataDetailPaging =[]
+           this.timerValue = 0 //重置timerValue 当切换TAB的时候，防止重复查询详细详细
           },
           //获取速度和PrimaryKey
           getDataLinePrimaryKey(lineId){
@@ -672,7 +734,22 @@ export default {
              if( this.currentAvgSpeed <=0){
                 this.currentAvgSpeed = 120
              }
+             this.comparePrimaryKey()
              this.addDoneTime(this.setDoneTime)
+          },
+          //比较PrimaryKey 如果不一致即为换单，立即刷新详细单据
+          comparePrimaryKey(){
+            //debugger
+            if(this.tableDataDetail.length==0){
+              return
+            }
+            let lineKey= this.currentTipPrimaryKey
+            let detailKey = this.tableDataDetail[this.detailFirstPrimaryKeyIndex].PrimaryKey
+            if(lineKey!="" && detailKey !="" && lineKey!=detailKey){
+              //this.$toast(`已经换单，请重新刷新详细数据`);
+              this.GetLineDetailList(this.currentIndex,'splice') //详细 30秒 更新一次
+             
+            }
           },
           //设置当前线别 是否双刀 修改 样式 LINE-HEIGHT
           setIsDblCutLineCss(){
@@ -736,8 +813,9 @@ export default {
           },
           //获取生产数据列表
           GetLineList(timer){
-            // this.timerValue++
-           // console.log('item...每过2秒执行一次'+this.timerValue)
+            //debugger
+             //this.timerValue++
+            //console.log('item...每过2秒执行一次')
             let _self=this
             let params = {
               timer
@@ -755,11 +833,13 @@ export default {
                            if((_self.timerValue==15 || _self.timerValue >15)){
                                 //console.log('详细...每过30秒执行一次'+_self.timerValue)
                                 _self.timerValue = 0
-                                console.clear()
+                                //console.clear()
                                 _self.GetLineDetailList(_self.currentIndex,timer) //详细 30秒 更新一次
+                                //_self.resetInitData() //重启动定时器
                            }
                     }
                     else{
+                         _self.timerValue = 0
                         _self.GetLineDetailList(_self.currentIndex) //详细 30秒 更新一次
                     }
                    _self.getDataLinePrimaryKey(_self.currentIndex)
@@ -799,7 +879,7 @@ export default {
               timer
             }
             let _self = this
-            
+            //console.warn('timer:'+timer)
             this.$store.dispatch('getGoodsDetail_actions',params).then(res=>{
               let currentData =[...res]
                //debugger
@@ -808,31 +888,42 @@ export default {
                   _self.addDoneTime()
                },300);
 
-              setTimeout(function(){
-                 _self.errorContent ='暂无数据'
-               },20000);
+            
+
               _self.tableDataDetail = currentData
-             
+              if(timer=='splice'){
+                _self.tableDataDetail.splice(this.detailFirstPrimaryKeyIndex,1) //删除换单单据
+              }
+              
               if(_self.tableDataDetail.length>0){
+
                   _self.getClassDoneTime(_self.tableDataDetail)
 
-                  //this.tableDataDetailPaging=[] //刷新的时候，数据重置为0
+                  this.tableDataDetailPaging=[] //刷新的时候，数据重置为0
                   _self.getTableData() //分页数据开始
+              }else{
+                 _self.errorContent ='暂无数据'
               }
             
             }).catch(err=>{
                _self.ClearLog()
               //debugger
                _self.$toast('获取生产详细数据列表失败：'+err);
+               _self.errorContent ='暂无数据'
             })
           },
           //获取本班预计完工时间 tableDetailList 为详细数
           getClassDoneTime(tableDetailList){
                this.allTotalLength = 0
-           // debugger
+               let getFirstItem=false
+               if(tableDetailList.length==0){
+                 return
+               }
+            //debugger
                 for(let i =0;i<tableDetailList.length;i++){
                     //第一个
                     if(tableDetailList[i].PrimaryKey == this.currentTipPrimaryKey){
+                        this.detailFirstPrimaryKeyIndex = i
                       // debugger
                         let mainCutLen = this.getMainCutlen(tableDetailList[i])
                         let tempLen = (Number(tableDetailList[i].MainCutLen) - Number(mainCutLen) * this.mainCutQty) //必须大于 0
@@ -840,6 +931,7 @@ export default {
                         let leftCutlen = tempLen >0 ? tempLen : 0
                         this.allTotalLength = leftCutlen
                         this.setTotalCurDoneTime(leftCutlen) //设置本笔预计完工时间
+                        getFirstItem=true
                         let firstCurDoneTime  = this.getCurItemDoneTime(leftCutlen)
 
                         let params ={
@@ -862,6 +954,13 @@ export default {
                     }
                   
                 }
+                if(!getFirstItem){ //如果此单不再运行状态 取第一笔
+                   //debugger
+                     let mainCutLen = this.getMainCutlen(tableDetailList[0])
+                     let tempLen = (Number(tableDetailList[0].MainCutLen) - Number(mainCutLen) * this.mainCutQty) //必须大于 0
+                     let leftCutlen = tempLen >0 ? tempLen : 0
+                   this.setTotalCurDoneTime(leftCutlen) //设置本笔预计完工时间 
+                }
                // debugger
                 //本班预完工时间 =总长（米） / 速度
                 let totalDoneTime =((Number(this.allTotalLength) / 1000 / this.currentAvgSpeed) * 60).toFixed(0)
@@ -871,7 +970,8 @@ export default {
           },
           //设置本笔预计完工时间
           setTotalCurDoneTime(leftCutlen){
-              let tempDoneTime = (leftCutlen)*0.06/this.currentAvgSpeed //秒
+
+              let tempDoneTime = ((leftCutlen)*0.06/this.currentAvgSpeed).toFixed(2) //秒
               this.setCurDoneTime = this.formatDateTime(tempDoneTime)    
           },
           //获取主刀单个长度，设置主刀已生产数
@@ -900,21 +1000,33 @@ export default {
           },
           //获取与当前line 相同PrimaryKey的详细数据
            getCurrentLineDetailBy(primaryKey){
-             // debugger
+              //debugger
+              let getThePrimaryKey =false
               let currentLineDatailItem ={}
               if(this.tableDataDetail.length ==0){
                 return
               }
-              for(let i =0;i<this.tableDataDetail.length;i++){
+              if(primaryKey!=""){
+                  for(let i =0;i<this.tableDataDetail.length;i++){
                   let tempKey =this.tableDataDetail[i].PrimaryKey
-                 if(tempKey == primaryKey){
+                  if(tempKey == primaryKey){
+                    getThePrimaryKey =true
                     currentLineDatailItem =this.tableDataDetail[i]
                      i = this.tableDataDetail.length//break
                   }
+               }
+              }
+              if(!getThePrimaryKey){
+                currentLineDatailItem =this.tableDataDetail[0]
               }
               //debugger
                this.CurrentLineDetailItem = currentLineDatailItem
                this.NewTotalCurQty =this.CurrentLineDetailItem.OrderQty
+
+              //上刀毫米切长 //下刀毫米切长 =>技术平均车速
+               this.OrderLengthmm =this.CurrentLineDetailItem.OrderLengthmm
+               this.LoOrderLengthmm =this.CurrentLineDetailItem.LoOrderLengthmm
+
                //
                if(this.tableData[this.currentTipIndex] && this.tableData[this.currentTipIndex].CurQty){
                   this.CurleftQty = this.CurrentLineDetailItem.OrderQty - this.tableData[this.currentTipIndex].CurQty
@@ -931,15 +1043,18 @@ export default {
                 setDoneTime:this.setDoneTime,
                 NewTotalCurQty:this.NewTotalCurQty,//本笔总数
                 curDoneTime:this.setCurDoneTime,  //本笔预计完工时间
-                allTotalLength:this.allTotalLength
+                allTotalLength:this.allTotalLength,
+                OrderLengthmm:this.OrderLengthmm,//上刀毫米切长
+                LoOrderLengthmm:this.LoOrderLengthmm,//下刀毫米切长
               }
               if(valueTime!=null && valueTime!=0){
                 newParams.setDoneTime =valueTime
               }else{
                 //debugger
+                let currentLineDatailItem =  this.getCurrentLineDetailBy(this.currentTipPrimaryKey)
                 if(this.currentTipPrimaryKey!=""){
                   
-                    let currentLineDatailItem =  this.getCurrentLineDetailBy(this.currentTipPrimaryKey)
+                    // let currentLineDatailItem =  this.getCurrentLineDetailBy(this.currentTipPrimaryKey)
                     // let willDoneTime =this.getCrrentOrderDoneTime(currentLineDatailItem)
                     // newParams.setDoneTime = willDoneTime
                     // if(willDoneTime ==NaN || willDoneTime ==undefined){
@@ -968,6 +1083,7 @@ export default {
          
         setTimer() { 
                 //定时任务
+               // debugger
                 if(this.timer == null) {
                     let _self = this
                     this.timer = setInterval( () => {
@@ -976,7 +1092,19 @@ export default {
                         _self.GetLineList('timerRun')
                         _self.timerValue+=1
                     }, 2000)
+
+                    //因为setInterval请求时间超过了设定的时间,此时会造成阻塞 解决方案:使用嵌套setTimeout
+                   
                 }
+               
+            },
+            //初始化计时器
+            resetInitData(){
+              clearTimeout(this.timer)
+              // 每次进入界面时，先清除之前的所有定时器，然后启动新的定时器
+              clearInterval(this.timer)
+              this.timer = null
+              this.setTimer()
             }
    },
    computed:{
@@ -1018,17 +1146,13 @@ export default {
     
    },
    created(){
-     
-      // 每次进入界面时，先清除之前的所有定时器，然后启动新的定时器
-       clearInterval(this.timer)
-       this.timer = null
-       this.setTimer()
+    this.resetInitData()
    },
    beforeDestroy(){
        // 每次离开当前界面时，清除定时器 ，防止内存溢出
          clearInterval(this.timer)
          this.timer = null
- 
+         clearTimeout(this.timer)
         document.querySelector('.dataTableDetail .v-table-rightview .v-table-body').removeEventListener("scroll", this.scrollToTop,true)
    }
 

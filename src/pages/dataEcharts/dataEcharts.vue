@@ -217,11 +217,18 @@ export default {
            this.isSearchData =false
          
              if(type =='day'){
+               
+                 this.currentSelectClassId =''//当前选中班别
+                 this.currentSelectLineId='' //当前选中线别
+    
                  this.StartDate =this.getCurrentData().toString()
                  this.EndDate = this.getCurrentData().toString()
              }else if(type =='week'){
-                  this.StartDate = this.getCurrentWeekList()[0] //本周第一天
-                  this.EndDate = this.getCurrentWeekList()[6] //本周最后一天
+                  this.currentSelectClassId =''//当前选中班别
+                 this.currentSelectLineId='' //当前选中线别
+                 
+                  this.StartDate = this.getCurrentWeekList()[0].replace('/','-').replace('/','-') //本周第一天
+                  this.EndDate =this.getCurrentData().toString()//this.getCurrentWeekList()[6].replace('/','-').replace('/','-') //本周最后一天
              }else{ //month
                  this.StartDate =this.getCurrentMonthList()[0] //本月第一天
                  this.EndDate = this.getCurrentData().toString()
@@ -245,7 +252,7 @@ export default {
 
          //当前日期数据
          if(!this.isSearchData){
-              debugger
+              //debugger
               currentFilterData = _self.currentMonthBarData
              if(type =='day'){
              let currentDate =_self.getCurrentData().replace('-','/').replace('-','/')
@@ -315,11 +322,11 @@ export default {
              let num = day.getDay()-1;
              day.setDate(day.getDate() - num); //本周第一天
              if(firstDayOfWeek==''){
-                firstDayOfWeek = day.format("yyyy-MM-dd");
+                firstDayOfWeek = day.format("yyyy/MM/dd");
                 currentWeekArray.push(firstDayOfWeek)
              }
              day.setDate(day.getDate() + i)   
-             let currentDate = day.format("yyyy-MM-dd");
+             let currentDate = day.format("yyyy/MM/dd");
              currentWeekArray.push(currentDate)
          }
         return currentWeekArray
@@ -441,7 +448,7 @@ export default {
 
         if(!this.checkInputData()) //日期验证 是否有效
         {
-            //return
+            return
         }
        this.currentSelectLineId = '', //当前选中线别
        this.currentSelectClassId = '',//当前选中班别
@@ -472,8 +479,8 @@ export default {
    },
    //初始化数据
    beforeMount(){
-     this.StartDate =this.getCurrentData(-60).toString() //测试 60 天 数据
-    // this.StartDate =this.getCurrentMonthList()[0] //本月第一天 ，上线 时，应该是这个数据
+     //this.StartDate =this.getCurrentData(-60).toString() //测试 60 天 数据
+     this.StartDate =this.getCurrentMonthList()[0] //本月第一天 ，上线 时，应该是这个数据
      this.EndDate = this.getCurrentData().toString() //今天
      this.getChargeListDetail() //缓存购买的 生产线 信息
    

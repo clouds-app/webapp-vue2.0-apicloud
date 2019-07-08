@@ -100,35 +100,36 @@ export default {
             }
            
         })
-    },
-    getQueryDatasList_actions({commit},params){
-        return new Promise((resolve,reject)=>{
-            try {
-                getQueryDatasList(params).then(res=>{
-                    const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
-                    //debugger
-                    if(data.length > 0 && !data[0].Error) 
-                    {
-                      resolve(data)
-                      commit('setGoodsReport',data)
-                    }
-                    else
-                    {
-                      reject(serverDataZero+' '+data[0].Error)
-                    }
-                }).catch(err=>{
-                    console.error(JSON.stringify(err))
-                    //reject(serverBusyTips)
-                    reject(serverDataZero)
-                })
-            } catch (error) {
-                console.error(JSON.stringify(error))
-                reject(serverBusyTips)
-               // reject(serverDataZero +"::"+error)
-            }
-           
-        })
-    },
+        },
+        getQueryDatasList_actions({commit},params){
+            return new Promise((resolve,reject)=>{
+                try {
+                    getQueryDatasList(params).then(res=>{
+                        const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
+                        //debugger
+                        if(data.length > 0 && !data[0].Error) 
+                        {
+                        resolve(data)
+                        commit('setGoodsReport',data)
+                        }
+                        else
+                        {
+                        reject(serverDataZero+' '+data[0].Error)
+                        }
+                    }).catch(err=>{
+                        console.error(JSON.stringify(err))
+                        //reject(serverBusyTips)
+                        reject(serverDataZero)
+                    })
+                } catch (error) {
+                    console.error(JSON.stringify(error))
+                    reject(serverBusyTips)
+                // reject(serverDataZero +"::"+error)
+                }
+            
+            })
+        },
+      
 
 
       
