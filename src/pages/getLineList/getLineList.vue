@@ -111,6 +111,7 @@ export default {
                  currentIndex:1,//默认查询详细线别LineId
                  tableWidth:window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                  tableData: [],
+                 deletedPrimaryKeyList:[],//已经删除的PK 前十个
                  tableDataDetail:[],
                  tableDataDetailPaging:[],
                  columns: [
@@ -193,6 +194,10 @@ export default {
                           let leftCurQty = rowData.CurQty
                           if(!!rowData.NewTotalCurQty){
                               leftCurQty =Number(rowData.NewTotalCurQty) - Number(rowData.CurQty) 
+                              if(leftCurQty<0)
+                              {
+                                  leftCurQty =0
+                              }
                           }
 
                           let allTotalLength = 0
@@ -225,29 +230,34 @@ export default {
                          let classSpeed=0
                          let curSpeed=0
                          //班
+                          
                          if(rowData.ClassProdTime!=0){
-                            let minuteTime = parseInt(rowData.ClassProdTime / 60) 
+                           
+                            let minuteTime = Number(rowData.ClassProdTime / 60).toFixed(2)
+                           
                             //平均车速（米/分） = （当班良品+当班不良品）/1000 /生产时间
                             let totalLen =((Number(rowData.ClassGoodLength)+Number(rowData.ClassBadLength))/1000).toFixed(0)
                             classSpeed = (totalLen/minuteTime).toFixed(1)
-
+                           
                          }
                          //笔
                          if(rowData.CurProdTime!=0){
-                           let minuteTime = parseInt(rowData.CurProdTime / 60)
+                           let minuteTime = Number(rowData.CurProdTime / 60).toFixed(2)
                            //主刀平均车速（米/分） = （本笔良品+本笔不良品）*本笔切长/生产时间
                            //上刀
                            let totalLen =(Number(rowData.CurQty)+Number(rowData.CurBadQty))/1000 * rowData.OrderLengthmm
-                           let mainSpeed =totalLen /minuteTime
-
+                           
+                          let mainSpeed =(totalLen.toFixed(2) /minuteTime).toFixed(1)
+                      
                            //下刀
                            let totalLenSub =(Number(rowData.CurLoQty)+Number(rowData.CurLoBadQty))/1000 * rowData.LoOrderLengthmm
-                           let subSpeed =totalLenSub /minuteTime
+                           let subSpeed =(totalLenSub.toFixed(2) /minuteTime).toFixed(1)
 
-                           if(mainSpeed>=subSpeed){
-                               curSpeed = mainSpeed.toFixed(1)
+                           if( mainSpeed && mainSpeed!=0){
+                             
+                               curSpeed = mainSpeed
                            }else{
-                               curSpeed = subSpeed.toFixed(1)
+                               curSpeed = subSpeed
                            }
 
                          
@@ -543,10 +553,19 @@ export default {
         //console.log('scrollToTop:'+ this.$refs['dataTableDetail'].scrollToTop)
         },
    methods:{
+          filterTopTenData(dataList){
+            if(this.deletedPrimaryKeyList.length>0){
+                  return dataList.filter(item=>{
+                        let flag = this.deletedPrimaryKeyList.indexOf(item.PrimaryKey)==-1 ? true : false
+                      return flag
+                    })
+            }else{
+              return dataList
+            }
+          },
           getTableData() {
            // debugger
-           //this.tableDataDetailPaging=[] //刷新的时候，数据重置为0
-           let tableDataDetail =this.tableDataDetail
+           let tableDataDetail =this.filterTopTenData(this.tableDataDetail)
            let currentPageData =[]
            this.total = tableDataDetail.length;
            let totalPageSize = Number(this.total)/this.pageSize
@@ -622,7 +641,6 @@ export default {
           // console.log('js get scrollTop'+leftScrollHeight)
           if (leftScrollHeight ==0) {//如果置底
 
-                
                 // 需要执行的代码
                 // console.log('js get scrollTop'+leftScrollHeight) 
                 this.pageChange()
@@ -739,7 +757,9 @@ export default {
           },
           //比较PrimaryKey 如果不一致即为换单，立即刷新详细单据
           comparePrimaryKey(){
-            //debugger
+            
+            //test
+           // this.handleTopTenFK("EF881491-E705-457F-8583-56FF426C28CB")
             if(this.tableDataDetail.length==0){
               return
             }
@@ -747,9 +767,28 @@ export default {
             let detailKey = this.tableDataDetail[this.detailFirstPrimaryKeyIndex].PrimaryKey
             if(lineKey!="" && detailKey !="" && lineKey!=detailKey){
               //this.$toast(`已经换单，请重新刷新详细数据`);
-              this.GetLineDetailList(this.currentIndex,'splice') //详细 30秒 更新一次
-             
+             // this.GetLineDetailList(this.currentIndex,'splice') //详细 30秒 更新一次
+
+             this.GetLineList('timerRun')
+             this.timerValue=15
+             this.tableDataDetailPaging.splice(this.detailFirstPrimaryKeyIndex,1) //删除换单单据
+             this.handleTopTenFK(detailKey)
             }
+          },
+          //存储前10PK
+          handleTopTenFK(currentKey){
+            //debugger
+            let flag = this.deletedPrimaryKeyList.indexOf(currentKey)
+            if(flag==-1){
+                   if(this.deletedPrimaryKeyList.length<10){
+                    this.deletedPrimaryKeyList.push(currentKey)
+                    }else{
+                      //shift 方法用于把数组的第一个元素从其中删除，并返回第一个元素的值。
+                      this.deletedPrimaryKeyList.shift() //该方法不创建新数组，而是直接修改原有的 arrayObject
+                      this.deletedPrimaryKeyList.push(currentKey)
+                    }
+            }
+       
           },
           //设置当前线别 是否双刀 修改 样式 LINE-HEIGHT
           setIsDblCutLineCss(){
@@ -831,6 +870,7 @@ export default {
 
                     if(timer!="" && timer!=null){
                            if((_self.timerValue==15 || _self.timerValue >15)){
+                            
                                 //console.log('详细...每过30秒执行一次'+_self.timerValue)
                                 _self.timerValue = 0
                                 //console.clear()
@@ -889,11 +929,11 @@ export default {
                },300);
 
             
-
+               //debugger
               _self.tableDataDetail = currentData
-              if(timer=='splice'){
-                _self.tableDataDetail.splice(this.detailFirstPrimaryKeyIndex,1) //删除换单单据
-              }
+              // if(timer=='splice'){
+              //   _self.tableDataDetail.splice(this.detailFirstPrimaryKeyIndex,1) //删除换单单据
+              // }
               
               if(_self.tableDataDetail.length>0){
 
@@ -1091,7 +1131,7 @@ export default {
                          //定时任务开启-》获取线别数据
                         _self.GetLineList('timerRun')
                         _self.timerValue+=1
-                    }, 2000)
+                    }, 1000)
 
                     //因为setInterval请求时间超过了设定的时间,此时会造成阻塞 解决方案:使用嵌套setTimeout
                    

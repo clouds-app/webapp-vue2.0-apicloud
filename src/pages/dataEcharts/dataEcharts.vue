@@ -91,7 +91,7 @@ export default {
                   EndDate:'',
                   barData: [],
                   currentMonthBarData:[],
-                  tempBarData:[...mockData] || [],
+                  tempBarData:[], //[...mockData] || 
                   currentDateType:'week',//当天 day （默认），本周 week，本月 month :null
                   currentSelectLineId:'', //当前选中线别
                   currentSelectClassId:'',//当前选中班别
@@ -165,13 +165,13 @@ export default {
            this.currentSelectLineId =lineId
    
           let currentData =this.dateFilter(this)
-          this.barData  = currentData
+          this.barData  =  this.dateToTimeAndSortByTime(currentData)
       },
         //过滤数据 班别
       filterDataByClassId(classId){
           this.currentSelectClassId = classId
          let currentData =this.dateFilter(this)
-          this.barData  = currentData
+          this.barData  =  this.dateToTimeAndSortByTime(currentData)
       },
       //字符串列表 转 数组 数字 列表
       strToArrayNum(itemList){
@@ -307,10 +307,27 @@ export default {
          }
 
          
-          _self.barData  = currentFilterData
-         // debugger
+          _self.barData  =  _self.dateToTimeAndSortByTime( currentFilterData)
+        
           return currentFilterData
           
+      },
+      //先将对象中的日期字段变成时间戳，然后通过sort()来排序
+      dateToTimeAndSortByTime(dataList){
+       // debugger
+          if(dataList.length>0){
+             let newDataList =dataList.map((item,index,arr)=>{  
+                //用/替换日期中的-是为了解决Safari的兼容
+                  arr[index].publishTimeNew =(new Date(item.PDate.replace(/-/g,'/'))).getTime()
+                  return arr[index]
+           
+             })
+             //sort()来排序
+             newDataList = newDataList.sort(function(a, b) {
+                                return b.publishTimeNew < a.publishTimeNew ? 1 : -1;
+                })
+             return  newDataList
+          }
       },
       //获取本周日期 列表
       getCurrentWeekList(){
