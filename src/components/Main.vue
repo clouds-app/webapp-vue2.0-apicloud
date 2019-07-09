@@ -21,6 +21,14 @@
          </div>
         <!-- <Footer/> -->
     </van-pull-refresh>
+    <van-popup v-model="showProcess">
+        <van-circle
+            v-model="currentRate"
+            :rate="0"
+            :speed="100"
+            :text="downLoadText"
+            />
+    </van-popup>
     </section>
 </template>
 <script>
@@ -40,6 +48,8 @@ export default {
     components:{NavBar,userStatus,Footer,marginLine},
     data(){
         return{
+            currentRate:0,//下载进度
+            showProcess: false,//是否显示下载进度条
             companyName:' 我 ',
             isLoading: false,
             hasAccess:false,
@@ -53,6 +63,11 @@ export default {
             statusCheck:getCookie('statusCheck'),
         }
     },
+     computed: {
+            downLoadText() {
+              return '下载'+this.currentRate.toFixed(0) + '%'
+            }
+     },
     methods:{
         //vant 下拉刷新
         onRefresh() {
@@ -198,6 +213,7 @@ export default {
                      isDone =true
                     // alert(1)
                       _self.appDownload(res.appUrl)
+                      
                     }).catch(() => {
                     // on cancel  
                      isDone =false
@@ -214,28 +230,47 @@ export default {
                     }).catch(() => {
                     // on cancel
                      isDone =false
+                      _self.checkLogin()
+                      _self.getCompanyName()
                     });      
          }       
       },
       //下载更新文件
       appDownload(downLoadUrl){
            //alert('下载开始....')
+           this.showProcess =true
+           let _self =this
            if (window.api.systemType == "android") {
                                     window.api.download({
                                         url : downLoadUrl,
                                         report : true
                                     }, function(ret, err) {
                                         if (ret && 0 == ret.state) {/* 下载进度 */
-                                            window.api.toast({
-                                                msg : "正在下载应用" + ret.percent + "%",
-                                                duration : 2000
-                                            });
+                                            // window.api.toast({
+                                            //     msg : "正在下载应用" + ret.percent + "%",
+                                            //     duration : 2000
+                                            // });
+                                            _self.currentRate = ret.percent
                                         }
                                         if (ret && 1 == ret.state) {/* 下载完成 */
+                                            _self.showProcess=false
                                             let savePath = ret.savePath;
                                             window.api.installApp({
                                                 appUri : savePath
                                             });
+                                        }else if (ret && 2 == ret.state)
+                                        {
+                                          this.$dialog.confirm({
+                                            title: '提示',
+                                            message: '更新失败，是否重新更新'
+                                            }).then(() => {
+                                                // on confirm
+                                                _self.appDownload(res.appUrl)
+                                            }).catch(() => {
+                                            // on cancel
+                                                _self.checkLogin()
+                                                _self.getCompanyName()
+                                            });      
                                         }
                                     });
                                 }
@@ -307,6 +342,15 @@ export default {
 }
 </script>
 <style scoped>
+
+.van-circle {
+    position: relative;
+    display: block;
+    text-align: center;
+}
+.van-popup--center{
+    border-radius: 50px;
+}
 .van-pull-refresh{
     height: calc(100vh - 50px);
 }
