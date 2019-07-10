@@ -1,5 +1,5 @@
-import { getGoodsList,getGoodsDetail,getQueryDatasList} from '@/api/serverData'
-import { setCookie,getCookie,setLocalStorage,getLocalStorage} from '@/libs/util'
+import { getGoodsList,getGoodsDetail,getQueryDatasList,getReportLinesAndClasses} from '@/api/serverData'
+import { setLocalStorage,getLocalStorage} from '@/libs/util'
 const serverBusyTips="服务繁忙，请稍后再试！";
 const serverDataZero="暂无数据";
 export default {
@@ -7,12 +7,14 @@ export default {
         goodsList:getLocalStorage('goodsList'),
         goodsDetail:getLocalStorage('goodsDetail'),
         goodsReport:getLocalStorage('goodsReport'),
+        goodsReportLineAndClass:getLocalStorage('goodsReportLineAndClass'),
     },
     getters:{
       
         goodsList_state:state=>state.goodsList,
         goodsDetail_state:state=>state.goodsDetail,
-        goodsReport_state:state=>state.goodsReport
+        goodsReport_state:state=>state.goodsReport,
+        goodsReportLineAndClass_state:state=>state.goodsReportLineAndClass
        // doneTodos: state => {//通过方法访问
       //   return state.todos.filter(todo => todo.done)
       // },
@@ -35,6 +37,11 @@ export default {
         setGoodsReport(state,data){
             state.goodsReport =data
             setLocalStorage('goodsReport',JSON.stringify(data))
+          },
+          //获取生产报表所有线别班别
+        setGoodsReportLineAndClass(state,data){
+            state.goodsReportLineAndClass =data
+            setLocalStorage('goodsReportLineAndClass',JSON.stringify(data))
           }
     },
     actions:{
@@ -75,7 +82,7 @@ export default {
         * @description 获取生产线详情
         * @params { line }
         */
-       getGoodsDetail_actions({commit},params){
+        getGoodsDetail_actions({commit},params){
         return new Promise((resolve,reject)=>{
             try {
                 getGoodsDetail(params).then(res=>{
@@ -111,6 +118,34 @@ export default {
                         {
                         resolve(data)
                         commit('setGoodsReport',data)
+                        }
+                        else
+                        {
+                        reject(serverDataZero+' '+data[0].Error)
+                        }
+                    }).catch(err=>{
+                        console.error(JSON.stringify(err))
+                        //reject(serverBusyTips)
+                        reject(serverDataZero)
+                    })
+                } catch (error) {
+                    console.error(JSON.stringify(error))
+                    reject(serverBusyTips)
+                // reject(serverDataZero +"::"+error)
+                }
+            
+            })
+        },
+        getReportLinesAndClasses_actions({commit},params){
+            return new Promise((resolve,reject)=>{
+                try {
+                    getReportLinesAndClasses(params).then(res=>{
+                        const data = process.env.NODE_ENV === 'production' ? res : res.data //因为web 浏览器 多封装了一层 data 包裹
+                        //debugger
+                        if(data.length > 0 && !data[0].Error) 
+                        {
+                        resolve(data)
+                        commit('setGoodsReportLineAndClass',data)
                         }
                         else
                         {

@@ -554,6 +554,7 @@ export default {
         },
    methods:{
           filterTopTenData(dataList){
+            //debugger
             if(this.deletedPrimaryKeyList.length>0){
                   return dataList.filter(item=>{
                         let flag = this.deletedPrimaryKeyList.indexOf(item.PrimaryKey)==-1 ? true : false
@@ -740,6 +741,7 @@ export default {
             this.pageIndex =1
            this.tableDataDetailPaging =[]
            this.timerValue = 0 //重置timerValue 当切换TAB的时候，防止重复查询详细详细
+           this.deletedPrimaryKeyList =[]
           },
           //获取速度和PrimaryKey
           getDataLinePrimaryKey(lineId){
@@ -765,6 +767,7 @@ export default {
             }
             let lineKey= this.currentTipPrimaryKey
             let detailKey = this.tableDataDetail[this.detailFirstPrimaryKeyIndex].PrimaryKey
+           
             if(lineKey!="" && detailKey !="" && lineKey!=detailKey){
               //this.$toast(`已经换单，请重新刷新详细数据`);
              // this.GetLineDetailList(this.currentIndex,'splice') //详细 30秒 更新一次
@@ -777,16 +780,24 @@ export default {
           },
           //存储前10PK
           handleTopTenFK(currentKey){
+                 
             //debugger
             let flag = this.deletedPrimaryKeyList.indexOf(currentKey)
-            if(flag==-1){
-                   if(this.deletedPrimaryKeyList.length<10){
-                    this.deletedPrimaryKeyList.push(currentKey)
-                    }else{
-                      //shift 方法用于把数组的第一个元素从其中删除，并返回第一个元素的值。
-                      this.deletedPrimaryKeyList.shift() //该方法不创建新数组，而是直接修改原有的 arrayObject
+                   if(flag==-1){
+                   if(this.deletedPrimaryKeyList.length>1){
+                       this.deletedPrimaryKeyList.length =0
+                       this.deletedPrimaryKeyList.push(currentKey)
+                   }else{
                       this.deletedPrimaryKeyList.push(currentKey)
-                    }
+                   }
+                 
+                  //  if(this.deletedPrimaryKeyList.length<10){
+                  //   this.deletedPrimaryKeyList.push(currentKey)
+                  //   }else{
+                  //     //shift 方法用于把数组的第一个元素从其中删除，并返回第一个元素的值。
+                  //     this.deletedPrimaryKeyList.shift() //该方法不创建新数组，而是直is.deletedPrimaryKeyList.shift() //该方法不创建新数组，而接修改原有的 arrayObject
+                  //     this.deletedPrimaryKeyList.push(currentKey)
+                  //   }
             }
        
           },

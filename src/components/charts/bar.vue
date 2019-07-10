@@ -49,13 +49,13 @@ export default {
         }
 
         //车速=生产米数/生产时间     车速单位：米/秒
-        let runSpeed = 0
-        if(itemList[item].ProdTime!="" && itemList[item].ProdTime!="0"){
-          let up1= Number.parseFloat(itemList[item].FinishLength)
-          let down1 =Number.parseFloat(itemList[item].ProdTime)
-          runSpeed= up1/down1
-          runSpeed = runSpeed.toFixed(2)
-        }
+        let runSpeed = itemList[item].AvgSpeed
+        // if(itemList[item].ProdTime!="" && itemList[item].ProdTime!="0"){
+        //   let up1= Number.parseFloat(itemList[item].FinishLength)
+        //   let down1 =Number.parseFloat(itemList[item].ProdTime)
+        //   runSpeed= up1/down1
+        //   runSpeed = runSpeed.toFixed(2)
+        // }
        
        let currentData = new Date()
        let currentYear=  currentData.getFullYear()
@@ -121,7 +121,31 @@ export default {
           // 相对位置，放置在容器正中间
           position: ['50%', '5%']
         },
-      
+        //  dataZoom: [
+        //     {
+        //         type: 'slider',
+        //         show: true,
+        //         start: 94,
+        //         end: 100,
+        //         handleSize: 18
+        //     },
+        //     {
+        //         type: 'inside',
+        //         start: 94,
+        //         end: 100
+        //     },
+        //     {
+        //         type: 'slider',
+        //         show: true,
+        //         yAxisIndex: 0,
+        //         filterMode: 'empty',
+        //         width: 12,
+        //         height: '70%',
+        //         handleSize: 8,
+        //         showDataShadow: false,
+        //         left: '93%'
+        //     }
+        // ],
         dataset: {
             // 提供一份数据。
             dimensions:  ['product', '面积', '米数', '车速','损耗','停次'],

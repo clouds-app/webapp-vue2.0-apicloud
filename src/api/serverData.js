@@ -60,13 +60,26 @@ export const getGoodsList = ({timer}) => {
 
 /**
 * @description 获取生产报表数据列表
-* @params {storedProcedureName,StartDate,EndDate}
+* @params {storedProcedureName,StartDate,EndDate,LineID,ClassID,DateGroupBy}
+* @url  /API/GetQueryDatas&spAppXLAanlyzer&@StartDate=2019-07-01&@EndDate=2019-07-10&@LineID=&@ClassID=&@DateGroupBy=0
 */
-  export const getQueryDatasList = ({storedProcedureName,StartDate,EndDate}) =>{
+  export const getQueryDatasList = ({storedProcedureName,StartDate,EndDate,LineID,ClassID,DateGroupBy}) =>{
     //debugger
     //参数
     let data = {
       //storedProcedureName,StartDate,EndDate
+    }
+    let LineIDStr =''
+    if(LineID && LineID!=null){
+      LineIDStr='&@LineID='+LineID
+    }
+    let ClassIDStr =''
+    if(ClassID&& ClassID!=null){
+      ClassIDStr='&@ClassID='+ClassID
+    }
+    let DateGroupByStr =''
+    if(DateGroupBy!=null){
+      DateGroupByStr='&@DateGroupBy='+DateGroupBy
     }
     storedProcedureName ='spAppXLAanlyzer'
     if(process.env.NODE_ENV === 'production'){
@@ -75,7 +88,8 @@ export const getGoodsList = ({timer}) => {
     } 
 
     return axiosServer.request({
-      url: `${api}/GetQueryDatas&${storedProcedureName}&${StartDate}&${EndDate}`,
+     
+      url: `${api}/GetQueryDatas&${storedProcedureName}&@StartDate=${StartDate}&@EndDate=${EndDate}${LineIDStr}${ClassIDStr}${DateGroupByStr}`,
       data,
       method: 'post',
       // transformRequest: [function (data) {
@@ -85,5 +99,33 @@ export const getGoodsList = ({timer}) => {
     })
 
   }
+
+  /**
+* @description 获取生产报表所有线别班别数据列表
+* @params {storedProcedureName}
+*/
+export const getReportLinesAndClasses = ({storedProcedureName}) =>{
+  //debugger
+  //参数
+  let data = {
+    //storedProcedureName,
+  }
+  storedProcedureName ='spGetAppXLAanlyzerLinesAndClasses'
+  if(process.env.NODE_ENV === 'production'){
+    //apiCloud 参数传递封装，其它另行处理，参考：https://docs.apicloud.com/Client-API/api#3  ajax
+    data= {values: data} 
+  } 
+
+  return axiosServer.request({
+    url: `${api}/GetQueryDatas&${storedProcedureName}&`,
+    data,
+    method: 'post',
+    // transformRequest: [function (data) {
+    //   // 对 data 进行任意转换处理
+    //   return Qs.stringify(data)
+    // }],
+  })
+
+}
 
 
