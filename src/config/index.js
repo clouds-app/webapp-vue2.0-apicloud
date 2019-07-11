@@ -34,7 +34,7 @@ export default {
      */
     baseUrl: {
       dev: '',
-      pro: 'http://shop.szclsoft.com/clerp-getway-admin'
+      pro: 'http://pmc.szclsoft.com'
     },
      /**
      * @description 生管数据api请求基础路径 

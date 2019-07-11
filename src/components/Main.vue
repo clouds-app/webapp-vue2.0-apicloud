@@ -284,7 +284,7 @@ export default {
       //获取服务app版本信息,
       getServiceVerInfo(){
             let _self=this
-            let currentVersion = '0.1.0'
+            let currentVersion = '1.1.0'
             if(isApp){
                 //currentVersion:1.3.29
                 currentVersion =  window.api.appVersion 

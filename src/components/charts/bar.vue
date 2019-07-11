@@ -12,13 +12,17 @@ echarts.registerTheme('tdTheme', tdTheme)
 export default {
   name: 'ChartBar',
   props: {
+    sortGroup:{
+         type:String,
+         default:'天'
+    },
     value: Array,
     text: String,
     subtext: String
   },
   data () {
     return {
-      dom: null
+      dom: null, yAxisUnit:'面积'
     }
   },
   watch:{
@@ -87,10 +91,36 @@ export default {
       }  
       return seriesArray
    },
+   //处理Y 轴 单位 
+   handleYAxisUnit(params){
+        //debugger
+        switch(params.name){
+               case '面积':
+              this.yAxisUnit ='面积'
+              break;
+                case '米数':
+              this.yAxisUnit ='米数'
+              break;
+                case '车速':
+              this.yAxisUnit ='车速'
+              break;
+                case '损耗':
+              this.yAxisUnit ='损耗'
+              break;
+               case '停次':
+              this.yAxisUnit ='停次'
+              break;
+              default:
+             this.yAxisUnit ='面积'
+                 break;
+          }
+   },
    //初始化数据
    initData(){
        let _self = this
        let tempValue =this.value
+       let sortGroup =this.sortGroup
+       let yAxisUnit =this.yAxisUnit
        //debugger
        if(tempValue){
             let seriesData = _self.getSeriesData(tempValue)
@@ -121,52 +151,37 @@ export default {
           // 相对位置，放置在容器正中间
           position: ['50%', '5%']
         },
-        //  dataZoom: [
-        //     {
-        //         type: 'slider',
-        //         show: true,
-        //         start: 94,
-        //         end: 100,
-        //         handleSize: 18
-        //     },
-        //     {
-        //         type: 'inside',
-        //         start: 94,
-        //         end: 100
-        //     },
-        //     {
-        //         type: 'slider',
-        //         show: true,
-        //         yAxisIndex: 0,
-        //         filterMode: 'empty',
-        //         width: 12,
-        //         height: '70%',
-        //         handleSize: 8,
-        //         showDataShadow: false,
-        //         left: '93%'
-        //     }
-        // ],
+         dataZoom: [
+            {
+                type: 'slider',
+                show: true,
+                start: 94,
+                end: 100,
+                handleSize: 18
+            },
+            {
+                type: 'inside',
+                start: 94,
+                end: 100
+            },
+            {
+                type: 'slider',
+                show: true,
+                yAxisIndex: 0,
+                filterMode: 'empty',
+                width: 12,
+                height: '70%',
+                handleSize: 8,
+                showDataShadow: false,
+                left: '93%'
+            }
+        ],
         dataset: {
             // 提供一份数据。
             dimensions:  ['product', '面积', '米数', '车速','损耗','停次'],
             //dimensions:  ['product', 'LineID','ClassID', 'PDate','FinishArea','BadArea','FinishLength', 'BadLength','FinishWt','BadWt', 'BreakCount','BreakTime','ProdTime', 'BadRate','AvgSpeed'],
             source: seriesData
-            // source: [
-            //     ['6月1', 43.3, 85.8, 2193.7],
-            //     ['6月2', 83.1, 73.4, 55.1],
-            //     ['6月3', 86.4, 65.2, 82.5],
-            //     ['6月4', 72.4, 53.9, 1239.1],
-            //     ['6月5', 72.4, 53.9, 39.1],
-            //     ['6月6', 72.4, 353.9, 339.1],
-            //     ['6月7', 72.4, 253.9, 39.1],
-            //     ['6月8', 43.3, 85.8, 193.7],
-            //     ['6月9', 83.1, 73.4, 55.1],
-            //     ['6月13', 86.4, 265.2, 1182.5],
-            //     ['6月14', 72.4, 253.9, 239.1],
-            //     ['6月15', 72.4, 53.9, 39.1],
-            //     ['6月16', 72.4, 53.9, 339.1],
-            //     ['6月17', 72.4, 53.9, 39.1],
-            // ]
+          
         },
         // title: {
         // text: this.text,
@@ -175,20 +190,55 @@ export default {
         // y: 0
         // },
         // 声明一个 X 轴，类目轴（category）。默认情况下，类目轴对应到 dataset 第一列。
-        xAxis: {type: 'category'},
+        xAxis: [
+               {type: 'category', name: `(${sortGroup})`},
+               ],
         // 声明一个 Y 轴，数值轴。
-         yAxis:{},
+          yAxis:{},
         // yAxis: [
         //     {
-        //         type: 'value',
-        //         name: 'GDP（亿元）'
+        //         name: `${yAxisUnit}`
         //     }
         // ],
         // 声明多个 bar 系列，默认情况下，每个系列会自动对应到 dataset 的每一列。
         series: _self.getSeriesCount(5)
     }
       this.dom = echarts.init(this.$refs.dom, 'tdTheme')
+
+      // 图例开关的行为只会触发 legendselectchanged 事件
+   
+      // this.dom.on('legendselectchanged', (params)=>{
+      //     let _that =this
+      //     // 获取点击图例的选中状态
+      //     let isSelected = params.selected[params.name];
+      //     // _that.handleYAxisUnit(params)
+      //      //option.yAxis.name='BBBBB'
+      //     // console.log(option)
+      //     switch(params.name){
+      //          case '面积':
+      //         option.yAxis.name ='面积'
+      //         break;
+      //           case '米数':
+      //         option.yAxis.name ='米数'
+      //         break;
+      //           case '车速':
+      //        option.yAxis.name ='车速'
+      //         break;
+      //           case '损耗':
+      //        option.yAxis.name ='损耗'
+      //         break;
+      //          case '停次':
+      //         option.yAxis.name='停次'
+      //         break;
+      //         default:
+      //        option.yAxis.name ='面积'
+      //            break;
+      //     }
+      //     _that.dom.setOption(option)
+      // });
+
       this.dom.setOption(option)
+
       on(window, 'resize', this.resize)
     }
      

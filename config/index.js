@@ -20,7 +20,7 @@ module.exports = {
       //   }
       // }
       '/api': {
-        target: 'http://shop.szclsoft.com/clerp-getway-admin/api/', //对应自己的接口
+        target: 'http://pmc.szclsoft.com/api/', //对应自己的接口
         changeOrigin: true,//是否跨域
         ws: true,
         pathRewrite: {
@@ -28,7 +28,7 @@ module.exports = {
         }
       },
       '/apk': {
-        target: 'http://120.78.91.203:12689/api/', //对应自己的接口
+        target: 'http://120.76.102.113:12689/api/', //对应自己的接口 120.76.102.113:12689" http://120.78.91.203:12689/api/
         changeOrigin: true,//是否跨域
         ws: true,
         pathRewrite: {

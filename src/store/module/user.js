@@ -66,7 +66,7 @@ export default {
       * @params { systemId,deviceId } 
       */
       handleCheckLogin ({commit}, params) {
-        //debugger
+        debugger
         return new Promise((resolve, reject) => {
           try {
             checkLogin(params).then(res => {
@@ -87,7 +87,7 @@ export default {
               }
               else
               {
-               // debugger
+               debugger
                 let errData=data.data  //到期续费的 需要重新赋值setUserInfo
                 if(errData!=null){
                   commit('setUserInfo',data.data)

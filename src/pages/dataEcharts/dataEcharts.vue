@@ -81,7 +81,7 @@
       </van-col>
     </van-row>
     <div class="subButton">
-      <chart-bar style="min-height:268px;height:auto;" :value="barData" text="生产报表图" />
+      <chart-bar style="min-height:268px;height:auto;" :sortGroup='sortGroup' :value="barData" text="生产报表图" />
     </div>
     <div class="lineButton" id="lineButton">
       <div>
@@ -160,6 +160,7 @@ export default {
   },
   data() {
     return {
+      sortGroup:'天',
       DateGroupBy:0,//0 天，1 周 ，2 月 分组
       myChargeListDetail: {},
       isSearchData: false,
@@ -215,8 +216,8 @@ export default {
         let date1 = this.stringToDate(this.StartDate);
         let date2 = this.stringToDate(this.EndDate);
         let diff = dataDiff("d", date1, date2);
-        if (diff > 31) {
-          msg = "时间间隔不能超过30天";
+        if (diff > 730) {
+          msg = "时间间隔不能超过2年";
           flag = false;
         }
         if (diff < 0) {
@@ -312,6 +313,7 @@ export default {
         // this.currentSelectClassId = ""; //当前选中班别
         // this.currentSelectLineId = ""; //当前选中线别
         this.DateGroupBy = 0
+        this.sortGroup ='天'
 
         // this.StartDate = this.getCurrentData().toString();
         // this.EndDate = this.getCurrentData().toString();
@@ -319,6 +321,7 @@ export default {
         // this.currentSelectClassId = ""; //当前选中班别
         // this.currentSelectLineId = ""; //当前选中线别
         this.DateGroupBy = 1
+         this.sortGroup ='周'
         // this.StartDate = this.getCurrentWeekList()[0]
         //   .replace("/", "-")
         //   .replace("/", "-"); //本周第一天
@@ -328,6 +331,7 @@ export default {
         // this.StartDate = this.getCurrentMonthList()[0]; //本月第一天
         // this.EndDate = this.getCurrentData().toString();
         this.DateGroupBy = 2
+         this.sortGroup ='月'
       }
       //如果列表没有数据，需要重新查询_self.currentMonthBarData
       // if (this.currentMonthBarData.length == 0) {

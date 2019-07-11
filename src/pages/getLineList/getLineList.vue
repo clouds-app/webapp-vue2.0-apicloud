@@ -80,6 +80,8 @@ export default {
   },
    data() {
             return {
+                 lineTimerTime:1000,
+                 currentLineStatus:-1, //当前线别运行状态
                  pageIndex: 1,
                  pageSize: 50,
                  total:'',
@@ -532,8 +534,8 @@ export default {
                            }
                         }
                     },
-                  
-                      {field: 'OrderNo', title: '样式设置', width: 0.1,
+                        //样式控制 多行 双刀 单刀
+                      {field: 'OrderNo', title: '', width: 0.1,
                      formatter: function (rowData, index) {
 
                           if(rowData.IsDblCut==1){
@@ -546,12 +548,7 @@ export default {
                     ]
             }
         },
-   activated(){
-        //在vue对象存活的情况下，进入当前存在activated()函数的页面时，一进入页面就触发；可用于初始化页面数据等
-       // this.$refs.wrapper.scrollTop = this.scroll
-        //this.$refs['dataTableDetail'].scrollToTop = this.scroll
-        //console.log('scrollToTop:'+ this.$refs['dataTableDetail'].scrollToTop)
-        },
+  
    methods:{
           filterTopTenData(dataList){
             //debugger
@@ -565,7 +562,7 @@ export default {
             }
           },
           getTableData() {
-           // debugger
+            //debugger
            let tableDataDetail =this.filterTopTenData(this.tableDataDetail)
            let currentPageData =[]
            this.total = tableDataDetail.length;
@@ -577,8 +574,9 @@ export default {
                 for(let i =1;i<=this.pageIndex;i++){
                     currentPageData = tableDataDetail.slice(
                     (i - 1) * this.pageSize,
-                    ((i * this.pageSize) >this.total ? this.total:(i * this.pageSize))
-                   )}
+                    ((i * this.pageSize) >this.total ? this.total:(i * this.pageSize)))
+                     this.tableDataDetailPaging.push(...currentPageData)
+                   }
            }else{
                 if(this.setPageDataWhenFirstOrLast(tableDataDetail)){
                    return
@@ -587,8 +585,9 @@ export default {
                 (this.pageIndex - 1) * this.pageSize,
                 ((this.pageIndex * this.pageSize) >this.total ? this.total:(this.pageIndex * this.pageSize))
                )
+               this.tableDataDetailPaging.push(...currentPageData)
            }
-            this.tableDataDetailPaging.push(...currentPageData)
+           
           },
           //首页或末页数据控制
           setPageDataWhenFirstOrLast(tableDataDetail){
@@ -751,10 +750,16 @@ export default {
              this.currentTipPrimaryKey = currentLineItem[0].PrimaryKey
              this.currentAvgSpeed = currentLineItem[0].SetAvgSpeed ////设定平均车速， 用来计算预估完工时间
              this.IsDblCut = currentLineItem[0].IsDblCut //是否双刀
+             this.currentLineStatus =currentLineItem[0].LineStatus
              if( this.currentAvgSpeed <=0){
                 this.currentAvgSpeed = 120
              }
-             this.comparePrimaryKey()
+             //debugger
+             if(this.currentLineStatus == type.line_status_working){
+             
+                this.comparePrimaryKey()
+
+             }
              this.addDoneTime(this.setDoneTime)
           },
           //比较PrimaryKey 如果不一致即为换单，立即刷新详细单据
@@ -878,8 +883,12 @@ export default {
               //console.warn(JSON.stringify(currentData))
               _self.tableData = _self.filterLine(currentData) 
               if(_self.tableData.length>0){
-
+                   
                     if(timer!="" && timer!=null){
+                        //  if(this.currentLineStatus != type.line_status_working){
+                        //     _self.timerValue = 0
+                        //     return  //不在运行状态 不查询
+                        //  }
                            if((_self.timerValue==15 || _self.timerValue >15)){
                             
                                 //console.log('详细...每过30秒执行一次'+_self.timerValue)
@@ -949,9 +958,12 @@ export default {
               if(_self.tableDataDetail.length>0){
 
                   _self.getClassDoneTime(_self.tableDataDetail)
+                      this.tableDataDetailPaging=[] //刷新的时候，数据重置为0
+                        _self.getTableData() //分页数据开始
+                  //  if(_self.currentLineStatus == type.line_status_working){
+                     
+                  //  }
 
-                  this.tableDataDetailPaging=[] //刷新的时候，数据重置为0
-                  _self.getTableData() //分页数据开始
               }else{
                  _self.errorContent ='暂无数据'
               }
@@ -1142,7 +1154,7 @@ export default {
                          //定时任务开启-》获取线别数据
                         _self.GetLineList('timerRun')
                         _self.timerValue+=1
-                    }, 1000)
+                    }, _self.lineTimerTime)
 
                     //因为setInterval请求时间超过了设定的时间,此时会造成阻塞 解决方案:使用嵌套setTimeout
                    
