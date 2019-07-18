@@ -20,6 +20,7 @@
                           titleBgColor="#1989fa"
                           id="dataTableLine"
                           ref="dataTableLine"
+                          :title-row-height='22'
                           is-vertical-resize
                           style="width:100%;"
                           is-horizontal-resize
@@ -41,6 +42,8 @@
                               <v-table
                               titleBgColor="#1989fa"
                               :is-vertical-resize="true"
+                              :title-row-height='22'
+                              :row-height="rowheightOfDetail"
                               :style="`width:100%;`"
                               :is-horizontal-resize="true"
                               :vertical-resize-offset='resizeOffset'
@@ -80,6 +83,7 @@ export default {
   },
    data() {
             return {
+                 rowheightOfDetail:20, //详细数据表格行高，双刀时 应设置为40 
                  lineTimerTime:1000,
                  currentLineStatus:-1, //当前线别运行状态
                  pageIndex: 1,
@@ -108,7 +112,7 @@ export default {
                  timerValue: 0,//测试 定时器
                  myChargeListDetail:{},
                  resizeOffset:1,
-                 virtualMarginHeight:'126px', //区分真机和网页的不兼容问题
+                 virtualMarginHeight:'110px', //区分真机和网页的不兼容问题
                  dataWindowH: window.innerHeight || document.body.clientHeight,
                  currentIndex:1,//默认查询详细线别LineId
                  tableWidth:window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
@@ -422,7 +426,12 @@ export default {
                   columnsDetail:[ 
                     {field: 'OrderNo', title: '序号', width: 40, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
-                         return '<div style="line-height: 40px !important;"><span>' +(index+1) + '</span></div>'
+                        
+                         if(rowData.IsDblCut==1){
+                               return '<div style="line-height: 40px !important;"><span>' +(index+1) + '</span></div>'
+                           }else{
+                               return '<div style="line-height: 20px !important;"><span>' +(index+1) + '</span></div>'
+                           }
                         }
                       },
                      {field: 'OrderNo', title: '订单号', width: 120, titleAlign: 'center',columnAlign:'right',isResize:true,
@@ -447,8 +456,12 @@ export default {
                    
                     {field: 'ArtID', title: '纸质', width: 80, titleAlign: 'center',columnAlign:'left',isResize:true,
                      formatter: function (rowData, index) {
-                         
-                            return '<div style="line-height: 40px !important;"><span>' + (rowData.ArtID) +'('+ (rowData.ArtLB)+ ')' + '</span></div>'
+                           if(rowData.IsDblCut==1){
+                                 return '<div style="line-height: 40px !important;"><span>' + (rowData.ArtID) +'('+ (rowData.ArtLB)+ ')' + '</span></div>'
+                           }else{
+                                 return '<div style="line-height: 20px !important;"><span>' + (rowData.ArtID) +'('+ (rowData.ArtLB)+ ')' + '</span></div>'
+                           }
+                          
                         }},
                     // {field: 'ArtLB', title: '楞别', width: 40, titleAlign: 'center',columnAlign:'center',
                     //  formatter: function (rowData, index) {
@@ -482,7 +495,12 @@ export default {
                         }},
                       {field: 'TotalWidthmm', title: '门幅',width: 40, titleAlign: 'center',columnAlign:'center',
                      formatter: function (rowData, index) {
-                          return '<div style="line-height: 40px !important;"><span>' + rowData.TotalWidthmm + '</span></div>'
+                        
+                           if(rowData.IsDblCut==1){
+                                   return '<div style="line-height: 40px !important;"><span>' + rowData.TotalWidthmm + '</span></div>'
+                           }else{
+                                  return '<div style="line-height: 20px !important;"><span>' + rowData.TotalWidthmm + '</span></div>'
+                           }
                         }},
                     {field: 'Cut', title: '剖', width: 30, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
@@ -499,12 +517,22 @@ export default {
                           if(!!rowData.curDoneTime){
                              curDoneTime = rowData.curDoneTime
                           }
-                          return '<div style="line-height: 40px !important;"><span>' + (curDoneTime) + '</span></div>'
+                         
+                            if(rowData.IsDblCut==1){
+                                   return '<div style="line-height: 40px !important;"><span>' + (curDoneTime) + '</span></div>'
+                           }else{
+                                  return '<div style="line-height: 20px !important;"><span>' + (curDoneTime) + '</span></div>'
+                           }
                         }
                         },
                     {field: 'MainCutLen', title: '总长', width: 50, titleAlign: 'center',columnAlign:'right',
                      formatter: function (rowData, index) {
-                             return '<div style="line-height: 40px !important;"><span>' + (Number(rowData.MainCutLen)/1000).toFixed(0) + '</span></div>'
+                            
+                               if(rowData.IsDblCut==1){
+                                    return '<div style="line-height: 40px !important;"><span>' + (Number(rowData.MainCutLen)/1000).toFixed(0) + '</span></div>'
+                                }else{
+                                        return '<div style="line-height: 20px !important;"><span>' + (Number(rowData.MainCutLen)/1000).toFixed(0) + '</span></div>'
+                                }
                         }
                     },
                      {field: 'CustName', title:'客户PO号', width: 80, titleAlign: 'center',columnAlign:'left',
@@ -537,19 +565,22 @@ export default {
                         //样式控制 多行 双刀 单刀
                       {field: 'OrderNo', title: '', width: 0.1,
                      formatter: function (rowData, index) {
-
                           if(rowData.IsDblCut==1){
                                 return '<style>#dataTableDetail .v-table-body-cell{line-height: 20px !important;} #dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >'
                            }else{
-                               return '<style>#dataTableDetail .v-table-body-cell{line-height: 40px !important;} #dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >'
+                               return '<style>#dataTableDetail .v-table-body-cell{line-height: 20px !important;} #dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >'
                            } 
-                        }
+                          }
                         },
+                      
                     ]
             }
         },
   
    methods:{
+          MyFunctionTest(){
+            console.log('hello world')
+          },
           filterTopTenData(dataList){
             //debugger
             if(this.deletedPrimaryKeyList.length>0){
@@ -812,7 +843,8 @@ export default {
              this.IsDblCutLineCss ="<style>#dataTableLine .v-table-body-cell{line-height: 20px !important;}</style >"
              let _self= this
              setTimeout(function(){
-                      if(_self.IsDblCut==1){
+                      if(_self.IsDblCut==1){ //双刀
+                         _self.rowheightOfDetail = 40
                         _self.IsDblCutLineCss ="<style>#dataTableLine .v-table-body-cell{line-height: 13px !important;}</style >"
                       }
                },100);
@@ -1196,7 +1228,7 @@ export default {
       //    // this.dataWindowH =
       //  })
        if(isApp){
-         this.virtualMarginHeight ='126px'
+         this.virtualMarginHeight ='110px'
          this.resizeOffset=-1
        }
       this.$nextTick(()=>{
